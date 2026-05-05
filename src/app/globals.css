@@ -1,26 +1,374 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Design Tokens ───────────────────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  --color-bg: #0a0900;
+  --color-surface: #111100;
+  --color-surface-2: #1c1a00;
+  --color-surface-hover: #2e2a00;
+  --color-border: #2e2a00;
+  --color-border-subtle: #1c1a00;
+  --color-text: #f5f0d0;
+  --color-text-secondary: #c8b96a;
+  --color-text-muted: #9e8f45;
+  --color-primary: #ffc700;
+  --color-primary-dark: #e6b400;
+  --color-primary-text: #000;
+  --color-primary-soft: rgba(255, 199, 0, 0.08);
+  --color-primary-soft-strong: rgba(255, 199, 0, 0.16);
+  --color-primary-border: rgba(255, 199, 0, 0.32);
+  --color-warning: #ff9900;
+  --color-warning-bg: rgba(255, 153, 0, 0.14);
+  --color-warning-bg-strong: rgba(255, 153, 0, 0.22);
+  --color-warning-border: rgba(255, 153, 0, 0.34);
+  --color-warning-text: #ffd08a;
+  --color-danger: #ff4444;
+  --color-danger-bg: rgba(255, 68, 68, 0.14);
+  --color-danger-bg-strong: rgba(255, 68, 68, 0.22);
+  --color-danger-border: rgba(255, 68, 68, 0.34);
+  --color-danger-text: #ffb3b3;
+  --color-danger-surface: #3d0000;
+  --color-danger-surface-hover: #5a0000;
+  --color-danger-button-text: #ffb3b3;
+  /* Verde semântico */
+  --color-success: #4ade80;
+  --color-success-bg: rgba(74, 222, 128, 0.12);
+  --color-success-border: rgba(74, 222, 128, 0.30);
+  --color-success-text: #4ade80;
+  /* Toggle */
+  --color-toggle-track-off: #2e2a00;
+  --color-toggle-knob: #f5f0d0;
+  --color-scrollbar-thumb: #2e2a00;
+  --color-skeleton-base: #1c1a00;
+  --color-skeleton-highlight: #2e2a00;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="light"] {
+  --color-bg: #ffc700;
+  /* Surfaces brancas — alto contraste sobre fundo amarelo */
+  --color-surface: #ffffff;
+  --color-surface-2: #fff8e6;
+  --color-surface-hover: #fff0cc;
+  --color-border: rgba(0, 0, 0, 0.13);
+  --color-border-subtle: rgba(0, 0, 0, 0.07);
+  --color-text: #000000;
+  --color-text-secondary: #2d1f00;
+  --color-text-muted: #5a3e00;
+  --color-primary: #1a1200;
+  --color-primary-dark: #000000;
+  --color-primary-text: #ffc700;
+  --color-primary-soft: rgba(0, 0, 0, 0.06);
+  --color-primary-soft-strong: rgba(0, 0, 0, 0.11);
+  --color-primary-border: rgba(0, 0, 0, 0.18);
+  /* Verde semântico — não confunde com --color-primary */
+  --color-success: #16a34a;
+  --color-success-bg: rgba(22, 163, 74, 0.10);
+  --color-success-border: rgba(22, 163, 74, 0.28);
+  --color-success-text: #15803d;
+  --color-warning: #b84500;
+  --color-warning-bg: rgba(184, 69, 0, 0.10);
+  --color-warning-bg-strong: rgba(184, 69, 0, 0.18);
+  --color-warning-border: rgba(184, 69, 0, 0.26);
+  --color-warning-text: #7a2f00;
+  --color-danger: #cc0000;
+  --color-danger-bg: rgba(204, 0, 0, 0.09);
+  --color-danger-bg-strong: rgba(204, 0, 0, 0.16);
+  --color-danger-border: rgba(204, 0, 0, 0.26);
+  --color-danger-text: #7a0000;
+  --color-danger-surface: #cc0000;
+  --color-danger-surface-hover: #a60000;
+  --color-danger-button-text: #fff4f4;
+  /* Toggle */
+  --color-toggle-track-off: rgba(0, 0, 0, 0.22);
+  --color-toggle-knob: #ffffff;
+  --color-scrollbar-thumb: rgba(0, 0, 0, 0.25);
+  --color-skeleton-base: rgba(0, 0, 0, 0.07);
+  --color-skeleton-highlight: rgba(0, 0, 0, 0.13);
+
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ─── Typography scale ─────────────────────────────────────────────────── */
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ─── Card component ───────────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-interactive {
+  transition: border-color 150ms, box-shadow 150ms, transform 100ms;
+}
+
+.card-interactive:hover {
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.card-interactive:active {
+  transform: scale(0.99);
+}
+
+/* ─── Button base ───────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  padding: 10px 18px;
+  transition: background-color 150ms, border-color 150ms, color 150ms, opacity 150ms, transform 100ms;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.btn-danger {
+  background: var(--color-danger-surface);
+  color: var(--color-danger-button-text);
+  border: 1px solid var(--color-danger-border);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-surface-hover);
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  font-size: 1rem;
+  padding: 14px 24px;
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Form inputs ───────────────────────────────────────────────────────── */
+.input {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  width: 100%;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ─── Badge / Chip ──────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+}
+
+.badge-green {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  border: 1px solid var(--color-success-border);
+}
+
+.badge-amber {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border: 1px solid var(--color-warning-border);
+}
+
+.badge-red {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border: 1px solid var(--color-danger-border);
+}
+
+.badge-gray {
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+/* ─── Section label ─────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+/* ─── Divider ───────────────────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border-subtle);
+  margin: 0;
+}
+
+/* ─── Safe area (iOS bottom notch) ──────────────────────────────────────── */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+/* ─── Skeleton loading ──────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-base) 25%,
+    var(--color-skeleton-highlight) 50%,
+    var(--color-skeleton-base) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Video / media ─────────────────────────────────────────────────────── */
+video {
+  display: block;
+}
+
+/* ─── Tab highlight suppression (mobile) ───────────────────────────────── */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
