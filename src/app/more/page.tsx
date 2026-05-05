@@ -6,6 +6,7 @@ const MORE_ITEMS = [
   { href: "/injuries",  icon: "🩹", label: "Gerir Lesões",          desc: "Protocolos McGill, McKenzie e outros" },
   { href: "/plans",     icon: "📅", label: "Planos Semanais",       desc: "Organizar treinos por dia da semana" },
   { href: "/equipment", icon: "⚙",  label: "Meus Equipamentos",     desc: "Selecionar o que você tem disponível" },
+  { href: "/sync",      icon: "🔄", label: "Sincronizar",           desc: "Strava e Apple Health" },
 ];
 
 export default function MorePage() {

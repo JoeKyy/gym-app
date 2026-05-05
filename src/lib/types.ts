@@ -132,6 +132,12 @@ export interface WorkoutSession {
   exercises: ExerciseLog[];
   rating?: 1 | 2 | 3 | 4 | 5; // session feel
   notes?: string;
+  // ─── Health / external sync ───────────────────────────────────────────────
+  heartRateAvg?: number;       // bpm
+  heartRateMax?: number;       // bpm
+  calories?: number;           // kcal (active calories)
+  stravaActivityId?: string;   // prevents duplicate exports
+  externalSource?: "strava" | "apple_health";
 }
 
 // ─── Workout Suggestion ───────────────────────────────────────────────────────

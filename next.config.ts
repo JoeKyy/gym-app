@@ -37,8 +37,8 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
-  // Images don't need optimization for static export
   images: { unoptimized: true },
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);

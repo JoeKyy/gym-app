@@ -235,6 +235,25 @@ export default function ProgressPage() {
                           <span>· {"⭐".repeat(session.rating)}</span>
                         )}
                       </div>
+                      {/* Health metrics row */}
+                      {(session.heartRateAvg || session.calories) && (
+                        <div className="flex items-center gap-2 mt-1 text-xs">
+                          {session.heartRateAvg && (
+                            <span className="text-red-400">
+                              ❤️ {session.heartRateAvg}
+                              {session.heartRateMax ? `–${session.heartRateMax}` : ""} bpm
+                            </span>
+                          )}
+                          {session.calories && (
+                            <span className="text-orange-400">🔥 {session.calories} kcal</span>
+                          )}
+                          {session.externalSource && (
+                            <span className="text-[var(--color-text-muted)]">
+                              · {session.externalSource === "strava" ? "🚴 Strava" : "🍎 Health"}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleDelete(session.id)}
