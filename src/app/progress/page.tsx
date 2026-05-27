@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { getSessions, deleteSession } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
+import BodyMapImage from "@/components/BodyMapImage";
 import type { WorkoutSession, Exercise } from "@/lib/types";
 
 const DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -21,6 +22,7 @@ function formatDuration(min?: number): string {
 export default function ProgressPage() {
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [exercises, setExercises] = useState<Map<string, Exercise>>(new Map());
+  const [bodyMapPeriod, setBodyMapPeriod] = useState<"7d" | "30d" | "all">("30d");
 
   useEffect(() => {
     setSessions(getSessions().sort((a, b) => b.date.localeCompare(a.date)));
@@ -92,6 +94,26 @@ export default function ProgressPage() {
   }, [sessions, exercises]);
 
   const maxVol = muscleVolume[0]?.[1] ?? 1;
+
+  const topExercisesForBodymap = useMemo(() => {
+    const days = bodyMapPeriod === "7d" ? 7 : bodyMapPeriod === "30d" ? 30 : Infinity;
+    const cutoff = new Date();
+    if (isFinite(days)) cutoff.setDate(cutoff.getDate() - days);
+    const counts: Record<string, { exercise: Exercise; sets: number }> = {};
+    for (const s of sessions) {
+      if (isFinite(days) && new Date(s.startedAt) < cutoff) continue;
+      for (const log of s.exercises) {
+        const ex = exercises.get(log.exerciseId);
+        if (!ex) continue;
+        const done = log.sets.filter((st) => st.completed).length;
+        if (!counts[ex.id]) counts[ex.id] = { exercise: ex, sets: 0 };
+        counts[ex.id].sets += done;
+      }
+    }
+    return Object.values(counts)
+      .sort((a, b) => b.sets - a.sets)
+      .slice(0, 4);
+  }, [sessions, exercises, bodyMapPeriod]);
   const heatmapLegend = [
     "bg-[var(--color-surface-2)]",
     "bg-[var(--color-primary-soft)]",
@@ -203,6 +225,46 @@ export default function ProgressPage() {
                       />
                     </div>
                     <span className="text-xs text-[var(--color-text-muted)] w-10 text-right">{vol} sets</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {topExercisesForBodymap.length > 0 && (
+            <div className="card p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-[var(--color-text-secondary)] font-medium">🗺 Músculos trabalhados</p>
+                <div className="flex gap-1">
+                  {(["7d", "30d", "all"] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setBodyMapPeriod(p)}
+                      className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
+                        bodyMapPeriod === p
+                          ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold"
+                          : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
+                      }`}
+                    >
+                      {p === "all" ? "Tudo" : p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {topExercisesForBodymap.map(({ exercise, sets }) => (
+                  <div key={exercise.id} className="flex flex-col items-center gap-1 shrink-0">
+                    <BodyMapImage
+                      slug={exercise.slug}
+                      targetMuscles={exercise.targetMuscles}
+                      defaultView="auto"
+                      size="sm"
+                      showToggle={false}
+                    />
+                    <p className="text-xs text-[var(--color-text-secondary)] text-center max-w-[100px] leading-tight">
+                      {exercise.name}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-muted)]">{sets} sets</p>
                   </div>
                 ))}
               </div>

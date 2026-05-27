@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { DIFFICULTY_PT, EQUIPMENT_PT } from "@/lib/translations";
+import BodyMapImage from "@/components/BodyMapImage";
 import type { Exercise } from "@/lib/types";
 
 interface SetRow { id: number; weight: string; reps: string; done: boolean; }
@@ -182,6 +183,13 @@ export default function ExerciseDetailPage() {
 
           <div className="hidden lg:block mt-4 card p-4 space-y-2">
             <p className="section-label">Músculos</p>
+            <BodyMapImage
+              slug={exercise.slug}
+              targetMuscles={exercise.targetMuscles}
+              defaultView="auto"
+              size="md"
+              className="py-2"
+            />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {exercise.targetMuscles.map((m) => (
                 <span key={m} className={`badge font-semibold ${
@@ -220,6 +228,13 @@ export default function ExerciseDetailPage() {
 
           <div className="lg:hidden card p-4 space-y-2">
             <p className="section-label">Músculos</p>
+            <BodyMapImage
+              slug={exercise.slug}
+              targetMuscles={exercise.targetMuscles}
+              defaultView="auto"
+              size="md"
+              className="py-2"
+            />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {exercise.targetMuscles.map((m) => (
                 <span key={m} className={`badge font-semibold ${

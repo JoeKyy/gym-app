@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getInjuriesV2, saveInjuryV2, deleteInjuryV2, updateInjuryV2, generateId } from "@/lib/storage";
+import { getExercises } from "@/lib/data";
 import { INJURY_CONDITIONS, getRehabProtocolsForConditions } from "@/lib/rehab";
-import type { Injury, InjuryPhase } from "@/lib/types";
+import BodyMapImage from "@/components/BodyMapImage";
+import type { Injury, InjuryPhase, Exercise } from "@/lib/types";
 
 const PHASE_LABELS: Record<InjuryPhase, { label: string; color: string; description: string }> = {
   acute: {
@@ -39,6 +41,7 @@ const SEVERITY_LABELS: Record<number, string> = {
 
 export default function InjuriesPage() {
   const [injuries, setInjuries] = useState<Injury[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [showAdd, setShowAdd] = useState(false);
 
   const [selectedCondition, setSelectedCondition] = useState("");
@@ -50,6 +53,7 @@ export default function InjuriesPage() {
 
   useEffect(() => {
     setInjuries(getInjuriesV2());
+    getExercises().then(setExercises);
   }, []);
 
   const refresh = () => setInjuries(getInjuriesV2());
@@ -97,6 +101,15 @@ export default function InjuriesPage() {
   const activeInjuries = injuries.filter((i) => i.phase !== "recovered");
   const recoveredInjuries = injuries.filter((i) => i.phase === "recovered");
 
+  /** Find a representative exercise that targets the given muscles */
+  const findRepresentativeSlug = (muscles: string[]): { slug: string; targets: string[] } | null => {
+    const lower = muscles.map((m) => m.toLowerCase());
+    const match = exercises.find((ex) =>
+      ex.targetMuscles.some((m) => lower.includes(m.toLowerCase()))
+    );
+    return match ? { slug: match.slug, targets: match.targetMuscles } : null;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -125,6 +138,7 @@ export default function InjuriesPage() {
         const condition = INJURY_CONDITIONS.find((c) => c.id === inj.conditionId);
         const protocols = getRehabProtocolsForConditions([inj.conditionId], inj.phase);
         const phaseInfo = PHASE_LABELS[inj.phase];
+        const bodymap = findRepresentativeSlug(inj.affectedMuscles);
 
         return (
           <div key={inj.id} className="card p-5 space-y-4">
@@ -154,6 +168,16 @@ export default function InjuriesPage() {
                   <p className="text-[var(--color-text-muted)] text-xs mt-2 italic">{inj.notes}</p>
                 )}
               </div>
+              {bodymap && (
+                <BodyMapImage
+                  slug={bodymap.slug}
+                  targetMuscles={bodymap.targets}
+                  defaultView="auto"
+                  size="sm"
+                  showToggle={false}
+                  className="shrink-0 opacity-80"
+                />
+              )}
               <button
                 onClick={() => handleDelete(inj.id)}
                 className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] text-lg p-1 transition-colors"
