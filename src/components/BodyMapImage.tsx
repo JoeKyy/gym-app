@@ -52,17 +52,16 @@ export default function BodyMapImage({
   if (error) return null;
 
   return (
-    <div className={`flex flex-col items-center gap-4 ${className}`}>
+    <div className={`flex flex-col items-center gap-6 ${className}`}>
       <div
         style={{ width, height }}
-        className="relative flex items-center justify-center"
+        className="relative overflow-hidden"
       >
         <Image
           key={src}
           src={src}
           alt={`Bodymap ${view} view`}
-          width={width}
-          height={height}
+          fill
           className="object-contain"
           onError={() => setError(true)}
           unoptimized
@@ -70,10 +69,10 @@ export default function BodyMapImage({
       </div>
 
       {showToggle && (
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           <button
             onClick={() => setView("front")}
-            className={`text-xs px-3 py-1 rounded-full transition-colors ${
+            className={`text-sm px-5 py-2 rounded-full transition-colors ${
               view === "front"
                 ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold"
                 : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
@@ -83,7 +82,7 @@ export default function BodyMapImage({
           </button>
           <button
             onClick={() => setView("back")}
-            className={`text-xs px-3 py-1 rounded-full transition-colors ${
+            className={`text-sm px-5 py-2 rounded-full transition-colors ${
               view === "back"
                 ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold"
                 : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]"

@@ -741,13 +741,18 @@ export default function WorkoutEditorPage() {
 
       {/* Sticky bottom bar — session mode only */}
       {mode === "session" && (
-        <div className="fixed bottom-16 left-0 right-0 z-40 flex justify-center px-4 pt-5 pb-4"
-          style={{ background: "linear-gradient(to top, var(--color-bg) 75%, transparent)" }}>
+        <div
+          className="fixed left-0 right-0 z-40 flex justify-center px-4 pt-4 pb-4"
+          style={{
+            bottom: "calc(4rem + env(safe-area-inset-bottom, 0px))",
+            background: "linear-gradient(to top, var(--color-bg) 80%, transparent)",
+          }}
+        >
           <div className="w-full max-w-3xl">
             <button
               onClick={() => setShowFinish(true)}
               disabled={completedInSession === 0}
-              className="w-full py-4 rounded-2xl font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
               style={{
                 background: completedInSession > 0 ? "var(--color-primary)" : "var(--color-surface-2)",
                 color: completedInSession > 0 ? "var(--color-primary-text)" : "var(--color-text-muted)",
