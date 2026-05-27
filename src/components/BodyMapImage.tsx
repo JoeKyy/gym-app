@@ -52,7 +52,7 @@ export default function BodyMapImage({
   if (error) return null;
 
   return (
-    <div className={`flex flex-col items-center gap-2 ${className}`}>
+    <div className={`flex flex-col items-center gap-4 ${className}`}>
       <div
         style={{ width, height }}
         className="relative flex items-center justify-center"
