@@ -35,12 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} min-h-full flex flex-col`}
         style={{ background: "var(--color-bg)", color: "var(--color-text)" }}>
-        {/* Top bar — fluid, sem container */}
-        <div className="sticky top-0 z-40 flex justify-end px-4 sm:px-6 py-2 w-full"
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex justify-end px-4 sm:px-6 py-3 w-full"
           style={{ background: "var(--color-bg)", borderBottom: "1px solid var(--color-border-subtle)" }}>
           <ThemeToggle />
         </div>
-        <main className="flex-1 w-full px-4 sm:px-6 lg:px-10 pb-24">{children}</main>
+        <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-5 pb-32">{children}</main>
         <BottomNav />
       </body>
     </html>

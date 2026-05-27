@@ -16,17 +16,17 @@ export default function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom"
       style={{ background: "var(--color-surface)", borderTop: "1px solid var(--color-border)" }}>
-      <ul className="flex items-center justify-around h-16 max-w-4xl mx-auto px-2">
+      <ul className="flex items-center justify-around h-16 max-w-3xl mx-auto px-4">
         {TABS.map(({ href, label, icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (
             <li key={href} className="flex-1 relative">
               <Link href={href}
                 style={{ color: active ? "var(--color-primary)" : "var(--color-text-muted)" }}
-                className="flex flex-col items-center justify-center h-16 gap-0.5 transition-colors"
+                className="flex flex-col items-center justify-center h-16 gap-1 transition-colors px-2"
               >
                 {active && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full"
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
                     style={{ background: "var(--color-primary)" }} />
                 )}
                 <span className={`text-xl leading-none transition-transform duration-150 ${active ? "scale-110" : ""}`}>

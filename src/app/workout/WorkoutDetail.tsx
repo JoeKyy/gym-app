@@ -636,7 +636,7 @@ export default function WorkoutEditorPage() {
         />
       )}
 
-      <div className="space-y-5 pb-24">
+      <div className="space-y-5 pb-32">
         {/* Header */}
         <div className="flex items-start gap-3">
           {mode === "edit" ? (
@@ -741,21 +741,23 @@ export default function WorkoutEditorPage() {
 
       {/* Sticky bottom bar — session mode only */}
       {mode === "session" && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-6 pt-3"
+        <div className="fixed bottom-16 left-0 right-0 z-40 flex justify-center px-4 pt-3 pb-2"
           style={{ background: "linear-gradient(to top, var(--color-bg) 70%, transparent)" }}>
-          <button
-            onClick={() => setShowFinish(true)}
-            disabled={completedInSession === 0}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{
-              background: completedInSession > 0 ? "var(--color-primary)" : "var(--color-surface-2)",
-              color: completedInSession > 0 ? "var(--color-primary-text)" : "var(--color-text-muted)",
-            }}
-          >
-            {completedInSession === 0
-              ? "Complete ao menos 1 exercício"
-              : `✓ Finalizar treino (${completedInSession}/${workout.exercises.length})`}
-          </button>
+          <div className="w-full max-w-3xl">
+            <button
+              onClick={() => setShowFinish(true)}
+              disabled={completedInSession === 0}
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                background: completedInSession > 0 ? "var(--color-primary)" : "var(--color-surface-2)",
+                color: completedInSession > 0 ? "var(--color-primary-text)" : "var(--color-text-muted)",
+              }}
+            >
+              {completedInSession === 0
+                ? "Complete ao menos 1 exercício"
+                : `✓ Finalizar treino (${completedInSession}/${workout.exercises.length})`}
+            </button>
+          </div>
         </div>
       )}
     </>
