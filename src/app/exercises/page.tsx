@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getEquipmentProfile } from "@/lib/storage";
@@ -7,6 +7,8 @@ import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
 import InjuryPanel from "@/components/InjuryPanel";
 import type { Exercise, AppFilters } from "@/lib/types";
+
+const PAGE_SIZE = 30;
 
 const DEFAULT_FILTERS: AppFilters = {
   search: "",
@@ -23,12 +25,19 @@ export default function ExercisesPage() {
   const [sortBy, setSortBy] = useState<"name" | "difficulty" | "muscle">("name");
   const [showInjuryPanel, setShowInjuryPanel] = useState(false);
   const [userEquipment, setUserEquipment] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const { injuredMuscleNames, isRisky } = useInjuries();
 
   useEffect(() => {
     getExercises().then(setExercises);
     setUserEquipment(getEquipmentProfile());
   }, []);
+
+  // Reset pagination whenever filters/sort change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filters, sortBy]);
 
   const bodyParts = useMemo(() => [...new Set(exercises.flatMap((e) => e.bodyParts))].sort(), [exercises]);
   const equipments = useMemo(() => [...new Set(exercises.flatMap((e) => e.equipments))].sort(), [exercises]);
@@ -47,6 +56,24 @@ export default function ExercisesPage() {
       return 0;
     });
   }, [exercises, filters, injuredMuscleNames, sortBy, userEquipment]);
+
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
+  // Load more when sentinel enters viewport
+  const loadMore = useCallback(() => {
+    setVisibleCount((c) => Math.min(c + PAGE_SIZE, filtered.length));
+  }, [filtered.length]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   return (
     <div className="space-y-5">
@@ -110,11 +137,26 @@ export default function ExercisesPage() {
           <p className="text-sm mt-1">Tente ajustar os filtros</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {filtered.map((ex) => (
-            <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {visible.map((ex) => (
+              <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} />
+            ))}
+          </div>
+
+          {/* Sentinel for infinite scroll */}
+          {visibleCount < filtered.length && (
+            <div ref={sentinelRef} className="flex justify-center py-6 text-[var(--color-text-muted)] text-sm">
+              <span>Carregando mais… ({visibleCount}/{filtered.length})</span>
+            </div>
+          )}
+
+          {visibleCount >= filtered.length && filtered.length > PAGE_SIZE && (
+            <p className="text-center text-xs text-[var(--color-text-muted)] py-4">
+              ✓ Todos os {filtered.length} exercícios carregados
+            </p>
+          )}
+        </>
       )}
     </div>
   );

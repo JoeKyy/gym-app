@@ -25,28 +25,24 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout }: Prop
 
   return (
     <div
-      className={`card card-interactive overflow-hidden
-                  flex flex-col
-                  sm:flex-row
+      className={`card card-interactive overflow-hidden flex flex-col
                   ${isRisky ? "border-[var(--color-danger-border)]" : ""}`}
     >
-      {/* Media — mobile: full-width top, desktop: fixed-width left column */}
-      <div className="sm:shrink-0 sm:self-stretch">
-        <Link href={`/exercises/${exercise.slug}`} className="block">
-          <ExerciseMedia
-            exercise={exercise}
-            risky={isRisky}
-            className="w-full h-[200px] sm:h-full sm:w-[clamp(130px,30%,210px)]"
-          />
-        </Link>
-      </div>
+      {/* Media — always full-width on top */}
+      <Link href={`/exercises/${exercise.slug}`} className="block w-full shrink-0">
+        <ExerciseMedia
+          exercise={exercise}
+          risky={isRisky}
+          className="w-full h-[180px]"
+        />
+      </Link>
 
       {/* Info */}
-      <div className="flex flex-col justify-between p-3 sm:p-4 flex-1 min-w-0 gap-2">
+      <div className="flex flex-col justify-between p-3 flex-1 min-w-0 gap-2">
         <div className="min-w-0">
           <Link
             href={`/exercises/${exercise.slug}`}
-            className="font-bold text-sm sm:text-base leading-snug line-clamp-2
+            className="font-bold text-sm leading-snug line-clamp-2
                        hover:text-[var(--color-primary)] transition-colors"
             style={{ color: "var(--color-text)" }}
           >
@@ -62,19 +58,19 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout }: Prop
 
           {exercise.targetMuscles.length > 0 && (
             <p className="text-xs mt-1 line-clamp-2" style={{ color: "var(--color-text-muted)" }}>
-              {exercise.targetMuscles.slice(0, 5).join(", ")}
+              {exercise.targetMuscles.slice(0, 4).join(", ")}
             </p>
           )}
         </div>
 
         <div className="flex flex-wrap gap-1.5">
           {exercise.equipments.slice(0, 2).map((eq) => (
-            <span key={eq} className="badge badge-gray text-[10px] sm:text-[11px]">
+            <span key={eq} className="badge badge-gray text-[10px]">
               {EQUIPMENT_PT[eq] ?? eq}
             </span>
           ))}
           {diffBadge && exercise.difficulty && (
-            <span className={`${diffBadge} text-[10px] sm:text-[11px]`}>
+            <span className={`${diffBadge} text-[10px]`}>
               {DIFF_LABEL[exercise.difficulty] ?? exercise.difficulty}
             </span>
           )}
@@ -83,7 +79,7 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout }: Prop
         {onAddToWorkout && (
           <button
             onClick={(e) => { e.preventDefault(); onAddToWorkout(exercise); }}
-            className="btn btn-primary btn-sm text-xs w-full sm:w-auto"
+            className="btn btn-primary btn-sm text-xs w-full"
           >
             + Adicionar
           </button>
