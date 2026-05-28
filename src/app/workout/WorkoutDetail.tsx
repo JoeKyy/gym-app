@@ -218,47 +218,48 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: "var(--color-bg)" }}>
-      {/* Video hero — full bleed */}
-      <div className="relative w-full bg-black shrink-0" style={{ aspectRatio: "1 / 1", maxHeight: "60vw" }}>
-        {videoUrl && !videoError ? (
-          <video key={videoUrl} src={videoUrl} autoPlay loop muted playsInline
-            onError={() => setVideoError(true)}
-            className="w-full h-full object-contain" />
-        ) : ex.gifUrl ? (
-          <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-contain" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center opacity-20">
-            <Dumbbell size={64} style={{ color: "var(--color-text-muted)" }} />
-          </div>
-        )}
+      <div className="max-w-3xl mx-auto">
+        {/* Video hero */}
+        <div className="relative w-full bg-black shrink-0" style={{ aspectRatio: "1 / 1", maxHeight: "60vw" }}>
+          {videoUrl && !videoError ? (
+            <video key={videoUrl} src={videoUrl} autoPlay loop muted playsInline
+              onError={() => setVideoError(true)}
+              className="w-full h-full object-contain" />
+          ) : ex.gifUrl ? (
+            <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-contain" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center opacity-20">
+              <Dumbbell size={64} style={{ color: "var(--color-text-muted)" }} />
+            </div>
+          )}
 
-        {/* Back button overlaid top-left */}
-        <button onClick={onClose}
-          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
-          style={{ background: "rgba(0,0,0,0.45)" }}>
-          <ChevronLeft size={20} />
-        </button>
+          {/* Back button overlaid top-left */}
+          <button onClick={onClose}
+            className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
+            style={{ background: "rgba(0,0,0,0.45)" }}>
+            <ChevronLeft size={20} />
+          </button>
+        </div>
 
-        {/* Angle switcher overlaid bottom */}
+        {/* Angle switcher — below video, not overlaid */}
         {availableAngles.length > 1 && (
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 px-4">
+          <div className="flex justify-center gap-2 px-4 pt-3" style={{ borderBottom: "1px solid var(--color-border-subtle)" }}>
             {availableAngles.map((a) => (
               <button key={a}
                 onClick={() => { setAngle(a); setVideoError(false); }}
-                className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap backdrop-blur-sm transition-colors ${
+                className={`text-xs px-3 py-2 rounded-full whitespace-nowrap transition-colors mb-2 ${
                   angle === a
                     ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold"
-                    : "text-white"
+                    : "text-[var(--color-text-muted)]"
                 }`}
-                style={angle !== a ? { background: "rgba(0,0,0,0.45)" } : {}}
+                style={angle !== a ? { background: "var(--color-surface-2)" } : {}}
               >{ANGLE_LABELS[a] ?? a}</button>
             ))}
           </div>
         )}
-      </div>
 
-      {/* Content */}
-      <div className="px-4 pt-5 space-y-5 pb-12">
+        {/* Content */}
+        <div className="px-4 pt-5 space-y-5 pb-12">
         {/* Title + badges */}
         <div>
           <h1 className="text-2xl font-bold leading-tight capitalize">{ex.name}</h1>
@@ -318,7 +319,7 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
         {(ex.targetMuscles.length > 0 || ex.secondaryMuscles.length > 0) && (
           <div className="card p-4 space-y-3">
             <p className="section-label">Músculos</p>
-            <div className="flex gap-5 items-start">
+            <div className="flex gap-5 items-center justify-center">
               <BodyMapImage slug={ex.slug} targetMuscles={ex.targetMuscles} defaultView="auto" size="md" className="shrink-0" />
               <div className="flex flex-col gap-3 pt-2">
                 {ex.targetMuscles.length > 0 && (
@@ -447,6 +448,7 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
           </div>
         )}
       </div>
+      </div>{/* /max-w-3xl */}
     </div>
   );
 }
