@@ -130,224 +130,196 @@ export default function ExerciseDetailPage() {
   const doneSetsCount = sets.filter((s) => s.done).length;
 
   return (
-    <div>
-      <div className="pb-3">
-        <Link href="/exercises" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] inline-flex items-center gap-1 transition-colors">
-          ← Exercícios
+    <div className="-mx-4 -mt-5">
+      {/* ── Video Hero ─────────────────────────────────────────────────── */}
+      <div className="relative w-full bg-black" style={{ aspectRatio: "1 / 1", maxHeight: "60vw" }}>
+        {videoUrl && !videoError ? (
+          <video key={videoUrl} src={videoUrl} autoPlay loop muted playsInline
+            onError={() => setVideoError(true)}
+            className="w-full h-full object-contain" />
+        ) : exercise.gifUrl ? (
+          <img src={exercise.gifUrl} alt={exercise.name} className="w-full h-full object-contain" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-7xl opacity-20">🏋</div>
+        )}
+
+        {/* Back button overlaid top-left */}
+        <Link href="/exercises"
+          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg backdrop-blur-sm"
+          style={{ background: "rgba(0,0,0,0.45)" }}>
+          ←
         </Link>
+
+        {/* Angle switcher overlaid bottom */}
+        {allAngles.length > 1 && (
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 px-4">
+            {allAngles.map((angle) => (
+              <button key={angle}
+                onClick={() => { setVideoAngle(angle); setVideoError(false); }}
+                className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap backdrop-blur-sm transition-colors ${
+                  videoAngle === angle
+                    ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold"
+                    : "text-white"
+                }`}
+                style={videoAngle !== angle ? { background: "rgba(0,0,0,0.45)" } : {}}
+              >{angleLabels[angle]}</button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="lg:flex lg:gap-6 lg:items-start">
-        <div className="lg:w-96 lg:shrink-0 lg:sticky lg:top-4 mb-4 lg:mb-0">
-          <div className="mb-3 lg:hidden">
-            <h1 className="text-xl font-bold leading-tight">{exercise.name}</h1>
-            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-              {diffPt && (
-                <span className={`badge ${exercise.difficulty === "beginner" ? "badge-green" : exercise.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>
-                  {diffPt}
-                </span>
-              )}
-              {exercise.mechanic && <span className="badge badge-gray">{mechanicPt[exercise.mechanic] ?? exercise.mechanic}</span>}
-              {risky && <span className="badge badge-red">⚠ Risco: {riskyMuscles.join(", ")}</span>}
-            </div>
-          </div>
+      {/* ── Content ────────────────────────────────────────────────────── */}
+      <div className="px-4 pt-5 space-y-5">
 
-          <div className="rounded-2xl overflow-hidden card">
-            <div className="aspect-square bg-[var(--color-surface-2)]">
-              {videoUrl && !videoError ? (
-                <video key={videoUrl} src={videoUrl} autoPlay loop muted playsInline
-                  onError={() => setVideoError(true)}
-                  className="w-full h-full object-contain" />
-              ) : exercise.gifUrl ? (
-                <img src={exercise.gifUrl} alt={exercise.name} className="w-full h-full object-contain" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🏋</div>
-              )}
-            </div>
-
-            {allAngles.length > 1 && (
-              <div className="flex gap-2 p-3 border-t border-[var(--color-border-subtle)] overflow-x-auto">
-                {allAngles.map((angle) => (
-                  <button key={angle}
-                    onClick={() => { setVideoAngle(angle); setVideoError(false); }}
-                    className={`text-xs px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors ${
-                      videoAngle === angle
-                        ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold"
-                        : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]"
-                    }`}
-                  >{angleLabels[angle]}</button>
-                ))}
-              </div>
+        {/* Title + badges */}
+        <div>
+          <h1 className="text-2xl font-bold leading-tight capitalize">{exercise.name}</h1>
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {diffPt && (
+              <span className={`badge ${exercise.difficulty === "beginner" ? "badge-green" : exercise.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>
+                {diffPt}
+              </span>
             )}
-          </div>
-
-          <div className="hidden lg:block mt-4 card p-4 space-y-2">
-            <p className="section-label">Músculos</p>
-            <BodyMapImage
-              slug={exercise.slug}
-              targetMuscles={exercise.targetMuscles}
-              defaultView="auto"
-              size="md"
-              className="py-2"
-            />
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {exercise.targetMuscles.map((m) => (
-                <span key={m} className={`badge font-semibold ${
-                  injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"
-                }`}>{m}</span>
-              ))}
-              {exercise.secondaryMuscles.map((m) => (
-                <span key={m} className={`badge ${
-                  injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"
-                }`}>{m}</span>
-              ))}
-            </div>
-            {exercise.equipments.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {exercise.equipments.map((eq) => (
-                  <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
-                ))}
-              </div>
-            )}
+            {exercise.mechanic && <span className="badge badge-gray">{mechanicPt[exercise.mechanic] ?? exercise.mechanic}</span>}
+            {exercise.equipments.length > 0 && exercise.equipments.map((eq) => (
+              <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
+            ))}
+            {risky && <span className="badge badge-red">⚠ Risco: {riskyMuscles.join(", ")}</span>}
           </div>
         </div>
 
-        <div className="flex-1 min-w-0 space-y-4">
-          <div className="hidden lg:block">
-            <h1 className="text-2xl font-bold leading-tight">{exercise.name}</h1>
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
-              {diffPt && (
-                <span className={`badge ${exercise.difficulty === "beginner" ? "badge-green" : exercise.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>
-                  {diffPt}
-                </span>
-              )}
-              {exercise.mechanic && <span className="badge badge-gray">{mechanicPt[exercise.mechanic] ?? exercise.mechanic}</span>}
-              {risky && <span className="badge badge-red">⚠ Risco: {riskyMuscles.join(", ")}</span>}
+        {/* Muscles + bodymap */}
+        {(exercise.targetMuscles.length > 0 || exercise.secondaryMuscles.length > 0) && (
+          <div className="card p-4 space-y-3">
+            <p className="section-label">Músculos</p>
+            <div className="flex gap-6 items-start">
+              <BodyMapImage
+                slug={exercise.slug}
+                targetMuscles={exercise.targetMuscles}
+                defaultView="auto"
+                size="md"
+                className="shrink-0"
+              />
+              <div className="flex flex-col gap-3 pt-2">
+                {exercise.targetMuscles.length > 0 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {exercise.targetMuscles.map((m) => (
+                        <span key={m} className={`badge font-semibold ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"}`}>{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {exercise.secondaryMuscles.length > 0 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Secundários</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {exercise.secondaryMuscles.map((m) => (
+                        <span key={m} className={`badge ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"}`}>{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        )}
 
-          <div className="lg:hidden card p-4 space-y-2">
-            <p className="section-label">Músculos</p>
-            <BodyMapImage
-              slug={exercise.slug}
-              targetMuscles={exercise.targetMuscles}
-              defaultView="auto"
-              size="md"
-              className="py-2"
-            />
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {exercise.targetMuscles.map((m) => (
-                <span key={m} className={`badge font-semibold ${
-                  injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"
-                }`}>{m}</span>
+        {/* Instructions */}
+        {exercise.instructions.length > 0 && (
+          <div className="card p-4">
+            <p className="section-label mb-3">Como executar</p>
+            <ol className="space-y-3">
+              {exercise.instructions.map((step, i) => (
+                <li key={i} className="flex gap-3 text-sm">
+                  <span className="text-[var(--color-primary)] font-bold shrink-0 w-5">{i + 1}.</span>
+                  <span className="text-[var(--color-text-secondary)] leading-relaxed">
+                    {step.replace(/^Step:\d+\s*/i, "")}
+                  </span>
+                </li>
               ))}
-              {exercise.secondaryMuscles.map((m) => (
-                <span key={m} className={`badge ${
-                  injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"
-                }`}>{m}</span>
-              ))}
-            </div>
-            {exercise.equipments.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {exercise.equipments.map((eq) => (
-                  <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
-                ))}
-              </div>
+            </ol>
+          </div>
+        )}
+
+        {/* Sets tracker */}
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="section-label">
+              Séries{doneSetsCount > 0 && ` — ${doneSetsCount}/${sets.length} feitas`}
+            </p>
+            {doneSetsCount > 0 && (
+              <button onClick={resetSets} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">
+                Reiniciar
+              </button>
             )}
           </div>
 
-          {exercise.instructions.length > 0 && (
-            <div className="card p-4">
-              <p className="section-label mb-3">Como executar</p>
-              <ol className="space-y-3">
-                {exercise.instructions.map((step, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <span className="text-[var(--color-primary)] font-bold shrink-0 w-5">{i + 1}.</span>
-                    <span className="text-[var(--color-text-secondary)] leading-relaxed">
-                      {step.replace(/^Step:\d+\s*/i, "")}
-                    </span>
-                  </li>
-                ))}
-              </ol>
+          {allDone && (
+            <div className="bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] rounded-xl p-3 text-center">
+              <p className="text-[var(--color-primary)] font-semibold">🎉 Exercício concluído!</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Todas as {sets.length} séries feitas</p>
             </div>
           )}
 
-          <div className="card p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="section-label">
-                Séries{doneSetsCount > 0 && ` — ${doneSetsCount}/${sets.length} feitas`}
-              </p>
-              {doneSetsCount > 0 && (
-                <button onClick={resetSets} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">
-                  Reiniciar
+          {restingAfter !== null && !allDone && <RestTimer onDone={() => setRestingAfter(null)} />}
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 px-1">
+              <span className="w-7 shrink-0" />
+              <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">#</span>
+              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Peso (kg)</span>
+              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Reps</span>
+              <span className="w-8 shrink-0" />
+            </div>
+
+            {sets.map((set, idx) => (
+              <div key={set.id} className={`flex items-center gap-2 rounded-xl px-1 py-1.5 transition-all ${set.done ? "opacity-50" : ""}`}>
+                <button
+                  onClick={() => toggleSet(set.id)}
+                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                    set.done
+                      ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-text)]"
+                      : "border-[var(--color-border)] hover:border-[var(--color-primary)]"
+                  }`}
+                >
+                  {set.done && <span className="text-xs font-bold">✓</span>}
                 </button>
-              )}
-            </div>
-
-            {allDone && (
-              <div className="bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] rounded-xl p-3 text-center">
-                <p className="text-[var(--color-primary)] font-semibold">🎉 Exercício concluído!</p>
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Todas as {sets.length} séries feitas</p>
+                <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">{idx + 1}</span>
+                <input type="number" inputMode="decimal" placeholder="—"
+                  value={set.weight} disabled={set.done}
+                  onChange={(e) => updateSet(set.id, "weight", e.target.value)}
+                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                />
+                <input type="number" inputMode="numeric" placeholder="12"
+                  value={set.reps} disabled={set.done}
+                  onChange={(e) => updateSet(set.id, "reps", e.target.value)}
+                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                />
+                <button onClick={() => setSets((prev) => prev.filter((s) => s.id !== set.id))}
+                  className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg">
+                  ×
+                </button>
               </div>
-            )}
-
-            {restingAfter !== null && !allDone && <RestTimer onDone={() => setRestingAfter(null)} />}
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 px-1">
-                <span className="w-7 shrink-0" />
-                <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">#</span>
-                <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Peso (kg)</span>
-                <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Reps</span>
-                <span className="w-8 shrink-0" />
-              </div>
-
-              {sets.map((set, idx) => (
-                <div key={set.id} className={`flex items-center gap-2 rounded-xl px-1 py-1.5 transition-all ${set.done ? "opacity-50" : ""}`}>
-                  <button
-                    onClick={() => toggleSet(set.id)}
-                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                      set.done
-                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-text)]"
-                        : "border-[var(--color-border)] hover:border-[var(--color-primary)]"
-                    }`}
-                  >
-                    {set.done && <span className="text-xs font-bold">✓</span>}
-                  </button>
-                  <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">{idx + 1}</span>
-                  <input type="number" inputMode="decimal" placeholder="—"
-                    value={set.weight} disabled={set.done}
-                    onChange={(e) => updateSet(set.id, "weight", e.target.value)}
-                    className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
-                  />
-                  <input type="number" inputMode="numeric" placeholder="12"
-                    value={set.reps} disabled={set.done}
-                    onChange={(e) => updateSet(set.id, "reps", e.target.value)}
-                    className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
-                  />
-                  <button onClick={() => setSets((prev) => prev.filter((s) => s.id !== set.id))}
-                    className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg">
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={addSet}
-              className="w-full border border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] rounded-xl py-2.5 text-sm transition-colors">
-              + Adicionar série
-            </button>
+            ))}
           </div>
 
-          <div className="flex gap-3 pb-2">
-            {exercise.musclewikiUrl && (
-              <a href={exercise.musclewikiUrl} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors">
-                MuscleWiki ↗
-              </a>
-            )}
-          </div>
+          <button onClick={addSet}
+            className="w-full border border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] rounded-xl py-2.5 text-sm transition-colors">
+            + Adicionar série
+          </button>
         </div>
+
+        {/* External link */}
+        {exercise.musclewikiUrl && (
+          <div className="pb-2">
+            <a href={exercise.musclewikiUrl} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors">
+              Ver no MuscleWiki ↗
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

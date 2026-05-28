@@ -100,118 +100,106 @@ const ANGLE_LABELS: Record<string, string> = {
 function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => void }) {
   const availableAngles = getAvailableAngles(ex);
   const [angle, setAngle] = useState<VideoAngle>(availableAngles[0] ?? "frontMale");
+  const [videoError, setVideoError] = useState(false);
   const videoUrl = getVideoUrl(ex, angle);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "var(--color-bg)" }}>
-      {/* Top bar */}
-      <div className="flex items-center gap-3 px-4 pt-4 pb-3 shrink-0">
-        <button
-          onClick={onClose}
-          className="text-xl leading-none shrink-0"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          ←
-        </button>
-        <h2 className="font-bold text-base capitalize flex-1 truncate">{ex.name}</h2>
-      </div>
-
-      {/* Video hero */}
-      <div className="w-full bg-[var(--color-surface-2)] shrink-0"
-        style={{ aspectRatio: "16/10" }}>
-        {videoUrl ? (
-          <video
-            key={videoUrl}
-            src={videoUrl}
-            autoPlay loop muted playsInline
-            className="w-full h-full object-contain"
-          />
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: "var(--color-bg)" }}>
+      {/* Video hero — full bleed */}
+      <div className="relative w-full bg-black shrink-0" style={{ aspectRatio: "1 / 1", maxHeight: "60vw" }}>
+        {videoUrl && !videoError ? (
+          <video key={videoUrl} src={videoUrl} autoPlay loop muted playsInline
+            onError={() => setVideoError(true)}
+            className="w-full h-full object-contain" />
         ) : ex.gifUrl ? (
           <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-contain" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🏋</div>
+          <div className="w-full h-full flex items-center justify-center text-7xl opacity-20">🏋</div>
+        )}
+
+        {/* Back button overlaid top-left */}
+        <button onClick={onClose}
+          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg backdrop-blur-sm"
+          style={{ background: "rgba(0,0,0,0.45)" }}>
+          ←
+        </button>
+
+        {/* Angle switcher overlaid bottom */}
+        {availableAngles.length > 1 && (
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 px-4">
+            {availableAngles.map((a) => (
+              <button key={a}
+                onClick={() => { setAngle(a); setVideoError(false); }}
+                className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap backdrop-blur-sm transition-colors ${
+                  angle === a
+                    ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold"
+                    : "text-white"
+                }`}
+                style={angle !== a ? { background: "rgba(0,0,0,0.45)" } : {}}
+              >{ANGLE_LABELS[a] ?? a}</button>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Angle switcher */}
-      {availableAngles.length > 1 && (
-        <div className="flex gap-2 px-4 py-2 overflow-x-auto shrink-0 border-b"
-          style={{ borderColor: "var(--color-border)" }}>
-          {availableAngles.map((a) => (
-            <button
-              key={a}
-              onClick={() => setAngle(a)}
-              className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
-                angle === a
-                  ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold"
-                  : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
-              }`}
-            >
-              {ANGLE_LABELS[a] ?? a}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5">
-        {/* Muscles */}
-        {ex.targetMuscles.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
-              style={{ color: "var(--color-text-muted)" }}>Músculos</p>
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {ex.targetMuscles.map((m) => (
-                <span key={m} className="badge badge-green font-semibold">{m}</span>
-              ))}
-              {ex.secondaryMuscles.map((m) => (
-                <span key={m} className="badge badge-gray">{m}</span>
+      {/* Content */}
+      <div className="px-4 pt-5 space-y-5 pb-12">
+        {/* Title + badges */}
+        <div>
+          <h2 className="text-xl font-bold leading-tight capitalize">{ex.name}</h2>
+          {(ex.equipments?.length > 0) && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {ex.equipments.map((eq) => (
+                <span key={eq} className="badge badge-gray">{eq}</span>
               ))}
             </div>
-            <BodyMapImage
-              slug={ex.slug}
-              targetMuscles={ex.targetMuscles}
-              defaultView="auto"
-              size="md"
-              className="mx-auto"
-            />
+          )}
+        </div>
+
+        {/* Muscles + bodymap */}
+        {ex.targetMuscles.length > 0 && (
+          <div className="card p-4 space-y-3">
+            <p className="section-label">Músculos</p>
+            <div className="flex gap-5 items-start">
+              <BodyMapImage slug={ex.slug} targetMuscles={ex.targetMuscles} defaultView="auto" size="md" className="shrink-0" />
+              <div className="flex flex-col gap-3 pt-2">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ex.targetMuscles.map((m) => (
+                      <span key={m} className="badge badge-green font-semibold">{m}</span>
+                    ))}
+                  </div>
+                </div>
+                {ex.secondaryMuscles.length > 0 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Secundários</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ex.secondaryMuscles.map((m) => (
+                        <span key={m} className="badge badge-gray">{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         {/* Instructions */}
         {ex.instructions && ex.instructions.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
-              style={{ color: "var(--color-text-muted)" }}>Execução</p>
-            <ol className="space-y-2">
+          <div className="card p-4">
+            <p className="section-label mb-3">Como executar</p>
+            <ol className="space-y-3">
               {ex.instructions.map((step, i) => (
-                <li key={i} className="flex gap-3 text-sm" style={{ color: "var(--color-text)" }}>
-                  <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
-                    style={{ background: "var(--color-primary)", color: "var(--color-primary-text)" }}>
-                    {i + 1}
-                  </span>
-                  <span className="leading-relaxed">{step}</span>
+                <li key={i} className="flex gap-3 text-sm">
+                  <span className="text-[var(--color-primary)] font-bold shrink-0 w-5">{i + 1}.</span>
+                  <span className="leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{step}</span>
                 </li>
               ))}
             </ol>
           </div>
         )}
-
-        {/* Equipment */}
-        {ex.equipments && ex.equipments.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
-              style={{ color: "var(--color-text-muted)" }}>Equipamento</p>
-            <div className="flex flex-wrap gap-1.5">
-              {ex.equipments.map((eq) => (
-                <span key={eq} className="badge badge-gray">{eq}</span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Bottom spacer for nav */}
-        <div className="h-8" />
       </div>
     </div>
   );
