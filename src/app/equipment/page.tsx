@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Dumbbell } from "lucide-react";
 import BackButton from "@/components/BackButton";
@@ -10,9 +10,11 @@ import EquipmentIcon from "@/components/EquipmentIcon";
 export default function EquipmentPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     setSelected(new Set(getEquipmentProfile()));
+    return () => clearTimeout(savedTimer.current);
   }, []);
 
   const toggle = (id: string) => {
@@ -27,7 +29,8 @@ export default function EquipmentPage() {
   const handleSave = () => {
     saveEquipmentProfile(Array.from(selected));
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    clearTimeout(savedTimer.current);
+    savedTimer.current = setTimeout(() => setSaved(false), 2000);
   };
 
   const selectedCount = selected.size;

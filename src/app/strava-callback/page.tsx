@@ -28,6 +28,7 @@ export default function StravaCallbackPage() {
       return;
     }
 
+    let timer: ReturnType<typeof setTimeout>;
     exchangeStravaCode(code).then((token) => {
       if (!token) {
         setStatus("error");
@@ -36,8 +37,9 @@ export default function StravaCallbackPage() {
       }
       setStatus("success");
       setMessage("Conectado com sucesso! Redirecionando...");
-      setTimeout(() => router.push("/sync"), 1500);
+      timer = setTimeout(() => router.push("/sync"), 1500);
     });
+    return () => clearTimeout(timer);
   }, [router]);
 
   return (

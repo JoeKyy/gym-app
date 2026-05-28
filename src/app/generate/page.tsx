@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getExercises } from "@/lib/data";
@@ -55,6 +55,7 @@ export default function GeneratePage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [generatedWorkout, setGeneratedWorkout] = useState<GeneratedWorkout | null>(null);
   const [savedMsg, setSavedMsg] = useState(false);
+  const savedMsgTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     getExercises().then(setExercises);
@@ -84,6 +85,7 @@ export default function GeneratePage() {
     // Map duration → exercise count
     const countMap: Record<number, number> = { 30: 4, 45: 6, 60: 8, 75: 9, 90: 10 };
     setExerciseCount(countMap[profile.durationMinutes] ?? 6);
+    return () => clearTimeout(savedMsgTimer.current);
   }, []);
 
   // Injured muscles to avoid
@@ -134,7 +136,8 @@ export default function GeneratePage() {
     const workout = generatedToWorkout(generatedWorkout);
     saveWorkout(workout);
     setSavedMsg(true);
-    setTimeout(() => setSavedMsg(false), 2500);
+    clearTimeout(savedMsgTimer.current);
+    savedMsgTimer.current = setTimeout(() => setSavedMsg(false), 2500);
   }
 
   function handleStartNow() {

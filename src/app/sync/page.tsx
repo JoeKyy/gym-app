@@ -32,6 +32,7 @@ export default function SyncPage() {
   const [stravaMsg, setStravaMsg] = useState("");
   const [stravaLoading, setStravaLoading] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
+  const stravaMsgTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ── Apple Health state ────────────────────────────────────────────────────
   const [appleMsg, setAppleMsg] = useState("");
@@ -45,6 +46,7 @@ export default function SyncPage() {
       setClientSecret(settings.clientSecret);
     }
     setConnected(isStravaConnected());
+    return () => clearTimeout(stravaMsgTimer.current);
   }, []);
 
   // ── Strava helpers ────────────────────────────────────────────────────────
@@ -56,7 +58,8 @@ export default function SyncPage() {
     }
     saveStravaSettings({ clientId: clientId.trim(), clientSecret: clientSecret.trim() });
     setStravaMsg("Configurações salvas!");
-    setTimeout(() => setStravaMsg(""), 2000);
+    clearTimeout(stravaMsgTimer.current);
+    stravaMsgTimer.current = setTimeout(() => setStravaMsg(""), 2000);
   }
 
   function handleConnect() {

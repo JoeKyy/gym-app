@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Dumbbell, Flame, Zap, HeartPulse, RefreshCw, Layers, ArrowUpDown, Grid3X3, Check, Weight } from "lucide-react";
 import BackButton from "@/components/BackButton";
@@ -40,9 +40,11 @@ export default function ProfilePage() {
     bodyStats: {},
   }));
   const [saved, setSaved] = useState(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     setProfile(getProfile());
+    return () => clearTimeout(savedTimer.current);
   }, []);
 
   function update<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
@@ -65,7 +67,8 @@ export default function ProfilePage() {
   function handleSave() {
     saveProfile(profile);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    clearTimeout(savedTimer.current);
+    savedTimer.current = setTimeout(() => setSaved(false), 2000);
   }
 
   return (

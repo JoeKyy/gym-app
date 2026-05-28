@@ -32,33 +32,41 @@ const STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize";
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
 const STRAVA_API = "https://www.strava.com/api/v3";
 
+function ls_get(key: string): string | null {
+  try { return typeof window !== "undefined" ? localStorage.getItem(key) : null; } catch { return null; }
+}
+function ls_set(key: string, value: string): void {
+  try { localStorage.setItem(key, value); } catch { /* private mode */ }
+}
+function ls_del(key: string): void {
+  try { localStorage.removeItem(key); } catch { /* private mode */ }
+}
+
 // ─── Settings ────────────────────────────────────────────────────────────────
 
 export function getStravaSettings(): StravaSettings | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STRAVA_SETTINGS_KEY);
-  return raw ? JSON.parse(raw) : null;
+  const raw = ls_get(STRAVA_SETTINGS_KEY);
+  try { return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
 
 export function saveStravaSettings(settings: StravaSettings): void {
-  localStorage.setItem(STRAVA_SETTINGS_KEY, JSON.stringify(settings));
+  ls_set(STRAVA_SETTINGS_KEY, JSON.stringify(settings));
 }
 
 export function clearStravaSettings(): void {
-  localStorage.removeItem(STRAVA_SETTINGS_KEY);
-  localStorage.removeItem(STRAVA_KEY);
+  ls_del(STRAVA_SETTINGS_KEY);
+  ls_del(STRAVA_KEY);
 }
 
 // ─── Token management ────────────────────────────────────────────────────────
 
 export function getStravaToken(): StravaToken | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STRAVA_KEY);
-  return raw ? JSON.parse(raw) : null;
+  const raw = ls_get(STRAVA_KEY);
+  try { return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
 
 export function saveStravaToken(token: StravaToken): void {
-  localStorage.setItem(STRAVA_KEY, JSON.stringify(token));
+  ls_set(STRAVA_KEY, JSON.stringify(token));
 }
 
 export function isStravaConnected(): boolean {

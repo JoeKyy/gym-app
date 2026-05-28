@@ -4,11 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 export type Theme = "dark" | "light";
 const KEY = "gymapp:theme";
 
+function safeGet(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSet(key: string, value: string): void {
+  try { localStorage.setItem(key, value); } catch { /* private mode */ }
+}
+
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
-    const saved = (typeof window !== "undefined" && localStorage.getItem(KEY)) as Theme | null;
+    const saved = safeGet(KEY) as Theme | null;
     const initial: Theme = saved === "light" ? "light" : "dark";
     setThemeState(initial);
     document.documentElement.setAttribute("data-theme", initial);
@@ -17,7 +24,7 @@ export function useTheme() {
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     document.documentElement.setAttribute("data-theme", t);
-    localStorage.setItem(KEY, t);
+    safeSet(KEY, t);
   }, []);
 
   const toggle = useCallback(() => {

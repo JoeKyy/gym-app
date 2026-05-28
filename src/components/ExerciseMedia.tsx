@@ -62,7 +62,8 @@ export default function ExerciseMedia({
   const videoUrl = !videoError ? getVideoUrl(exercise, angle) : null;
   const posterUrl = exercise.gifUrl ?? undefined;
 
-  // Autoplay when in viewport, pause when out
+  // Autoplay when in viewport, pause when out; track visibility for UI
+  const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
@@ -70,6 +71,7 @@ export default function ExerciseMedia({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        setIsVisible(entry.isIntersecting);
         if (entry.isIntersecting) {
           video.play().catch(() => {/* Autoplay blocked — silent fail */});
         } else {
@@ -101,19 +103,30 @@ export default function ExerciseMedia({
       )}
 
       {videoUrl ? (
-        <video
-          ref={videoRef}
-          key={videoUrl}
-          src={videoUrl}
-          poster={posterUrl}
-          loop
-          muted
-          playsInline
-          onError={() => setVideoError(true)}
-          className="w-full h-full object-cover"
-          // preload="none" keeps initial page load fast; IO starts playback when visible
-          preload="none"
-        />
+        <>
+          {/* Poster shown as img (lazy) until video starts playing */}
+          {posterUrl && !isVisible && (
+            <img
+              src={posterUrl}
+              alt={exercise.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          )}
+          <video
+            ref={videoRef}
+            key={videoUrl}
+            src={videoUrl}
+            loop
+            muted
+            playsInline
+            onError={() => setVideoError(true)}
+            className="w-full h-full object-cover"
+            // preload="none" keeps initial page load fast; IO starts playback when visible
+            // No poster= attribute: poster fetches eagerly even with preload=none
+            preload="none"
+          />
+        </>
       ) : posterUrl ? (
         <img
           src={posterUrl}
