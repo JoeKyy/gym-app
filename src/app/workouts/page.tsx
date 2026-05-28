@@ -35,6 +35,9 @@ export default function WorkoutsPage() {
           <Link href="/generate" className="btn btn-primary">
             ⚡ Gerar treino
           </Link>
+          <Link href="/workouts/templates" className="btn btn-secondary">
+            📋 Templates
+          </Link>
           <button onClick={() => setShowForm((v) => !v)} className="btn btn-secondary">
             + Manual
           </button>

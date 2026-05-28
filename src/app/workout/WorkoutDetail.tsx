@@ -47,6 +47,58 @@ function formatElapsed(secs: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+// ─── Rest Timer Overlay ───────────────────────────────────────────────────────
+
+function RestTimerOverlay({ remaining, total, onSkip }: {
+  remaining: number; total: number; onSkip: () => void;
+}) {
+  const pct = total > 0 ? (remaining / total) * 100 : 0;
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  const isAlmostDone = remaining <= 5;
+
+  return (
+    <div className={`rounded-2xl p-4 transition-colors ${
+      isAlmostDone
+        ? "bg-[var(--color-success-bg)] border border-[var(--color-success-border)]"
+        : "bg-[var(--color-surface-2)] border border-[var(--color-border)]"
+    }`}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{isAlmostDone ? "✅" : "⏱"}</span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
+              {isAlmostDone ? "Quase lá!" : "Descansando"}
+            </p>
+            <p className="font-mono text-2xl font-bold leading-tight" style={{
+              color: isAlmostDone ? "var(--color-success-text)" : "var(--color-primary)"
+            }}>
+              {mins > 0 ? `${mins}:${String(secs).padStart(2, "0")}` : `${remaining}s`}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onSkip}
+          className="btn btn-sm"
+          style={{ background: "var(--color-surface)", color: "var(--color-text-muted)" }}
+        >
+          Pular →
+        </button>
+      </div>
+      {/* Progress bar */}
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-border)" }}>
+        <div
+          className="h-full rounded-full transition-all duration-1000"
+          style={{
+            width: `${pct}%`,
+            background: isAlmostDone ? "var(--color-success)" : "var(--color-primary)",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ─── Active Set Row ───────────────────────────────────────────────────────────
 
 function ActiveSetRow({ setNum, state, onChange, defaultReps }: {
@@ -207,17 +259,20 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
 
 // ─── Active Exercise Card ─────────────────────────────────────────────────────
 
-function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail }: {
+function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, onSetCompleted }: {
   ex: Exercise; config: ExerciseSet;
   sessionState: ExerciseSessionState;
   onChange: (s: ExerciseSessionState) => void;
   onViewDetail: () => void;
+  onSetCompleted: (restSeconds: number) => void;
 }) {
   const doneSets = sessionState.sets.filter((s) => s.completed).length;
   const allDone = doneSets === sessionState.sets.length;
 
   const markAll = () => {
-    onChange({ sets: sessionState.sets.map((s) => ({ ...s, completed: !allDone })) });
+    const nowAllDone = !allDone;
+    onChange({ sets: sessionState.sets.map((s) => ({ ...s, completed: nowAllDone })) });
+    if (nowAllDone) onSetCompleted(typeof config.rest === "number" ? config.rest : 60);
   };
 
   return (
@@ -263,9 +318,15 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail }
             key={i} setNum={i + 1} state={setS}
             defaultReps={String(config.reps)}
             onChange={(ns) => {
+              const wasCompleted = setS.completed;
+              const nowCompleted = ns.completed;
               const newSets = [...sessionState.sets];
               newSets[i] = ns;
               onChange({ sets: newSets });
+              // Trigger rest timer when a set is newly completed
+              if (!wasCompleted && nowCompleted) {
+                onSetCompleted(typeof config.rest === "number" ? config.rest : 60);
+              }
             }}
           />
         ))}
@@ -591,6 +652,10 @@ export default function WorkoutEditorPage() {
   const [showFinish, setShowFinish] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Rest timer
+  const [restTimer, setRestTimer] = useState<{ remaining: number; total: number } | null>(null);
+  const restTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => { getExercises().then(setAllExercises); }, []);
 
   useEffect(() => {
@@ -598,9 +663,12 @@ export default function WorkoutEditorPage() {
     if (found) setWorkout(found);
   }, [workouts, id]);
 
-  // Cleanup timer on unmount
+  // Cleanup timers on unmount
   useEffect(() => {
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (restTimerRef.current) clearInterval(restTimerRef.current);
+    };
   }, []);
 
   const searchResults = useMemo(() =>
@@ -681,11 +749,37 @@ export default function WorkoutEditorPage() {
 
   const handleExitSession = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (restTimerRef.current) { clearInterval(restTimerRef.current); restTimerRef.current = null; }
     setMode("edit");
     setSessionLogs({});
     setSessionStartedAt(null);
     setElapsed(0);
     setShowFinish(false);
+    setRestTimer(null);
+  }, []);
+
+  const startRestTimer = useCallback((seconds: number) => {
+    if (restTimerRef.current) clearInterval(restTimerRef.current);
+    setRestTimer({ remaining: seconds, total: seconds });
+    restTimerRef.current = setInterval(() => {
+      setRestTimer((prev) => {
+        if (!prev || prev.remaining <= 1) {
+          clearInterval(restTimerRef.current!);
+          restTimerRef.current = null;
+          // Vibrate when done (mobile)
+          if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+            navigator.vibrate([200, 100, 200]);
+          }
+          return null;
+        }
+        return { ...prev, remaining: prev.remaining - 1 };
+      });
+    }, 1000);
+  }, []);
+
+  const skipRestTimer = useCallback(() => {
+    if (restTimerRef.current) { clearInterval(restTimerRef.current); restTimerRef.current = null; }
+    setRestTimer(null);
   }, []);
 
   const handleSaveSession = useCallback((rating: number | null, notes: string) => {
@@ -852,6 +946,7 @@ export default function WorkoutEditorPage() {
                   sessionState={state}
                   onChange={(ns) => updateSetLog(exerciseId, ns)}
                   onViewDetail={() => setDetailEx(ex)}
+                  onSetCompleted={startRestTimer}
                 />
               );
             })}
@@ -873,13 +968,21 @@ export default function WorkoutEditorPage() {
       {/* Sticky bottom bar — session mode only */}
       {mode === "session" && (
         <div
-          className="fixed left-0 right-0 z-40 flex justify-center px-4 pt-4 pb-4"
+          className="fixed left-0 right-0 z-40 flex justify-center px-4 pt-3 pb-4"
           style={{
             bottom: "calc(4rem + env(safe-area-inset-bottom, 0px))",
-            background: "linear-gradient(to top, var(--color-bg) 80%, transparent)",
+            background: "linear-gradient(to top, var(--color-bg) 85%, transparent)",
           }}
         >
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl space-y-2">
+            {/* Rest timer (shown above finish button) */}
+            {restTimer && (
+              <RestTimerOverlay
+                remaining={restTimer.remaining}
+                total={restTimer.total}
+                onSkip={skipRestTimer}
+              />
+            )}
             <button
               onClick={() => setShowFinish(true)}
               disabled={completedInSession === 0}

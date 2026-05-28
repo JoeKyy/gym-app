@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ALL_EQUIPMENT, EQUIPMENT_CATEGORIES, EQUIPMENT_CATEGORY_LABELS } from "@/lib/equipment";
 import { getEquipmentProfile, saveEquipmentProfile } from "@/lib/storage";
+import EquipmentIcon from "@/components/EquipmentIcon";
 
 export default function EquipmentPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -76,7 +77,11 @@ export default function EquipmentPage() {
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-3xl">{eq.emoji}</span>
+                      <EquipmentIcon
+                        id={eq.id}
+                        size={44}
+                        color={isSelected ? "var(--color-primary)" : "var(--color-text-secondary)"}
+                      />
                       {isSelected && (
                         <span className="text-[var(--color-primary)] text-lg font-bold leading-none">✓</span>
                       )}
