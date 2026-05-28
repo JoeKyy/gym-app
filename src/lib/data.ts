@@ -9,8 +9,16 @@ export async function getExercises(): Promise<Exercise[]> {
   try {
     const res = await fetch("/data/exercises.json");
     if (!res.ok) throw new Error("Failed to load exercises");
-    const raw: Exercise[] = await res.json();
-    _exercises = applyEquipmentCorrections(raw);
+    const raw = await res.json();
+    if (!Array.isArray(raw) || !raw.every((e: unknown) =>
+      typeof e === "object" && e !== null &&
+      typeof (e as Record<string, unknown>).id === "string" &&
+      Array.isArray((e as Record<string, unknown>).targetMuscles)
+    )) {
+      console.warn("[data] exercises.json has unexpected shape, using empty fallback");
+      return [];
+    }
+    _exercises = applyEquipmentCorrections(raw as Exercise[]);
     return _exercises;
   } catch {
     console.warn("exercises.json not found — returning empty list");
