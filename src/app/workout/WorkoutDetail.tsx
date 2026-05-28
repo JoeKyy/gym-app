@@ -165,12 +165,56 @@ const ANGLE_LABELS: Record<string, string> = {
   frontFemale: "♀ Frontal", sideFemale: "♀ Lateral",
 };
 
+const SHEET_DEFAULT_SETS = 3;
+const SHEET_DEFAULT_REPS = "12";
+const SHEET_REST_SECS = 60;
+interface SheetSetRow { id: number; weight: string; reps: string; done: boolean; }
+
 function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise; onClose: () => void; injuredMuscleNames: string[] }) {
   const availableAngles = getAvailableAngles(ex);
   const [angle, setAngle] = useState<VideoAngle>(availableAngles[0] ?? "frontMale");
   const [videoError, setVideoError] = useState(false);
   const videoUrl = getVideoUrl(ex, angle);
   const [preference, setPreference] = useState<ExercisePreferenceState>(() => getExercisePreference(ex.id));
+
+  // Sets tracker
+  const initSets = (): SheetSetRow[] =>
+    Array.from({ length: SHEET_DEFAULT_SETS }, (_, i) => ({ id: i + 1, weight: "", reps: SHEET_DEFAULT_REPS, done: false }));
+  const [sets, setSets] = useState<SheetSetRow[]>(initSets);
+  const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
+  const [allDone, setAllDone] = useState(false);
+  const restRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const doneSetsCount = sets.filter((s) => s.done).length;
+
+  useEffect(() => {
+    if (restTimeLeft === null) { if (restRef.current) clearInterval(restRef.current); return; }
+    if (restTimeLeft <= 0) { setRestTimeLeft(null); return; }
+    restRef.current = setInterval(() => setRestTimeLeft((t) => (t !== null && t > 1 ? t - 1 : null)), 1000);
+    return () => { if (restRef.current) clearInterval(restRef.current); };
+  }, [restTimeLeft]);
+
+  const risky = injuredMuscleNames.some((m) =>
+    [...ex.targetMuscles, ...ex.secondaryMuscles].map((s) => s.toLowerCase()).includes(m.toLowerCase())
+  );
+  const riskyMuscles = injuredMuscleNames.filter((m) =>
+    [...ex.targetMuscles, ...ex.secondaryMuscles].map((s) => s.toLowerCase()).includes(m.toLowerCase())
+  );
+
+  const toggleSet = (id: number) => {
+    setSets((prev) => {
+      const updated = prev.map((s) => (s.id === id ? { ...s, done: !s.done } : s));
+      const justDone = !prev.find((s) => s.id === id)?.done;
+      if (justDone) {
+        if (updated.find((s) => !s.done)) setRestTimeLeft(SHEET_REST_SECS);
+        else setAllDone(true);
+      }
+      return updated;
+    });
+  };
+  const updateSet = (id: number, field: "weight" | "reps", value: string) =>
+    setSets((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+  const addSet = () => { setSets((prev) => [...prev, { id: Date.now(), weight: "", reps: SHEET_DEFAULT_REPS, done: false }]); setAllDone(false); };
+  const resetSets = () => { setSets(initSets()); setRestTimeLeft(null); setAllDone(false); };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: "var(--color-bg)" }}>
@@ -228,6 +272,7 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
             {ex.equipments?.map((eq) => (
               <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
             ))}
+            {risky && <span className="badge badge-red">⚠ Risco: {riskyMuscles.join(", ")}</span>}
           </div>
         </div>
 
@@ -321,6 +366,76 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
             </ol>
           </div>
         )}
+
+        {/* Sets tracker */}
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="section-label">
+              Séries{doneSetsCount > 0 && ` — ${doneSetsCount}/${sets.length} feitas`}
+            </p>
+            {doneSetsCount > 0 && (
+              <button onClick={resetSets} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">
+                Reiniciar
+              </button>
+            )}
+          </div>
+
+          {allDone && (
+            <div className="bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] rounded-xl p-3 flex items-center justify-center gap-2">
+              <Trophy size={16} className="text-[var(--color-primary)]" />
+              <p className="text-[var(--color-primary)] font-semibold text-sm">Exercício concluído!</p>
+            </div>
+          )}
+
+          {restTimeLeft !== null && !allDone && (
+            <RestTimerOverlay remaining={restTimeLeft} total={SHEET_REST_SECS} onSkip={() => setRestTimeLeft(null)} />
+          )}
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 px-1">
+              <span className="w-7 shrink-0" />
+              <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">#</span>
+              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Peso (kg)</span>
+              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Repetições</span>
+              <span className="w-8 shrink-0" />
+            </div>
+
+            {sets.map((set, idx) => (
+              <div key={set.id} className={`flex items-center gap-2 rounded-xl px-1 py-1.5 transition-all ${set.done ? "opacity-50" : ""}`}>
+                <button
+                  onClick={() => toggleSet(set.id)}
+                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                    set.done
+                      ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-text)]"
+                      : "border-[var(--color-border)] hover:border-[var(--color-primary)]"
+                  }`}
+                >
+                  {set.done && <span className="text-xs font-bold">✓</span>}
+                </button>
+                <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">{idx + 1}</span>
+                <input type="number" inputMode="decimal" placeholder="—"
+                  value={set.weight} disabled={set.done}
+                  onChange={(e) => updateSet(set.id, "weight", e.target.value)}
+                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                />
+                <input type="number" inputMode="numeric" placeholder={SHEET_DEFAULT_REPS}
+                  value={set.reps} disabled={set.done}
+                  onChange={(e) => updateSet(set.id, "reps", e.target.value)}
+                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                />
+                <button onClick={() => setSets((prev) => prev.filter((s) => s.id !== set.id))}
+                  className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg">
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={addSet}
+            className="w-full border border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] rounded-xl py-2.5 text-sm transition-colors">
+            + Adicionar série
+          </button>
+        </div>
 
         {/* MuscleWiki link */}
         {ex.musclewikiUrl && (
