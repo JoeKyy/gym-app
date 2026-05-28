@@ -213,29 +213,24 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, on
   );
 
   const toggleSet = (id: number) => {
-    setSets((prev) => {
-      const updated = prev.map((s) => (s.id === id ? { ...s, done: !s.done } : s));
-      const justDone = !prev.find((s) => s.id === id)?.done;
-      if (justDone) {
-        if (updated.find((s) => !s.done)) setRestTimeLeft(SHEET_REST_SECS);
-        else setAllDone(true);
-      }
-      syncSession(updated);
-      return updated;
-    });
+    const updated = sets.map((s) => (s.id === id ? { ...s, done: !s.done } : s));
+    const justDone = !sets.find((s) => s.id === id)?.done;
+    if (justDone) {
+      if (updated.find((s) => !s.done)) setRestTimeLeft(SHEET_REST_SECS);
+      else setAllDone(true);
+    }
+    setSets(updated);
+    syncSession(updated);
   };
-  const updateSet = (id: number, field: "weight" | "reps", value: string) =>
-    setSets((prev) => {
-      const updated = prev.map((s) => (s.id === id ? { ...s, [field]: value } : s));
-      syncSession(updated);
-      return updated;
-    });
+  const updateSet = (id: number, field: "weight" | "reps", value: string) => {
+    const updated = sets.map((s) => (s.id === id ? { ...s, [field]: value } : s));
+    setSets(updated);
+    syncSession(updated);
+  };
   const addSet = () => {
-    setSets((prev) => {
-      const updated = [...prev, { id: Date.now(), weight: "", reps: SHEET_DEFAULT_REPS, done: false }];
-      syncSession(updated);
-      return updated;
-    });
+    const updated = [...sets, { id: Date.now(), weight: "", reps: SHEET_DEFAULT_REPS, done: false }];
+    setSets(updated);
+    syncSession(updated);
     setAllDone(false);
   };
   const resetSets = () => { setSets(initSets()); setRestTimeLeft(null); setAllDone(false); syncSession(initSets()); };
@@ -448,7 +443,7 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, on
                   onChange={(e) => updateSet(set.id, "reps", e.target.value)}
                   className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
                 />
-                <button onClick={() => setSets((prev) => prev.filter((s) => s.id !== set.id))}
+                <button onClick={() => { const updated = sets.filter((s) => s.id !== set.id); setSets(updated); syncSession(updated); }}
                   className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg">
                   ×
                 </button>
@@ -518,36 +513,37 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
     <div className={`rounded-2xl overflow-hidden border transition-colors ${
       allDone ? "border-[var(--color-success-border)]" : "border-[var(--color-border)]"
     }`} style={{ background: "var(--color-surface)" }}>
-      {/* Header — tap to view details */}
-      <button
-        className="w-full flex items-center gap-3 px-3 py-3 text-left"
-        onClick={onViewDetail}
-      >
-        <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0">
-          <ExerciseMedia exercise={ex} className="w-full h-full" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm truncate capitalize" style={{ color: "var(--color-text)" }}>
-            {ex.name}
-            {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5"
-              style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}><Trophy size={9} />PR!</span>}
-          </p>
-          <p className="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
-            {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
-            {progression && !allDone && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
-                style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)" }}>
-                ↑ +{progression.suggestedIncrease}kg
-              </span>
-            )}
-          </p>
-        </div>
-        <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1 flex items-center"
-          style={{ color: "var(--color-text-muted)", background: "var(--color-surface-2)" }}>
-          <Info size={13} />
-        </span>
+      {/* Header row — flat div to avoid invalid nested <button> elements */}
+      <div className="flex items-center gap-3 px-3 py-3">
+        {/* Left: image + info — tap to view details */}
+        <button className="flex-1 flex items-center gap-3 text-left min-w-0" onClick={onViewDetail}>
+          <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0">
+            <ExerciseMedia exercise={ex} className="w-full h-full" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm truncate capitalize" style={{ color: "var(--color-text)" }}>
+              {ex.name}
+              {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5"
+                style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}><Trophy size={9} />PR!</span>}
+            </p>
+            <p className="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
+              {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
+              {progression && !allDone && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                  style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)" }}>
+                  ↑ +{progression.suggestedIncrease}kg
+                </span>
+              )}
+            </p>
+          </div>
+          <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1 flex items-center"
+            style={{ color: "var(--color-text-muted)", background: "var(--color-surface-2)" }}>
+            <Info size={13} />
+          </span>
+        </button>
+        {/* Right: mark-all — sibling button, not nested */}
         <button
-          onClick={(e) => { e.stopPropagation(); markAll(); }}
+          onClick={markAll}
           className={`text-xs px-2.5 py-1.5 rounded-lg border font-medium transition-colors shrink-0 ${
             allDone
               ? "bg-[var(--color-success-bg)] border-[var(--color-success-border)] text-[var(--color-success-text)]"
@@ -556,7 +552,7 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
         >
           {allDone ? "✓ Feito" : "Marcar todas"}
         </button>
-      </button>
+      </div>
 
       {/* Sets */}
       <div className="px-3 pb-3 space-y-1.5 border-t pt-2.5" style={{ borderColor: "var(--color-border)" }}>
