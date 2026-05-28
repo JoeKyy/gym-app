@@ -30,6 +30,7 @@ export interface Exercise {
   videoUrls?: VideoUrls;
   gifUrl?: string;
   instructions: string[];
+  instructions_pt?: string[];
   musclewikiUrl?: string;
   exrxUrl?: string;
   wgerUrl?: string;

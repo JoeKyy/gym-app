@@ -280,7 +280,7 @@ export default function ExerciseDetailPage() {
           <div className="card p-4">
             <p className="section-label mb-3">Como executar</p>
             <ol className="space-y-3">
-              {exercise.instructions.map((step, i) => (
+              {(exercise.instructions_pt ?? exercise.instructions).map((step, i) => (
                 <li key={i} className="flex gap-3 text-sm">
                   <span className="text-[var(--color-primary)] font-bold shrink-0 w-5">{i + 1}.</span>
                   <span className="text-[var(--color-text-secondary)] leading-relaxed">
