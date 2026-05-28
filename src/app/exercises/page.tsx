@@ -40,18 +40,27 @@ const BODY_REGION_TO_BODYPARTS: Record<string, string[]> = {
   "glutes":           ["Glutes", "Gluteus Maximus", "Gluteus Medius"],
   "gluteal":          ["Glutes", "Gluteus Maximus", "Gluteus Medius"],
   "calves":           ["Calves", "Gastrocnemius", "Soleus"],
+  "left-soleus":      ["Calves", "Soleus"],
+  "right-soleus":     ["Calves", "Soleus"],
   "lower back":       ["Lower back"],
+  "lower-back":       ["Lower back"],
   "erector spinae":   ["Lower back"],
   "lats":             ["Lats"],
   "upper back":       ["Lats", "Traps", "Traps (mid-back)", "Lower Traps", "Upper Traps"],
+  "upper-back":       ["Lats", "Traps", "Traps (mid-back)", "Lower Traps", "Upper Traps"],
   "traps":            ["Traps", "Traps (mid-back)", "Upper Traps", "Lower Traps"],
   "traps (mid-back)": ["Traps (mid-back)"],
   "trapezius":        ["Traps", "Upper Traps", "Lower Traps"],
   "triceps":          ["Triceps", "Long Head Tricep"],
   "shoulders":        ["Shoulders", "Front Shoulders", "Rear Shoulders", "Anterior Deltoid", "Lateral Deltoid", "Posterior Deltoid"],
+  "front-deltoids":   ["Shoulders", "Front Shoulders", "Anterior Deltoid", "Lateral Deltoid"],
+  "back-deltoids":    ["Rear Shoulders", "Posterior Deltoid"],
   "rear delts":       ["Rear Shoulders", "Posterior Deltoid"],
   "rotator cuff":     ["Rear Shoulders"],
   "serratus anterior":["Chest"],
+  // Inner/outer thigh — library uses "adductor" for posterior inner thigh, "abductors" for anterior outer thigh
+  "adductor":         ["Groin", "Inner Thigh"],
+  "abductors":        ["Glutes", "Gluteus Medius", "Inner Thigh"],
 };
 
 export default function ExercisesPage() {
@@ -94,6 +103,8 @@ export default function ExercisesPage() {
   }, [selectedMuscles]);
 
   const handleBodyMapToggle = (muscles: string[]) => {
+    // Clear the bodyPart dropdown when using the body map (they'd conflict as AND)
+    setFilters((f) => f.bodyPart ? { ...f, bodyPart: "" } : f);
     setSelectedMuscles((prev) => {
       const anySelected = muscles.some((m) => prev.includes(m));
       if (anySelected) {
