@@ -23,12 +23,6 @@ const ENV_ICON: Record<string, React.ReactNode> = {
   any:     <Zap    size={20} />,
 };
 const ENV_LABEL: Record<string, string> = { home: "Casa", gym: "Academia", pilates: "Pilates/Mobilidade", any: "Qualquer" };
-const ENV_BG: Record<string, string> = {
-  home:    "linear-gradient(135deg, #1e3a5f 0%, #2d4a7a 100%)",
-  gym:     "linear-gradient(135deg, #1a1a2e 0%, #3d2c2c 100%)",
-  pilates: "linear-gradient(135deg, #064e3b 0%, #0f4c5c 100%)",
-  any:     "linear-gradient(135deg, #312e81 0%, #4338ca 100%)",
-};
 
 // ─── Active Session Types ─────────────────────────────────────────────────────
 
@@ -995,177 +989,211 @@ export default function WorkoutEditorPage() {
         />
       )}
 
-      {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
-      <div className="-mx-4 -mt-5 relative overflow-hidden" style={{ minHeight: "160px", background: ENV_BG[workout.environment] ?? ENV_BG.any }}>
-        {/* subtle light accent */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)" }} />
+      {/* ── Same layout pattern as exercise detail page ─────────────────────── */}
+      {(() => {
+        const firstEx = workout.exercises.length > 0 ? exerciseMap.get(workout.exercises[0].exerciseId) : undefined;
+        const heroVideoUrl = firstEx?.videoUrls?.frontMale ?? firstEx?.videoUrls?.sideMale ?? firstEx?.videoUrls?.frontFemale ?? firstEx?.videoUrls?.sideFemale;
+        const heroImgUrl = firstEx?.gifUrl;
+        return (
+          <div className="-mx-4 -mt-5">
+            {/* ── Video Hero ─────────────────────────────────────────────── */}
+            <div className="relative w-full bg-black" style={{ aspectRatio: "1 / 1", maxHeight: "60vw" }}>
+              {heroVideoUrl ? (
+                <video key={heroVideoUrl} src={heroVideoUrl} autoPlay loop muted playsInline
+                  className="w-full h-full object-contain" />
+              ) : heroImgUrl ? (
+                <img src={heroImgUrl} alt={firstEx?.name ?? workout.name} className="w-full h-full object-contain" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center opacity-20">
+                  <Dumbbell size={64} style={{ color: "var(--color-text-muted)" }} />
+                </div>
+              )}
 
-        {/* Back button */}
-        {mode === "edit" ? (
-          <Link href="/workouts"
-            className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
-            style={{ background: "rgba(0,0,0,0.35)" }}>
-            <ChevronLeft size={20} />
-          </Link>
-        ) : (
-          <button onClick={handleExitSession}
-            className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
-            style={{ background: "rgba(0,0,0,0.35)" }}>
-            <ChevronLeft size={20} />
-          </button>
-        )}
+              {/* gradient overlay at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%)" }} />
 
-        {/* Hero content */}
-        <div className="px-4 pt-14 pb-5">
-          <div className="flex items-end justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
-                Treino
-              </p>
-              <h1 className="text-2xl font-bold text-white leading-tight truncate">{workout.name}</h1>
-              <div className="flex items-center gap-2 mt-2 flex-wrap text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
-                <span className="flex items-center gap-1">
-                  {ENV_ICON[workout.environment]}
-                  {ENV_LABEL[workout.environment]}
-                </span>
-                <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
-                <span>{workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}</span>
-                {riskyCount > 0 && (
-                  <>
-                    <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
-                    <span className="text-red-300">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>
-                  </>
-                )}
-                {mode === "session" && (
-                  <>
-                    <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
-                    <span className="font-mono font-semibold flex items-center gap-0.5 text-white">
-                      <Timer size={12} />{formatElapsed(elapsed)}
+              {/* Back button */}
+              {mode === "edit" ? (
+                <Link href="/workouts"
+                  className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
+                  style={{ background: "rgba(0,0,0,0.45)" }}>
+                  <ChevronLeft size={20} />
+                </Link>
+              ) : (
+                <button onClick={handleExitSession}
+                  className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
+                  style={{ background: "rgba(0,0,0,0.45)" }}>
+                  <ChevronLeft size={20} />
+                </button>
+              )}
+
+              {/* Session timer overlay (top-right) */}
+              {mode === "session" && (
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm text-white text-xs font-mono font-semibold"
+                  style={{ background: "rgba(0,0,0,0.45)" }}>
+                  <Timer size={12} />{formatElapsed(elapsed)}
+                </div>
+              )}
+            </div>
+
+            {/* ── Content ────────────────────────────────────────────────── */}
+            <div className="px-4 pt-5 space-y-5 pb-32">
+
+              {/* Title + badges */}
+              <div>
+                <h1 className="text-2xl font-bold leading-tight">{workout.name}</h1>
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <span className="badge badge-gray flex items-center gap-1">
+                    {ENV_ICON[workout.environment]}{ENV_LABEL[workout.environment]}
+                  </span>
+                  <span className="badge badge-gray">
+                    {workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}
+                  </span>
+                  {riskyCount > 0 && (
+                    <span className="badge badge-red">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Edit mode: start + add */}
+              {mode === "edit" && (
+                <div className="card p-3">
+                  <p className="text-[10px] uppercase tracking-wide mb-2" style={{ color: "var(--color-text-muted)" }}>
+                    Sessão de treino
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleStartSession}
+                      disabled={workout.exercises.length === 0}
+                      className="flex-1 btn btn-primary flex items-center justify-center gap-1.5 disabled:opacity-40"
+                    >
+                      <Play size={14} />Iniciar treino
+                    </button>
+                    <button
+                      onClick={() => setShowPicker(true)}
+                      className="btn flex items-center gap-1 text-sm"
+                      style={{ background: "var(--color-surface-2)", color: "var(--color-text)" }}
+                    >
+                      + Exercício
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Session mode: progress */}
+              {mode === "session" && workout.exercises.length > 0 && (
+                <div className="card p-3">
+                  <div className="flex justify-between text-xs mb-2" style={{ color: "var(--color-text-muted)" }}>
+                    <span>{completedInSession}/{workout.exercises.length} exercícios concluídos</span>
+                    <span className="font-semibold" style={{ color: "var(--color-primary)" }}>
+                      {Math.round((completedInSession / workout.exercises.length) * 100)}%
                     </span>
-                  </>
-                )}
-              </div>
-            </div>
-            {mode === "edit" && workout.exercises.length > 0 && (
-              <button onClick={handleStartSession} className="btn btn-primary shrink-0 flex items-center gap-1.5">
-                <Play size={14} />Iniciar
-              </button>
-            )}
-          </div>
-
-          {/* Session progress bar */}
-          {mode === "session" && workout.exercises.length > 0 && (
-            <div className="mt-4">
-              <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
-                <span>{completedInSession}/{workout.exercises.length} exercícios</span>
-                <span>{Math.round((completedInSession / workout.exercises.length) * 100)}%</span>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ background: "rgba(255,255,255,0.85)", width: `${(completedInSession / workout.exercises.length) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-5 pb-32 pt-5">
-
-        {/* Exercise list */}
-        {workout.exercises.length === 0 ? (
-          <div className="card p-10 text-center">
-            <div className="flex justify-center mb-3"><Dumbbell size={40} style={{ color: "var(--color-text-muted)", opacity: 0.3 }} /></div>
-            <p className="font-semibold" style={{ color: "var(--color-text)" }}>Nenhum exercício</p>
-            <p className="text-sm mt-1 mb-4" style={{ color: "var(--color-text-muted)" }}>Adicione exercícios ao seu treino</p>
-            <button onClick={() => setShowPicker(true)} className="btn btn-primary">+ Adicionar exercício</button>
-          </div>
-        ) : mode === "edit" ? (
-          <div className="space-y-2">
-            {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
-              const ex = exerciseMap.get(exerciseId);
-              if (!ex) return null;
-              const nextEx = workout.exercises[idx + 1];
-              const isStart = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
-              const isMember = !!(supersetGroupId && (
-                isStart ||
-                (idx > 0 && workout.exercises[idx - 1]?.supersetGroupId === supersetGroupId)
-              ));
-              return (
-                <div key={exerciseId}>
-                  <WorkoutExerciseRow
-                    ex={ex} config={config} idx={idx} total={workout.exercises.length}
-                    risky={isRisky(ex)}
-                    isInSuperset={isMember}
-                    isStartOfSuperset={isStart}
-                    onRemove={() => removeExercise(exerciseId)}
-                    onMove={(dir) => moveExercise(exerciseId, dir)}
-                    onUpdate={(p) => updateConfig(exerciseId, p)}
-                    onToggleSuperset={idx < workout.exercises.length - 1 ? () => toggleSuperset(idx) : undefined}
-                  />
-                  {isStart && (
-                    <div className="flex items-center gap-2 py-1 px-3">
-                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
-                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                        style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
-                        superset
-                      </span>
-                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
-                    </div>
-                  )}
+                  </div>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--color-surface-2)" }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ background: "var(--color-success)", width: `${(completedInSession / workout.exercises.length) * 100}%` }}
+                    />
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
-              const ex = exerciseMap.get(exerciseId);
-              const state = sessionLogs[exerciseId];
-              if (!ex || !state) return null;
-              const nextEx = workout.exercises[idx + 1];
-              const isFirstInSuperset = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
-              const prevEx = workout.exercises[idx - 1];
-              const isSecondInSuperset = !!(supersetGroupId && prevEx?.supersetGroupId === supersetGroupId);
-              // Short rest for first exercise in pair, normal for second
-              const restOverride = isFirstInSuperset ? 15 : undefined;
-              return (
-                <div key={exerciseId}>
-                  {isSecondInSuperset && (
-                    <div className="flex items-center gap-2 py-1 px-1">
-                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
-                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                        style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
-                        superset
-                      </span>
-                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
-                    </div>
-                  )}
-                  <ActiveExerciseCard
-                    ex={ex} config={config}
-                    sessionState={state}
-                    onChange={(ns) => updateSetLog(exerciseId, ns)}
-                    onViewDetail={() => setDetailEx(ex)}
-                    onSetCompleted={(secs) => startRestTimer(restOverride ?? secs)}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
+              )}
 
-        {/* Edit mode: add button */}
-        {mode === "edit" && workout.exercises.length > 0 && (
-          <button
-            onClick={() => setShowPicker(true)}
-            className="w-full py-3.5 rounded-2xl text-sm font-semibold transition-colors border border-dashed hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
-          >
-            + Adicionar exercício
-          </button>
-        )}
-      </div>
+              {/* Exercise list */}
+              {workout.exercises.length === 0 ? (
+                <div className="card p-10 text-center">
+                  <div className="flex justify-center mb-3"><Dumbbell size={40} style={{ color: "var(--color-text-muted)", opacity: 0.3 }} /></div>
+                  <p className="font-semibold" style={{ color: "var(--color-text)" }}>Nenhum exercício</p>
+                  <p className="text-sm mt-1 mb-4" style={{ color: "var(--color-text-muted)" }}>Adicione exercícios ao seu treino</p>
+                  <button onClick={() => setShowPicker(true)} className="btn btn-primary">+ Adicionar exercício</button>
+                </div>
+              ) : mode === "edit" ? (
+                <div className="space-y-2">
+                  {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
+                    const ex = exerciseMap.get(exerciseId);
+                    if (!ex) return null;
+                    const nextEx = workout.exercises[idx + 1];
+                    const isStart = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
+                    const isMember = !!(supersetGroupId && (
+                      isStart ||
+                      (idx > 0 && workout.exercises[idx - 1]?.supersetGroupId === supersetGroupId)
+                    ));
+                    return (
+                      <div key={exerciseId}>
+                        <WorkoutExerciseRow
+                          ex={ex} config={config} idx={idx} total={workout.exercises.length}
+                          risky={isRisky(ex)}
+                          isInSuperset={isMember}
+                          isStartOfSuperset={isStart}
+                          onRemove={() => removeExercise(exerciseId)}
+                          onMove={(dir) => moveExercise(exerciseId, dir)}
+                          onUpdate={(p) => updateConfig(exerciseId, p)}
+                          onToggleSuperset={idx < workout.exercises.length - 1 ? () => toggleSuperset(idx) : undefined}
+                        />
+                        {isStart && (
+                          <div className="flex items-center gap-2 py-1 px-3">
+                            <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                              style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
+                              superset
+                            </span>
+                            <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
+                    const ex = exerciseMap.get(exerciseId);
+                    const state = sessionLogs[exerciseId];
+                    if (!ex || !state) return null;
+                    const nextEx = workout.exercises[idx + 1];
+                    const isFirstInSuperset = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
+                    const prevEx = workout.exercises[idx - 1];
+                    const isSecondInSuperset = !!(supersetGroupId && prevEx?.supersetGroupId === supersetGroupId);
+                    const restOverride = isFirstInSuperset ? 15 : undefined;
+                    return (
+                      <div key={exerciseId}>
+                        {isSecondInSuperset && (
+                          <div className="flex items-center gap-2 py-1 px-1">
+                            <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                              style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
+                              superset
+                            </span>
+                            <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                          </div>
+                        )}
+                        <ActiveExerciseCard
+                          ex={ex} config={config}
+                          sessionState={state}
+                          onChange={(ns) => updateSetLog(exerciseId, ns)}
+                          onViewDetail={() => setDetailEx(ex)}
+                          onSetCompleted={(secs) => startRestTimer(restOverride ?? secs)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Edit mode: add more exercises */}
+              {mode === "edit" && workout.exercises.length > 0 && (
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="w-full py-3.5 rounded-2xl text-sm font-semibold transition-colors border border-dashed hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                  style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+                >
+                  + Adicionar exercício
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Sticky bottom bar — session mode only */}
       {mode === "session" && (
