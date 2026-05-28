@@ -36,14 +36,24 @@
 - Filtragem automática de exercícios contraindicados por lesão
 - Limites de carga espinhal configuráveis
 
+### 🏅 Sessão de Treino
+- **Supersets**: vincule dois exercícios como superset no modo de edição (expanda o card → "Superset com próximo"); durante a sessão, exibe banner "SUPERSET" entre os pares e usa descanso curto (15s) entre A→B, descanso normal após B
+- **Auto-progressão**: badge "+2.5kg" aparece quando RiR ≤ 1 nas últimas 2 sessões com aquele exercício
+- **PR em tempo real**: badge 🏆 quando um set supera o 1RM estimado histórico
+- **Timer de descanso** com vibração ao acabar (mobile)
+
 ### 📊 Progresso
 - Histórico de sessões com data, duração, exercícios realizados
-- Avaliação da sessão (⭐ 1–5), notas livres
+- Avaliação da sessão (⭐ 1–5), RiR, notas livres
 - Exibição de frequência cardíaca e calorias (via Strava ou Apple Health)
+- **Meta semanal de volume** por grupo muscular com barras de progresso
+- **mScore pessoal**: badges "Favorito" ⭐ e "Frequente" na biblioteca de exercícios
 
-### 🔄 Sincronização
+### 🔄 Sincronização & Backup
 - **Strava**: OAuth2 completo, exportar sessão como WeightTraining activity, importar dados de FC e calorias
 - **Apple Health**: Exportar sessão como `.tcx` para importar no iPhone, importar `export.xml` para enriquecer sessões
+- **Backup JSON**: exportar/restaurar todos os dados (sessões, treinos, perfil, lesões) como arquivo `.json`
+- **Download .tcx** por sessão diretamente no histórico de progresso
 
 ### ⚙️ Perfil de Equipamentos
 - Seleção de equipamentos disponíveis (casa, academia, ou personalizado)
@@ -254,16 +264,62 @@ done
 - Let's Encrypt (AutoSSL via cPanel) para HTTPS
 - Loop rsync para upload incremental dos 5418 vídeos (timeout SSH de 5min)
 
-### Fase 6 — Strava + Apple Health (sessão 15+)
-- Integração Strava: OAuth2 client-side, export WeightTraining, import FC/calorias
-- Integração Apple Health: export `.tcx`, parser `export.xml`
-- Novos campos em `WorkoutSession`: `heartRateAvg`, `heartRateMax`, `calories`, `stravaActivityId`, `externalSource`
-- Página `/sync/` com tabs Strava e Apple Health
-- Badges ❤️ bpm / 🔥 kcal nos cards de sessão no histórico
-- Fix Turbopack warning no Next.js 16 (`turbopack: {}`)
-- **Repositório privado criado** no GitHub (código-fonte apenas, sem mídia)
+### Fase 7 — Fitbod-inspired UX + Rehab Avançado (sessões 16–25)
+- Perfil de usuário (objetivo, nível, split, duração, unidades)
+- 1RM estimado (Epley) + PR automático em sessão
+- RiR (Reps in Reserve) pós-sessão
+- Meta semanal de volume por músculo (progress page)
+- Preferências de exercício (Mais / Menos / Excluir)
+- Gerador ciente do perfil (objetivo, split, duração)
+- Body map como filtro de exercícios (/exercises)
+- Check-ins de lesão + relatório para fisio
+- Tradução para PT-BR (nomes de músculos, dificuldade, mecânica, instruções)
+- Diagrama corporal adaptado ao tema (claro/escuro)
+- Back navigation padronizado com ícone ‹
+- mScore pessoal (Favorito/Frequente) na biblioteca e no gerador
+- Auto-progressão (+2.5kg badge)
+- Supersets no modo de edição e sessão
+- Backup JSON completo (exportar/restaurar)
+- Export .tcx por sessão no histórico
 
 ---
+
+## 📱 Usando no iPhone (Tailscale — desenvolvimento local)
+
+Para testar a PWA no iPhone com HTTPS local sem precisar fazer deploy:
+
+### 1. Instalar Tailscale
+
+- **Mac**: baixe em [tailscale.com/download](https://tailscale.com/download) ou `brew install tailscale`
+- **iPhone**: App Store → [Tailscale](https://apps.apple.com/app/tailscale/id1470499037)
+- Faça login com a mesma conta nos dois dispositivos
+
+### 2. Ativar HTTPS local com Tailscale Serve
+
+```bash
+# No terminal do Mac, com o dev server rodando:
+npm run dev                         # inicia em http://localhost:3000
+
+# Em outro terminal, exponha via HTTPS pela rede Tailscale:
+tailscale serve --bg https+insecure://localhost:3000
+```
+
+Anote o URL exibido (ex: `https://seu-mac.tail1234.ts.net`).
+
+### 3. Acessar no iPhone
+
+1. Abra o **Safari** no iPhone
+2. Acesse `https://seu-mac.tail1234.ts.net`
+3. Clique em **Compartilhar → Adicionar à Tela de Início**
+4. O app abre em fullscreen como PWA nativa
+
+### 4. Parar o serviço
+
+```bash
+tailscale serve --bg off
+```
+
+> **Nota**: Tailscale Serve cria um túnel HTTPS dentro da sua rede privada (sem expor à internet). Ideal para desenvolvimento mobile com service workers.
 
 ## 🛠️ Decisões Técnicas
 

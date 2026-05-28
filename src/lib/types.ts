@@ -90,6 +90,7 @@ export interface ExerciseSet {
 export interface WorkoutExercise {
   exerciseId: string;
   config: ExerciseSet;
+  supersetGroupId?: string; // exercises sharing the same groupId are paired as a superset
 }
 
 export interface Workout {

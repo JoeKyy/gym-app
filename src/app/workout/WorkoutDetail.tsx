@@ -12,7 +12,7 @@ import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/Exe
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
-import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper } from "lucide-react";
+import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper, Link2, Link2Off } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
@@ -550,15 +550,22 @@ function FinishModal({
 
 function WorkoutExerciseRow({
   ex, config, idx, total, risky,
-  onRemove, onMove, onUpdate,
+  isInSuperset, isStartOfSuperset,
+  onRemove, onMove, onUpdate, onToggleSuperset,
 }: {
   ex: Exercise; config: ExerciseSet; idx: number; total: number; risky: boolean;
+  isInSuperset?: boolean; isStartOfSuperset?: boolean;
   onRemove: () => void; onMove: (dir: -1 | 1) => void; onUpdate: (p: Partial<ExerciseSet>) => void;
+  onToggleSuperset?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className={`rounded-2xl overflow-hidden transition-colors ${risky ? "border border-[var(--color-danger-border)]" : "border border-[var(--color-border)]"}`}
+    <div className={`rounded-2xl overflow-hidden transition-colors ${
+      risky ? "border border-[var(--color-danger-border)]" :
+      isInSuperset ? "border-2 border-[var(--color-primary)]" :
+      "border border-[var(--color-border)]"
+    }`}
       style={{ background: "var(--color-surface)" }}>
       <div className="flex items-center gap-3 px-3 py-3">
         <Link href={`/exercises/${ex.slug}`} className="relative shrink-0 block w-12 h-12 rounded-xl overflow-hidden">
@@ -632,6 +639,20 @@ function WorkoutExerciseRow({
             style={{ color: "var(--color-primary)" }}>
             Ver detalhes do exercício →
           </Link>
+          {onToggleSuperset && (
+            <button
+              onClick={onToggleSuperset}
+              className="flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-xl border transition-colors"
+              style={{
+                borderColor: isInSuperset ? "var(--color-primary)" : "var(--color-border)",
+                color: isInSuperset ? "var(--color-primary)" : "var(--color-text-muted)",
+                background: isInSuperset ? "var(--color-primary-bg, var(--color-surface-2))" : "transparent",
+              }}
+            >
+              {isInSuperset ? <Link2Off size={12} /> : <Link2 size={12} />}
+              {isInSuperset ? "Remover superset" : "Superset com próximo"}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -813,6 +834,30 @@ export default function WorkoutEditorPage() {
       const items = [...prev.exercises];
       [items[idx], items[newIdx]] = [items[newIdx], items[idx]];
       const updated: Workout = { ...prev, exercises: items };
+      updateWorkout(updated);
+      return updated;
+    });
+  }, [updateWorkout]);
+
+  const toggleSuperset = useCallback((idx: number) => {
+    setWorkout((prev) => {
+      if (!prev || idx >= prev.exercises.length - 1) return prev;
+      const items = [...prev.exercises];
+      const a = items[idx];
+      const b = items[idx + 1];
+      let updatedItems: typeof items;
+      if (a.supersetGroupId && a.supersetGroupId === b.supersetGroupId) {
+        // remove pairing
+        updatedItems = items.map((we, i) =>
+          i === idx || i === idx + 1 ? { ...we, supersetGroupId: undefined } : we
+        );
+      } else {
+        const groupId = generateId();
+        updatedItems = items.map((we, i) =>
+          i === idx || i === idx + 1 ? { ...we, supersetGroupId: groupId } : we
+        );
+      }
+      const updated: Workout = { ...prev, exercises: updatedItems };
       updateWorkout(updated);
       return updated;
     });
@@ -1004,34 +1049,73 @@ export default function WorkoutEditorPage() {
           </div>
         ) : mode === "edit" ? (
           <div className="space-y-2">
-            {workout.exercises.map(({ exerciseId, config }, idx) => {
+            {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
               const ex = exerciseMap.get(exerciseId);
               if (!ex) return null;
+              const nextEx = workout.exercises[idx + 1];
+              const isStart = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
+              const isMember = !!(supersetGroupId && (
+                isStart ||
+                (idx > 0 && workout.exercises[idx - 1]?.supersetGroupId === supersetGroupId)
+              ));
               return (
-                <WorkoutExerciseRow key={exerciseId}
-                  ex={ex} config={config} idx={idx} total={workout.exercises.length}
-                  risky={isRisky(ex)}
-                  onRemove={() => removeExercise(exerciseId)}
-                  onMove={(dir) => moveExercise(exerciseId, dir)}
-                  onUpdate={(p) => updateConfig(exerciseId, p)}
-                />
+                <div key={exerciseId}>
+                  <WorkoutExerciseRow
+                    ex={ex} config={config} idx={idx} total={workout.exercises.length}
+                    risky={isRisky(ex)}
+                    isInSuperset={isMember}
+                    isStartOfSuperset={isStart}
+                    onRemove={() => removeExercise(exerciseId)}
+                    onMove={(dir) => moveExercise(exerciseId, dir)}
+                    onUpdate={(p) => updateConfig(exerciseId, p)}
+                    onToggleSuperset={idx < workout.exercises.length - 1 ? () => toggleSuperset(idx) : undefined}
+                  />
+                  {isStart && (
+                    <div className="flex items-center gap-2 py-1 px-3">
+                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                        style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
+                        superset
+                      </span>
+                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
         ) : (
           <div className="space-y-3">
-            {workout.exercises.map(({ exerciseId, config }) => {
+            {workout.exercises.map(({ exerciseId, config, supersetGroupId }, idx) => {
               const ex = exerciseMap.get(exerciseId);
               const state = sessionLogs[exerciseId];
               if (!ex || !state) return null;
+              const nextEx = workout.exercises[idx + 1];
+              const isFirstInSuperset = !!(supersetGroupId && nextEx?.supersetGroupId === supersetGroupId);
+              const prevEx = workout.exercises[idx - 1];
+              const isSecondInSuperset = !!(supersetGroupId && prevEx?.supersetGroupId === supersetGroupId);
+              // Short rest for first exercise in pair, normal for second
+              const restOverride = isFirstInSuperset ? 15 : undefined;
               return (
-                <ActiveExerciseCard key={exerciseId}
-                  ex={ex} config={config}
-                  sessionState={state}
-                  onChange={(ns) => updateSetLog(exerciseId, ns)}
-                  onViewDetail={() => setDetailEx(ex)}
-                  onSetCompleted={startRestTimer}
-                />
+                <div key={exerciseId}>
+                  {isSecondInSuperset && (
+                    <div className="flex items-center gap-2 py-1 px-1">
+                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                        style={{ color: "var(--color-primary)", background: "var(--color-primary-bg, var(--color-surface-2))" }}>
+                        superset
+                      </span>
+                      <div className="flex-1 h-px" style={{ background: "var(--color-primary)", opacity: 0.3 }} />
+                    </div>
+                  )}
+                  <ActiveExerciseCard
+                    ex={ex} config={config}
+                    sessionState={state}
+                    onChange={(ns) => updateSetLog(exerciseId, ns)}
+                    onViewDetail={() => setDetailEx(ex)}
+                    onSetCompleted={(secs) => startRestTimer(restOverride ?? secs)}
+                  />
+                </div>
               );
             })}
           </div>
