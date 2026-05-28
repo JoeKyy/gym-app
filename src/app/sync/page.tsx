@@ -16,7 +16,7 @@ import {
   matchAndEnrichFromHealth,
   HealthDataPoint,
 } from "@/lib/appleHealth";
-import { getSessions, saveSession } from "@/lib/storage";
+import { getSessions, saveSession, getWorkouts, saveWorkout, getProfile, saveProfile, getInjuriesV2, saveInjuryV2 } from "@/lib/storage";
 import { CheckCircle, XCircle, Heart, Flame, Calendar, Download, ArrowDownToLine, Bike, Apple } from "lucide-react";
 import BackButton from "@/components/BackButton";
 
@@ -380,8 +380,74 @@ export default function SyncPage() {
               <li className="flex items-center gap-2"><Calendar size={12} />Data, duração e tipo de treino</li>
             </ul>
           </div>
+
+          {/* JSON Backup / Restore */}
+          <BackupSection />
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── JSON Backup / Restore ────────────────────────────────────────────────────
+
+function BackupSection() {
+  const restoreRef = useRef<HTMLInputElement>(null);
+  const [restoreMsg, setRestoreMsg] = useState("");
+
+  function handleExport() {
+    const data = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      sessions: getSessions(),
+      workouts: getWorkouts(),
+      profile: getProfile(),
+      injuries: getInjuriesV2(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gymapp-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleRestore(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data.sessions || !data.workouts) throw new Error("Formato inválido");
+      let imported = 0;
+      for (const s of data.sessions ?? []) { saveSession(s); imported++; }
+      for (const w of data.workouts ?? []) saveWorkout(w);
+      if (data.profile) saveProfile(data.profile);
+      for (const inj of data.injuries ?? []) saveInjuryV2(inj);
+      setRestoreMsg(`${imported} sessões restauradas com sucesso.`);
+    } catch {
+      setRestoreMsg("Erro ao ler arquivo. Verifique se é um backup válido.");
+    }
+    e.target.value = "";
+  }
+
+  return (
+    <div className="card p-4 space-y-3">
+      <p className="font-semibold text-sm">Backup completo</p>
+      <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
+        Exporta todas as sessões, treinos, perfil e lesões em um arquivo JSON. Use para migrar entre dispositivos.
+      </p>
+      <div className="flex gap-2">
+        <button onClick={handleExport} className="btn btn-secondary flex-1 text-sm flex items-center justify-center gap-1.5">
+          <Download size={14} />Exportar .json
+        </button>
+        <button onClick={() => restoreRef.current?.click()} className="btn btn-ghost flex-1 text-sm">
+          Restaurar
+        </button>
+      </div>
+      <input ref={restoreRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+      {restoreMsg && <p className="text-sm text-[var(--color-text-muted)]">{restoreMsg}</p>}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getExercises } from "@/lib/data";
-import { getEquipmentProfile, getInjuriesV2, saveWorkout, getProfile } from "@/lib/storage";
+import { getEquipmentProfile, getInjuriesV2, saveWorkout, getProfile, getExerciseScoreMap } from "@/lib/storage";
 import { MECHANIC_PT, EQUIPMENT_PT, MUSCLE_PT } from "@/lib/translations";
 import BackButton from "@/components/BackButton";
 import {
@@ -113,6 +113,7 @@ export default function GeneratePage() {
       difficulty,
       exerciseCount,
       avoidMuscles,
+      scoreMap: getExerciseScoreMap(),
     };
     const result = generateWorkout(exercises, opts);
     setGeneratedWorkout(result);
@@ -128,6 +129,7 @@ export default function GeneratePage() {
       difficulty,
       exerciseCount,
       avoidMuscles,
+      scoreMap: getExerciseScoreMap(),
     };
     setGeneratedWorkout(generateWorkout(exercises, opts));
   }

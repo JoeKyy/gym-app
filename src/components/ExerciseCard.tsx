@@ -3,12 +3,14 @@ import Link from "next/link";
 import type { Exercise } from "@/lib/types";
 import { EQUIPMENT_PT, MUSCLE_PT } from "@/lib/translations";
 import ExerciseMedia from "@/components/ExerciseMedia";
+import { TrendingUp, Star } from "lucide-react";
 
 interface Props {
   exercise: Exercise;
   isRisky?: boolean;
   onAddToWorkout?: (exercise: Exercise) => void;
   variant?: "grid" | "list";
+  score?: number;
 }
 
 const DIFF_LABEL: Record<string, string> = {
@@ -18,7 +20,21 @@ const DIFF_LABEL: Record<string, string> = {
   advanced: "Avançado",
 };
 
-export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, variant = "grid" }: Props) {
+function ScoreBadge({ score }: { score: number }) {
+  if (score >= 35) return (
+    <span className="badge text-[10px] flex items-center gap-0.5" style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)", borderColor: "var(--color-warning-border)" }}>
+      <Star size={9} />Favorito
+    </span>
+  );
+  if (score >= 15) return (
+    <span className="badge badge-gray text-[10px] flex items-center gap-0.5">
+      <TrendingUp size={9} />Frequente
+    </span>
+  );
+  return null;
+}
+
+export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, variant = "grid", score }: Props) {
   const diffBadge =
     exercise.difficulty === "beginner" ? "badge badge-green" :
     exercise.difficulty === "intermediate" ? "badge badge-amber" :
@@ -61,6 +77,7 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, varian
 
         {/* Actions */}
         <div className="shrink-0 pr-3 flex flex-col items-center gap-1.5">
+          {score !== undefined && <ScoreBadge score={score} />}
           {diffBadge && exercise.difficulty && (
             <span className={`${diffBadge} text-[10px]`}>
               {DIFF_LABEL[exercise.difficulty] ?? exercise.difficulty}
@@ -120,6 +137,7 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, varian
         </div>
 
         <div className="flex flex-wrap gap-1.5">
+          {score !== undefined && <ScoreBadge score={score} />}
           {exercise.equipments.slice(0, 2).map((eq) => (
             <span key={eq} className="badge badge-gray text-[10px]">
               {EQUIPMENT_PT[eq] ?? eq}

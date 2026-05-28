@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
-import { getEquipmentProfile } from "@/lib/storage";
+import { getEquipmentProfile, getExerciseScoreMap } from "@/lib/storage";
 import { HeartPulse, Activity, Map as MapIcon, X } from "lucide-react";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
@@ -61,6 +61,7 @@ export default function ExercisesPage() {
   const [sortBy, setSortBy] = useState<"name" | "difficulty" | "muscle">("name");
   const [showInjuryPanel, setShowInjuryPanel] = useState(false);
   const [userEquipment, setUserEquipment] = useState<string[]>([]);
+  const [scoreMap, setScoreMap] = useState<Map<string, number>>(new Map());
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showBodyMap, setShowBodyMap] = useState(false);
@@ -74,6 +75,7 @@ export default function ExercisesPage() {
       setLoading(false);
     });
     setUserEquipment(getEquipmentProfile());
+    setScoreMap(getExerciseScoreMap());
   }, []);
 
   // Reset pagination whenever filters/sort/muscles change
@@ -324,7 +326,7 @@ export default function ExercisesPage() {
             : "flex flex-col gap-2"
           }>
             {visible.map((ex) => (
-              <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} variant={viewMode} />
+              <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} variant={viewMode} score={scoreMap.get(ex.id)} />
             ))}
           </div>
 

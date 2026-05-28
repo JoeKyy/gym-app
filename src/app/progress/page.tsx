@@ -3,10 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { getSessions, deleteSession, getTopStrengthExercises, getStrengthHistory, getProfile } from "@/lib/storage";
+import { downloadTCX } from "@/lib/appleHealth";
 import { getExercises } from "@/lib/data";
 import BodyMapImage from "@/components/BodyMapImage";
 import BackButton from "@/components/BackButton";
-import { Dumbbell, Calendar, Star, Heart, Zap, Check } from "lucide-react";
+import { Dumbbell, Calendar, Star, Heart, Zap, Check, Download } from "lucide-react";
 import type { WorkoutSession, Exercise } from "@/lib/types";
 import type { EstimatedStrength } from "@/lib/storage";
 
@@ -462,12 +463,22 @@ export default function ProgressPage() {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleDelete(session.id)}
-                      className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg p-0.5"
-                    >
-                      ×
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => downloadTCX(session)}
+                        className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors"
+                        style={{ color: "var(--color-text-muted)", background: "var(--color-surface-2)" }}
+                        title="Exportar .tcx"
+                      >
+                        <Download size={11} />.tcx
+                      </button>
+                      <button
+                        onClick={() => handleDelete(session.id)}
+                        className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg p-0.5"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {session.exercises.map((log) => {

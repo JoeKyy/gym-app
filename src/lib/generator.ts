@@ -31,6 +31,7 @@ export interface GeneratorOptions {
   difficulty: "beginner" | "intermediate" | "advanced";
   exerciseCount: number;       // 4 | 6 | 8 | 10
   avoidMuscles: string[];      // muscles to exclude (from injury profile)
+  scoreMap?: Map<string, number>; // personal relevance scores
 }
 
 export interface GeneratedExercise {
@@ -123,7 +124,7 @@ function getPrescription(goal: TrainingGoal, difficulty: string): ExerciseSet {
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 
-function scoreExercise(ex: Exercise, targetMuscles: string[], isFirst: boolean): number {
+function scoreExercise(ex: Exercise, targetMuscles: string[], isFirst: boolean, personalScore = 0): number {
   let score = 0;
 
   // Primary target muscles hit
@@ -138,6 +139,9 @@ function scoreExercise(ex: Exercise, targetMuscles: string[], isFirst: boolean):
   // Has video → better UX
   if (ex.videoUrls && Object.keys(ex.videoUrls).length > 0) score += 3;
 
+  // Personal usage score boost (max ±15 influence to avoid overriding muscle targeting)
+  score += Math.min(Math.max(personalScore * 0.3, -15), 15);
+
   // Slight randomization to add variety
   score += Math.random() * 4;
 
@@ -150,7 +154,7 @@ export function generateWorkout(
   exercises: Exercise[],
   opts: GeneratorOptions
 ): GeneratedWorkout {
-  const { equipment, focus, goal, difficulty, exerciseCount, avoidMuscles } = opts;
+  const { equipment, focus, goal, difficulty, exerciseCount, avoidMuscles, scoreMap } = opts;
 
   // Normalise avoid list for case-insensitive comparison
   const avoid = avoidMuscles.map((m) => m.toLowerCase());
@@ -190,11 +194,11 @@ export function generateWorkout(
   const targetMuscles = FOCUS_MUSCLES[focus] ?? [];
   const primaryMuscles = FOCUS_PRIMARY_MUSCLES[focus] ?? [];
 
-  // Sort pool by relevance to focus
+  // Sort pool by relevance to focus + personal score
   const scored = finalPool
     .map((ex, _, arr) => ({
       ex,
-      score: scoreExercise(ex, targetMuscles, arr.indexOf(ex) < 3),
+      score: scoreExercise(ex, targetMuscles, arr.indexOf(ex) < 3, scoreMap?.get(ex.id) ?? 0),
     }))
     .sort((a, b) => b.score - a.score);
 
