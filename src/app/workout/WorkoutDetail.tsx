@@ -6,8 +6,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
-import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM } from "@/lib/storage";
-import { MUSCLE_PT } from "@/lib/translations";
+import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM, getProgressionSuggestion } from "@/lib/storage";
+import { MUSCLE_PT, DIFFICULTY_PT, MECHANIC_PT, EQUIPMENT_PT } from "@/lib/translations";
 import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
@@ -216,13 +216,17 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
         {/* Title + badges */}
         <div>
           <h2 className="text-xl font-bold leading-tight capitalize">{ex.name}</h2>
-          {(ex.equipments?.length > 0) && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {ex.equipments.map((eq) => (
-                <span key={eq} className="badge badge-gray">{eq}</span>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {ex.difficulty && (
+              <span className={`badge ${ex.difficulty === "beginner" ? "badge-green" : ex.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>
+                {DIFFICULTY_PT[ex.difficulty] ?? ex.difficulty}
+              </span>
+            )}
+            {ex.mechanic && <span className="badge badge-gray">{MECHANIC_PT[ex.mechanic] ?? ex.mechanic}</span>}
+            {ex.equipments?.map((eq) => (
+              <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
+            ))}
+          </div>
         </div>
 
         {/* Muscles + bodymap */}
@@ -288,9 +292,11 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
 
   // PR tracking: load best 1RM for this exercise once
   const [prev1RM, setPrev1RM] = useState<number>(0);
+  const [progression, setProgression] = useState<{ suggestedIncrease: number; lastWeight: number } | null>(null);
   useEffect(() => {
     const best = getBestEstimated1RM(ex.id);
     setPrev1RM(best?.estimated1RM ?? 0);
+    setProgression(getProgressionSuggestion(ex.id));
   }, [ex.id]);
 
   // Compute PR status for each set
@@ -327,8 +333,14 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
             {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5"
               style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}><Trophy size={9} />PR!</span>}
           </p>
-          <p className="text-xs mt-0.5" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
+          <p className="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
             {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
+            {progression && !allDone && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)" }}>
+                ↑ +{progression.suggestedIncrease}kg
+              </span>
+            )}
           </p>
         </div>
         <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1 flex items-center"

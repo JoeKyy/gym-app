@@ -273,6 +273,35 @@ export function getTopStrengthExercises(n = 8): EstimatedStrength[] {
   return [...map.values()].sort((a, b) => b.estimated1RM - a.estimated1RM).slice(0, n);
 }
 
+// ─── Auto-Progression Suggestion ─────────────────────────────────────────────
+
+/**
+ * Returns a load progression suggestion if the last 2 sessions containing this
+ * exercise (both with RiR ≤ 1) had a consistent weight — suggesting the user
+ * is ready to increase load.
+ */
+export function getProgressionSuggestion(exerciseId: string): { suggestedIncrease: number; lastWeight: number } | null {
+  const sessions = getSessions()
+    .filter((s) => s.exercises.some((e) => e.exerciseId === exerciseId) && s.rir !== undefined)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 2);
+
+  if (sessions.length < 2) return null;
+  if (!sessions.every((s) => (s.rir ?? 99) <= 1)) return null;
+
+  const lastLog = sessions[0].exercises.find((e) => e.exerciseId === exerciseId);
+  if (!lastLog) return null;
+
+  const weights = lastLog.sets
+    .filter((s) => s.completed && s.weight !== undefined && (s.weight as number) > 0)
+    .map((s) => s.weight as number);
+
+  if (weights.length === 0) return null;
+  const lastWeight = Math.max(...weights);
+
+  return { suggestedIncrease: 2.5, lastWeight };
+}
+
 // ─── Exercise Preferences ─────────────────────────────────────────────────────
 
 export function getExercisePreferences(): Map<string, ExercisePreferenceState> {
