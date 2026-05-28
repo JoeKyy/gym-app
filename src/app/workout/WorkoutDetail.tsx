@@ -11,10 +11,16 @@ import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/Exe
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
+import { Dumbbell, Home, Zap } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
-const ENV_ICON: Record<string, string> = { home: "🏠", gym: "🏋", pilates: "🧘", any: "⚡" };
+const ENV_ICON: Record<string, React.ReactNode> = {
+  home:    <Home    size={20} />,
+  gym:     <Dumbbell size={20} />,
+  pilates: <Zap    size={20} />,
+  any:     <Zap    size={20} />,
+};
 const ENV_LABEL: Record<string, string> = { home: "Casa", gym: "Academia", pilates: "Pilates/Mobilidade", any: "Qualquer" };
 
 // ─── Active Session Types ─────────────────────────────────────────────────────
@@ -174,7 +180,9 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
         ) : ex.gifUrl ? (
           <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-contain" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-7xl opacity-20">🏋</div>
+          <div className="w-full h-full flex items-center justify-center opacity-20">
+            <Dumbbell size={64} style={{ color: "var(--color-text-muted)" }} />
+          </div>
         )}
 
         {/* Back button overlaid top-left */}
@@ -432,7 +440,7 @@ function FinishModal({
           {muscles.length > 0 && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "var(--color-text-secondary)" }}>
-                💪 Músculos trabalhados
+                Músculos trabalhados
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {muscles.map((m) => (

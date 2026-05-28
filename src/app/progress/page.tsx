@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getSessions, deleteSession, getTopStrengthExercises, getStrengthHistory, getProfile } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import BodyMapImage from "@/components/BodyMapImage";
+import { Dumbbell, Calendar, Star, Heart, Zap, Check } from "lucide-react";
 import type { WorkoutSession, Exercise } from "@/lib/types";
 import type { EstimatedStrength } from "@/lib/storage";
 
@@ -188,11 +189,11 @@ export default function ProgressPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">📊 Progresso</h1>
+          <h1 className="text-2xl font-bold">Progresso</h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">Histórico de sessões e volume de treino</p>
         </div>
-        <Link href="/workouts" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
-          ← Treinos
+        <Link href="/log" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
+          ← Log
         </Link>
       </div>
 
@@ -203,7 +204,7 @@ export default function ProgressPage() {
         </div>
         <div className="card p-4 text-center">
           <p className="text-3xl font-bold text-[var(--color-warning)]">{streak}</p>
-          <p className="text-xs text-[var(--color-text-muted)] mt-1">🔥 Sequência atual</p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">Sequência atual</p>
         </div>
         <div className="card p-4 text-center">
           <p className="text-3xl font-bold">
@@ -221,7 +222,7 @@ export default function ProgressPage() {
 
       {sessions.length === 0 ? (
         <div className="card p-10 text-center">
-          <p className="text-5xl mb-4">📋</p>
+          <p className="text-5xl mb-4">—</p>
           <p className="text-[var(--color-text-secondary)] font-medium">Nenhuma sessão registrada ainda</p>
           <p className="text-[var(--color-text-muted)] text-sm mt-2">
             Complete um treino para começar a rastrear seu progresso
@@ -330,7 +331,9 @@ export default function ProgressPage() {
           {/* ── Força — 1RM estimates ─────────────────────────────── */}
           {topStrength.length > 0 && (
             <div className="card p-4">
-              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">💪 Força — 1RM Estimado</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3 flex items-center gap-1.5">
+                <Dumbbell size={14} /> Força — 1RM Estimado
+              </p>
               <div className="space-y-3">
                 {topStrength.map(({ exerciseId, exercise, estimated1RM }) => {
                   const history = getStrengthHistory(exerciseId);
@@ -370,7 +373,9 @@ export default function ProgressPage() {
           {/* ── Esta Semana — volume targets ──────────────────────── */}
           {weeklyTargets.length > 0 && (
             <div className="card p-4">
-              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">📅 Esta semana — meta de volume</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3 flex items-center gap-1.5">
+                <Calendar size={14} /> Esta semana — meta de volume
+              </p>
               <div className="space-y-2.5">
                 {weeklyTargets.map(({ muscle, target }) => {
                   const current = thisWeekVolume[muscle] ?? 0;
@@ -379,8 +384,8 @@ export default function ProgressPage() {
                   return (
                     <div key={muscle}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className={done ? "text-[var(--color-success)] font-semibold" : "text-[var(--color-text-secondary)]"}>
-                          {done ? "✓ " : ""}{muscle}
+                        <span className={`flex items-center gap-1 ${done ? "text-[var(--color-success)] font-semibold" : "text-[var(--color-text-secondary)]"}`}>
+                          {done && <Check size={11} />}{muscle}
                         </span>
                         <span className="text-[var(--color-text-muted)]">{current}/{target} sets</span>
                       </div>
@@ -426,7 +431,11 @@ export default function ProgressPage() {
                           <span>· {formatDuration(session.durationMinutes)}</span>
                         )}
                         {session.rating && (
-                          <span>· {"⭐".repeat(session.rating)}</span>
+                          <span className="flex items-center gap-0.5">
+                            · {Array.from({ length: session.rating }).map((_, i) => (
+                              <Star key={i} size={10} className="fill-amber-400 text-amber-400" />
+                            ))}
+                          </span>
                         )}
                         {session.rir !== undefined && (
                           <span>· RiR {session.rir}</span>
@@ -436,17 +445,19 @@ export default function ProgressPage() {
                       {(session.heartRateAvg || session.calories) && (
                         <div className="flex items-center gap-2 mt-1 text-xs">
                           {session.heartRateAvg && (
-                            <span className="text-red-400">
-                              ❤️ {session.heartRateAvg}
-                              {session.heartRateMax ? `–${session.heartRateMax}` : ""} bpm
+                            <span className="flex items-center gap-1 text-red-400">
+                              <Heart size={10} />
+                              {session.heartRateAvg}{session.heartRateMax ? `–${session.heartRateMax}` : ""} bpm
                             </span>
                           )}
                           {session.calories && (
-                            <span className="text-orange-400">🔥 {session.calories} kcal</span>
+                            <span className="flex items-center gap-1 text-orange-400">
+                              <Zap size={10} /> {session.calories} kcal
+                            </span>
                           )}
                           {session.externalSource && (
                             <span className="text-[var(--color-text-muted)]">
-                              · {session.externalSource === "strava" ? "🚴 Strava" : "🍎 Health"}
+                              · {session.externalSource === "strava" ? "Strava" : "Health"}
                             </span>
                           )}
                         </div>

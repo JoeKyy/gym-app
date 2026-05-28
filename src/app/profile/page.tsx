@@ -1,22 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Dumbbell, Flame, Zap, HeartPulse, RefreshCw, Layers, ArrowUpDown, Grid3X3, Check, Weight } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/storage";
 import type { UserProfile, FitnessGoal, TrainingSplit } from "@/lib/types";
+import type { LucideIcon } from "lucide-react";
 
-const GOALS: { value: FitnessGoal; label: string; icon: string; desc: string }[] = [
-  { value: "build_muscle",    icon: "💪", label: "Hipertrofia",     desc: "Ganho de massa muscular" },
-  { value: "get_stronger",    icon: "🏋",  label: "Força",          desc: "Compostos pesados, poucas reps" },
-  { value: "get_lean",        icon: "🔥", label: "Definição",       desc: "Queima de gordura + tônus" },
-  { value: "general_fitness", icon: "⚡", label: "Condicionamento", desc: "Saúde e equilíbrio geral" },
-  { value: "rehab",           icon: "🩹", label: "Reabilitação",    desc: "Foco em recuperação e mobilidade" },
+const GOALS: { value: FitnessGoal; label: string; Icon: LucideIcon; desc: string }[] = [
+  { value: "build_muscle",    Icon: Dumbbell,   label: "Hipertrofia",     desc: "Ganho de massa muscular" },
+  { value: "get_stronger",    Icon: Weight,     label: "Força",           desc: "Compostos pesados, poucas reps" },
+  { value: "get_lean",        Icon: Flame,      label: "Definição",       desc: "Queima de gordura + tônus" },
+  { value: "general_fitness", Icon: Zap,        label: "Condicionamento", desc: "Saúde e equilíbrio geral" },
+  { value: "rehab",           Icon: HeartPulse, label: "Reabilitação",    desc: "Foco em recuperação e mobilidade" },
 ];
 
-const SPLITS: { value: TrainingSplit; label: string; icon: string; desc: string }[] = [
-  { value: "fresh_muscle", icon: "🔄", label: "Músculo Fresco",  desc: "Prioriza músculos mais recuperados" },
-  { value: "full_body",    icon: "💥", label: "Corpo Todo",      desc: "Todos os grupos em cada sessão" },
-  { value: "upper_lower",  icon: "⬆⬇", label: "Superior/Inferior", desc: "Alterna parte de cima e baixo" },
-  { value: "ppl",          icon: "🅿",  label: "Push/Pull/Legs", desc: "Divisão clássica de 3 dias" },
+const SPLITS: { value: TrainingSplit; label: string; Icon: LucideIcon; desc: string }[] = [
+  { value: "fresh_muscle", Icon: RefreshCw,    label: "Músculo Fresco",     desc: "Prioriza músculos mais recuperados" },
+  { value: "full_body",    Icon: Layers,       label: "Corpo Todo",         desc: "Todos os grupos em cada sessão" },
+  { value: "upper_lower",  Icon: ArrowUpDown,  label: "Superior/Inferior",  desc: "Alterna parte de cima e baixo" },
+  { value: "ppl",          Icon: Grid3X3,      label: "Push/Pull/Legs",     desc: "Divisão clássica de 3 dias" },
 ];
 
 const LEVELS = [
@@ -69,9 +71,9 @@ export default function ProfilePage() {
     <div className="space-y-6 pb-6">
       {/* Header */}
       <div>
-        <Link href="/more" className="text-sm inline-flex items-center gap-1 mb-2"
+        <Link href="/settings" className="text-sm inline-flex items-center gap-1 mb-2"
           style={{ color: "var(--color-text-muted)" }}>
-          ← Mais
+          ← Settings
         </Link>
         <h1 className="text-2xl font-bold">Meu Perfil</h1>
         <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
@@ -83,22 +85,25 @@ export default function ProfilePage() {
       <div>
         <p className="section-label mb-2">Objetivo</p>
         <div className="space-y-2">
-          {GOALS.map((g) => (
-            <button key={g.value}
-              onClick={() => update("goal", g.value)}
+          {GOALS.map(({ value, Icon, label, desc }) => (
+            <button key={value}
+              onClick={() => update("goal", value)}
               className="w-full flex items-center gap-4 rounded-2xl px-4 py-3 text-left transition-all"
               style={{
-                background: profile.goal === g.value ? "var(--color-primary-soft-strong)" : "var(--color-surface)",
-                border: `1px solid ${profile.goal === g.value ? "var(--color-primary-border)" : "var(--color-border-subtle)"}`,
+                background: profile.goal === value ? "var(--color-primary-soft-strong)" : "var(--color-surface)",
+                border: `1px solid ${profile.goal === value ? "var(--color-primary-border)" : "var(--color-border-subtle)"}`,
               }}>
-              <span className="text-2xl w-8 text-center">{g.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm" style={{ color: profile.goal === g.value ? "var(--color-primary)" : "var(--color-text)" }}>
-                  {g.label}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{g.desc}</p>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: profile.goal === value ? "var(--color-primary-soft)" : "var(--color-surface-2)" }}>
+                <Icon size={17} style={{ color: profile.goal === value ? "var(--color-primary)" : "var(--color-text-muted)" }} />
               </div>
-              {profile.goal === g.value && <span style={{ color: "var(--color-primary)" }}>✓</span>}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm" style={{ color: profile.goal === value ? "var(--color-primary)" : "var(--color-text)" }}>
+                  {label}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{desc}</p>
+              </div>
+              {profile.goal === value && <Check size={16} style={{ color: "var(--color-primary)" }} />}
             </button>
           ))}
         </div>
@@ -130,23 +135,26 @@ export default function ProfilePage() {
       <div>
         <p className="section-label mb-2">Divisão de Treino</p>
         <div className="space-y-2">
-          {SPLITS.map((s) => (
-            <button key={s.value}
-              onClick={() => update("split", s.value)}
+          {SPLITS.map(({ value, Icon, label, desc }) => (
+            <button key={value}
+              onClick={() => update("split", value)}
               className="w-full flex items-center gap-4 rounded-2xl px-4 py-3 text-left transition-all"
               style={{
-                background: profile.split === s.value ? "var(--color-primary-soft-strong)" : "var(--color-surface)",
-                border: `1px solid ${profile.split === s.value ? "var(--color-primary-border)" : "var(--color-border-subtle)"}`,
+                background: profile.split === value ? "var(--color-primary-soft-strong)" : "var(--color-surface)",
+                border: `1px solid ${profile.split === value ? "var(--color-primary-border)" : "var(--color-border-subtle)"}`,
               }}>
-              <span className="text-2xl w-8 text-center">{s.icon}</span>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: profile.split === value ? "var(--color-primary-soft)" : "var(--color-surface-2)" }}>
+                <Icon size={17} style={{ color: profile.split === value ? "var(--color-primary)" : "var(--color-text-muted)" }} />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm"
-                  style={{ color: profile.split === s.value ? "var(--color-primary)" : "var(--color-text)" }}>
-                  {s.label}
+                  style={{ color: profile.split === value ? "var(--color-primary)" : "var(--color-text)" }}>
+                  {label}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{s.desc}</p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{desc}</p>
               </div>
-              {profile.split === s.value && <span style={{ color: "var(--color-primary)" }}>✓</span>}
+              {profile.split === value && <Check size={16} style={{ color: "var(--color-primary)" }} />}
             </button>
           ))}
         </div>

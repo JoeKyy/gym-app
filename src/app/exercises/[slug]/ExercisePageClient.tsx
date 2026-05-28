@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ThumbsUp, ThumbsDown, Ban, Trophy, Dumbbell } from "lucide-react";
 import { getExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { DIFFICULTY_PT, EQUIPMENT_PT } from "@/lib/translations";
@@ -96,7 +97,7 @@ export default function ExerciseDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-64 text-[var(--color-text-muted)]">
         <div className="text-center">
-          <p className="text-4xl mb-2">🏋</p>
+          <Dumbbell size={36} className="mx-auto mb-2 opacity-40" />
           <p>Carregando...</p>
         </div>
       </div>
@@ -146,7 +147,9 @@ export default function ExerciseDetailPage() {
         ) : exercise.gifUrl ? (
           <img src={exercise.gifUrl} alt={exercise.name} className="w-full h-full object-contain" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-7xl opacity-20">🏋</div>
+          <div className="w-full h-full flex items-center justify-center opacity-20">
+            <Dumbbell size={64} style={{ color: "var(--color-text-muted)" }} />
+          </div>
         )}
 
         {/* Back button overlaid top-left */}
@@ -201,10 +204,10 @@ export default function ExerciseDetailPage() {
           </p>
           <div className="flex gap-2">
             {([
-              { state: "more" as const,     label: "👍 Mais",    desc: "Priorizar" },
-              { state: "less" as const,     label: "👎 Menos",   desc: "Reduzir" },
-              { state: "excluded" as const, label: "🚫 Excluir", desc: "Nunca sugerir" },
-            ]).map(({ state, label }) => {
+              { state: "more" as const,     Icon: ThumbsUp,   label: "Mais",    desc: "Priorizar" },
+              { state: "less" as const,     Icon: ThumbsDown, label: "Menos",   desc: "Reduzir" },
+              { state: "excluded" as const, Icon: Ban,        label: "Excluir", desc: "Nunca sugerir" },
+            ]).map(({ state, Icon, label }) => {
               const active = preference === state;
               return (
                 <button key={state}
@@ -213,12 +216,13 @@ export default function ExerciseDetailPage() {
                     setExercisePreference(exercise!.id, next);
                     setPreference(next);
                   }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all border flex items-center justify-center gap-1.5 ${
                     active
                       ? "border-[var(--color-primary)] text-[var(--color-primary)]"
                       : "border-[var(--color-border)] text-[var(--color-text-muted)]"
                   }`}
                   style={{ background: active ? "var(--color-primary-soft)" : "var(--color-surface-2)" }}>
+                  <Icon size={13} />
                   {label}
                 </button>
               );
@@ -300,8 +304,9 @@ export default function ExerciseDetailPage() {
           </div>
 
           {allDone && (
-            <div className="bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] rounded-xl p-3 text-center">
-              <p className="text-[var(--color-primary)] font-semibold">🎉 Exercício concluído!</p>
+            <div className="bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] rounded-xl p-3 text-center flex items-center justify-center gap-2">
+              <Trophy size={16} className="text-[var(--color-primary)]" />
+              <p className="text-[var(--color-primary)] font-semibold">Exercício concluído!</p>
               <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Todas as {sets.length} séries feitas</p>
             </div>
           )}

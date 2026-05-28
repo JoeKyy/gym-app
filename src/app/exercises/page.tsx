@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getEquipmentProfile } from "@/lib/storage";
+import { HeartPulse } from "lucide-react";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
 import InjuryPanel from "@/components/InjuryPanel";
@@ -128,7 +129,10 @@ export default function ExercisesPage() {
                 : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]"
             }`}
           >
-            🩹 Lesões {injuredMuscleNames.length > 0 && `(${injuredMuscleNames.length})`}
+            <span className="flex items-center gap-1.5">
+              <HeartPulse size={13} />
+              Lesões {injuredMuscleNames.length > 0 && `(${injuredMuscleNames.length})`}
+            </span>
           </button>
         </div>
       </div>
@@ -138,7 +142,9 @@ export default function ExercisesPage() {
       {injuredMuscleNames.length > 0 && (
         <div className="card p-4 flex items-center justify-between gap-4 flex-wrap border-[var(--color-border)]">
           <div>
-            <p className="text-sm font-semibold text-[var(--color-text-secondary)]">🩹 Você tem lesões ativas</p>
+            <p className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-1.5">
+              <HeartPulse size={14} /> Você tem lesões ativas
+            </p>
             <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Veja exercícios seguros e pilates recomendados</p>
           </div>
           <button

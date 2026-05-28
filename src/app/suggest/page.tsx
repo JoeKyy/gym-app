@@ -9,6 +9,7 @@ import { getRehabProtocolsForConditions, INJURY_CONDITIONS_MAP } from "@/lib/reh
 import { exerciseMatchesEquipment } from "@/lib/suggestions";
 import { calculateFreshness, recommendFocusFromFreshness, GROUP_LABELS } from "@/lib/recovery";
 import ExerciseMedia from "@/components/ExerciseMedia";
+import { Dumbbell, HeartPulse, Sparkles, Target, Zap, Flame } from "lucide-react";
 import type {
   Exercise,
   WorkoutSuggestion,
@@ -176,27 +177,27 @@ function ReplaceModal({
 
 
 const ENV_LABELS: Record<WorkoutEnvironment, string> = {
-  home: "🏠 Casa",
-  gym: "🏋 Academia",
-  pilates: "🧘 Pilates/Mobilidade",
-  any: "🌍 Qualquer",
+  home:    "Casa",
+  gym:     "Academia",
+  pilates: "Pilates/Mobilidade",
+  any:     "Qualquer",
 };
 
 const FOCUS_LABELS: Record<WorkoutFocus, string> = {
-  full_body: "💪 Corpo Inteiro",
-  upper: "🙆 Superior",
-  lower: "🦵 Inferior",
-  push: "➡️ Empurrar",
-  pull: "⬅️ Puxar",
-  core: "🎯 Core",
-  rehab: "🏥 Reabilitação",
-  mobility: "🌀 Mobilidade",
+  full_body: "Corpo Inteiro",
+  upper:     "Superior",
+  lower:     "Inferior",
+  push:      "Empurrar",
+  pull:      "Puxar",
+  core:      "Core",
+  rehab:     "Reabilitação",
+  mobility:  "Mobilidade",
 };
 
 const LEVEL_LABELS: Record<FitnessLevel, string> = {
-  beginner: "🌱 Iniciante",
-  intermediate: "⚡ Intermediário",
-  advanced: "🔥 Avançado",
+  beginner:     "Iniciante",
+  intermediate: "Intermediário",
+  advanced:     "Avançado",
 };
 
 export default function SuggestPage() {
@@ -334,7 +335,8 @@ export default function SuggestPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            🤖 Sugestão de Treino
+            <Sparkles size={22} style={{ color: "var(--color-primary)" }} />
+            Sugestão de Treino
           </h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">
             Treino gerado com base nas suas lesões, equipamento disponível e histórico recente
@@ -348,7 +350,7 @@ export default function SuggestPage() {
       {injuries.length > 0 && (
         <div className="rounded-xl p-4 bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)]">
           <p className="text-[var(--color-warning-text)] text-sm font-medium flex items-center gap-2">
-            🩹 {injuries.length} lesão(ões) ativa(s)
+            <HeartPulse size={14} /> {injuries.length} lesão(ões) ativa(s)
           </p>
           <div className="mt-1 flex flex-wrap gap-1">
             {injuries.map((inj) => {
@@ -371,7 +373,8 @@ export default function SuggestPage() {
         <div className="card p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm flex items-center gap-2">
-              💪 Músculos de Hoje
+              <Dumbbell size={14} style={{ color: "var(--color-primary)" }} />
+              Músculos de Hoje
             </h3>
             {focusRecommendation && (
               <span className="text-xs px-2 py-1 rounded-full font-medium"
@@ -389,7 +392,7 @@ export default function SuggestPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {freshness.map((s) => {
-              const icon = s.status === "ready" ? "🟢" : s.status === "partial" ? "🟡" : "🔴";
+              const dotColor = s.status === "ready" ? "bg-green-500" : s.status === "partial" ? "bg-amber-500" : "bg-red-500";
               const barColor = s.status === "ready"
                 ? "var(--color-primary)"
                 : s.status === "partial"
@@ -400,8 +403,9 @@ export default function SuggestPage() {
                   className="rounded-lg p-2.5 space-y-1.5"
                   style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-border)" }}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium truncate" style={{ color: "var(--color-text)" }}>
-                      {icon} {GROUP_LABELS[s.group]}
+                    <span className="text-xs font-medium truncate flex items-center gap-1" style={{ color: "var(--color-text)" }}>
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
+                      {GROUP_LABELS[s.group]}
                     </span>
                     <span className="text-[10px] font-bold ml-1 shrink-0"
                       style={{ color: barColor }}>
@@ -746,7 +750,7 @@ export default function SuggestPage() {
 
         {/* Equipamentos ativos */}
         <div className="card p-3 flex items-center gap-3">
-          <span className="text-xl shrink-0">🏋</span>
+          <Dumbbell size={20} className="shrink-0" style={{ color: "var(--color-text-muted)" }} />
           <div className="flex-1 min-w-0">
             {equipmentProfile.length > 0 ? (
               <>
@@ -778,7 +782,11 @@ export default function SuggestPage() {
           disabled={exercises.length === 0}
           className="w-full btn btn-primary btn-lg"
         >
-          {exercises.length === 0 ? "Carregando exercícios..." : "🤖 Gerar Treino"}
+          {exercises.length === 0 ? "Carregando exercícios..." : (
+            <span className="flex items-center justify-center gap-2">
+              <Sparkles size={16} /> Gerar Treino
+            </span>
+          )}
         </button>
       </div>
     </div>

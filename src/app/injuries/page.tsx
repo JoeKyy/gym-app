@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { HeartPulse, Sparkles } from "lucide-react";
 import { getInjuriesV2, saveInjuryV2, deleteInjuryV2, updateInjuryV2, generateId } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import { INJURY_CONDITIONS, getRehabProtocolsForConditions } from "@/lib/rehab";
@@ -114,13 +115,15 @@ export default function InjuriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">🩹 Gestão de Lesões</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <HeartPulse size={22} style={{ color: "var(--color-primary)" }} /> Gestão de Lesões
+          </h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">
             Registre suas condições clínicas para adaptar treinos e receber protocolos de reabilitação
           </p>
         </div>
         <Link href="/suggest" className="text-sm text-[var(--color-primary)] hover:text-[var(--color-text)]">
-          🤖 Sugerir Treino →
+          <span className="flex items-center gap-1"><Sparkles size={13} /> Sugerir Treino →</span>
         </Link>
       </div>
 

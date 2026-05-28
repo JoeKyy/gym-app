@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dumbbell, Activity, ClipboardList } from "lucide-react";
 
 const TABS = [
-  { href: "/", label: "Hoje", icon: "🏠", exact: true },
-  { href: "/exercises", label: "Explorar", icon: "🔍", exact: false },
-  { href: "/workouts", label: "Treinar", icon: "▶", exact: false },
-  { href: "/progress", label: "Progresso", icon: "📊", exact: false },
-  { href: "/more", label: "Mais", icon: "☰", exact: false },
+  { href: "/",     label: "Workout", Icon: Dumbbell,      exact: true },
+  { href: "/body", label: "Body",    Icon: Activity,      exact: false },
+  { href: "/log",  label: "Log",     Icon: ClipboardList, exact: false },
 ];
 
 export default function BottomNav() {
@@ -17,7 +16,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom"
       style={{ background: "var(--color-surface)", borderTop: "1px solid var(--color-border)" }}>
       <ul className="flex items-center justify-around h-16 max-w-3xl mx-auto px-4">
-        {TABS.map(({ href, label, icon, exact }) => {
+        {TABS.map(({ href, label, Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (
             <li key={href} className="flex-1 relative">
@@ -29,12 +28,9 @@ export default function BottomNav() {
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
                     style={{ background: "var(--color-primary)" }} />
                 )}
-                <span className={`text-xl leading-none transition-transform duration-150 ${active ? "scale-110" : ""}`}>
-                  {icon}
-                </span>
-                <span className="text-[10px] font-semibold tracking-wide">
-                  {label}
-                </span>
+                <Icon size={22} strokeWidth={active ? 2.5 : 1.75}
+                  className={`transition-transform duration-150 ${active ? "scale-110" : ""}`} />
+                <span className="text-[10px] font-semibold tracking-wide">{label}</span>
               </Link>
             </li>
           );

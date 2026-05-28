@@ -11,6 +11,7 @@
  */
 
 import { useRef, useEffect, useState } from "react";
+import { Dumbbell } from "lucide-react";
 import type { Exercise } from "@/lib/types";
 
 export type VideoAngle = "frontMale" | "sideMale" | "frontFemale" | "sideFemale";
@@ -121,8 +122,8 @@ export default function ExerciseMedia({
           loading="lazy"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-4xl opacity-20">
-          🏋
+        <div className="w-full h-full flex items-center justify-center opacity-20">
+          <Dumbbell size={40} style={{ color: "var(--color-text-muted)" }} />
         </div>
       )}
     </Tag>
