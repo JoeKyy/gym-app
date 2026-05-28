@@ -6,14 +6,15 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
-import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM, getProgressionSuggestion } from "@/lib/storage";
+import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM, getProgressionSuggestion, getExercisePreference, setExercisePreference } from "@/lib/storage";
 import { MUSCLE_PT, DIFFICULTY_PT, MECHANIC_PT, EQUIPMENT_PT } from "@/lib/translations";
 import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
-import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper, Link2, Link2Off, ChevronLeft } from "lucide-react";
+import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper, Link2, Link2Off, ChevronLeft, ThumbsUp, ThumbsDown, Ban } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
+import type { ExercisePreferenceState } from "@/lib/types";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
 const ENV_ICON: Record<string, React.ReactNode> = {
@@ -164,11 +165,12 @@ const ANGLE_LABELS: Record<string, string> = {
   frontFemale: "♀ Frontal", sideFemale: "♀ Lateral",
 };
 
-function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => void }) {
+function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise; onClose: () => void; injuredMuscleNames: string[] }) {
   const availableAngles = getAvailableAngles(ex);
   const [angle, setAngle] = useState<VideoAngle>(availableAngles[0] ?? "frontMale");
   const [videoError, setVideoError] = useState(false);
   const videoUrl = getVideoUrl(ex, angle);
+  const [preference, setPreference] = useState<ExercisePreferenceState>(() => getExercisePreference(ex.id));
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: "var(--color-bg)" }}>
@@ -215,7 +217,7 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
       <div className="px-4 pt-5 space-y-5 pb-12">
         {/* Title + badges */}
         <div>
-          <h2 className="text-xl font-bold leading-tight capitalize">{ex.name}</h2>
+          <h1 className="text-2xl font-bold leading-tight capitalize">{ex.name}</h1>
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
             {ex.difficulty && (
               <span className={`badge ${ex.difficulty === "beginner" ? "badge-green" : ex.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>
@@ -229,27 +231,71 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
           </div>
         </div>
 
+        {/* Preference buttons */}
+        <div className="card p-3">
+          <p className="text-[10px] uppercase tracking-wide mb-2" style={{ color: "var(--color-text-muted)" }}>
+            Preferência no gerador
+          </p>
+          <div className="flex gap-2">
+            {([
+              { state: "more" as const,     Icon: ThumbsUp,   label: "Mais" },
+              { state: "less" as const,     Icon: ThumbsDown, label: "Menos" },
+              { state: "excluded" as const, Icon: Ban,        label: "Excluir" },
+            ]).map(({ state, Icon, label }) => {
+              const active = preference === state;
+              return (
+                <button key={state}
+                  onClick={() => {
+                    const next: ExercisePreferenceState = active ? "default" : state;
+                    setExercisePreference(ex.id, next);
+                    setPreference(next);
+                  }}
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all border flex items-center justify-center gap-1.5 ${
+                    active
+                      ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                      : "border-[var(--color-border)] text-[var(--color-text-muted)]"
+                  }`}
+                  style={{ background: active ? "var(--color-primary-soft)" : "var(--color-surface-2)" }}>
+                  <Icon size={13} />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {preference !== "default" && (
+            <p className="text-[10px] text-[var(--color-primary)] mt-1.5 text-center">
+              {preference === "more" ? "Priorizado no gerador" : preference === "less" ? "Reduzido no gerador" : "Nunca será sugerido"}
+            </p>
+          )}
+        </div>
+
         {/* Muscles + bodymap */}
-        {ex.targetMuscles.length > 0 && (
+        {(ex.targetMuscles.length > 0 || ex.secondaryMuscles.length > 0) && (
           <div className="card p-4 space-y-3">
             <p className="section-label">Músculos</p>
             <div className="flex gap-5 items-start">
               <BodyMapImage slug={ex.slug} targetMuscles={ex.targetMuscles} defaultView="auto" size="md" className="shrink-0" />
               <div className="flex flex-col gap-3 pt-2">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {ex.targetMuscles.map((m) => (
-                      <span key={m} className="badge badge-green font-semibold">{MUSCLE_PT[m] ?? m}</span>
-                    ))}
+                {ex.targetMuscles.length > 0 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ex.targetMuscles.map((m) => (
+                        <span key={m} className={`badge font-semibold ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"}`}>
+                          {MUSCLE_PT[m] ?? m}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 {ex.secondaryMuscles.length > 0 && (
                   <div>
                     <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Secundários</p>
                     <div className="flex flex-wrap gap-1.5">
                       {ex.secondaryMuscles.map((m) => (
-                        <span key={m} className="badge badge-gray">{MUSCLE_PT[m] ?? m}</span>
+                        <span key={m} className={`badge ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"}`}>
+                          {MUSCLE_PT[m] ?? m}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -267,10 +313,22 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
               {(ex.instructions_pt ?? ex.instructions).map((step, i) => (
                 <li key={i} className="flex gap-3 text-sm">
                   <span className="text-[var(--color-primary)] font-bold shrink-0 w-5">{i + 1}.</span>
-                  <span className="leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{step}</span>
+                  <span className="leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                    {step.replace(/^Step:\d+\s*/i, "")}
+                  </span>
                 </li>
               ))}
             </ol>
+          </div>
+        )}
+
+        {/* MuscleWiki link */}
+        {ex.musclewikiUrl && (
+          <div className="pb-2">
+            <a href={ex.musclewikiUrl} target="_blank" rel="noopener noreferrer"
+              className="text-xs transition-colors" style={{ color: "var(--color-text-muted)" }}>
+              Ver no MuscleWiki ↗
+            </a>
           </div>
         )}
       </div>
@@ -967,7 +1025,7 @@ export default function WorkoutEditorPage() {
   return (
     <>
       {detailEx && (
-        <ExerciseDetailSheet ex={detailEx} onClose={() => setDetailEx(null)} />
+        <ExerciseDetailSheet ex={detailEx} onClose={() => setDetailEx(null)} injuredMuscleNames={injuredMuscleNames} />
       )}
 
       {showPicker && (
