@@ -7,7 +7,9 @@ import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
 import { saveSession, generateId, now as nowISO } from "@/lib/storage";
-import ExerciseMedia from "@/components/ExerciseMedia";
+import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
+import type { VideoAngle } from "@/components/ExerciseMedia";
+import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
 
@@ -88,12 +90,140 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps }: {
   );
 }
 
+// ─── Exercise Detail Sheet ────────────────────────────────────────────────────
+
+const ANGLE_LABELS: Record<string, string> = {
+  frontMale: "♂ Frontal", sideMale: "♂ Lateral",
+  frontFemale: "♀ Frontal", sideFemale: "♀ Lateral",
+};
+
+function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => void }) {
+  const availableAngles = getAvailableAngles(ex);
+  const [angle, setAngle] = useState<VideoAngle>(availableAngles[0] ?? "frontMale");
+  const videoUrl = getVideoUrl(ex, angle);
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "var(--color-bg)" }}>
+      {/* Top bar */}
+      <div className="flex items-center gap-3 px-4 pt-4 pb-3 shrink-0">
+        <button
+          onClick={onClose}
+          className="text-xl leading-none shrink-0"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          ←
+        </button>
+        <h2 className="font-bold text-base capitalize flex-1 truncate">{ex.name}</h2>
+      </div>
+
+      {/* Video hero */}
+      <div className="w-full bg-[var(--color-surface-2)] shrink-0"
+        style={{ aspectRatio: "16/10" }}>
+        {videoUrl ? (
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            autoPlay loop muted playsInline
+            className="w-full h-full object-contain"
+          />
+        ) : ex.gifUrl ? (
+          <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-contain" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🏋</div>
+        )}
+      </div>
+
+      {/* Angle switcher */}
+      {availableAngles.length > 1 && (
+        <div className="flex gap-2 px-4 py-2 overflow-x-auto shrink-0 border-b"
+          style={{ borderColor: "var(--color-border)" }}>
+          {availableAngles.map((a) => (
+            <button
+              key={a}
+              onClick={() => setAngle(a)}
+              className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
+                angle === a
+                  ? "bg-[var(--color-primary)] text-[var(--color-primary-text)] font-semibold"
+                  : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
+              }`}
+            >
+              {ANGLE_LABELS[a] ?? a}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5">
+        {/* Muscles */}
+        {ex.targetMuscles.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
+              style={{ color: "var(--color-text-muted)" }}>Músculos</p>
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {ex.targetMuscles.map((m) => (
+                <span key={m} className="badge badge-green font-semibold">{m}</span>
+              ))}
+              {ex.secondaryMuscles.map((m) => (
+                <span key={m} className="badge badge-gray">{m}</span>
+              ))}
+            </div>
+            <BodyMapImage
+              slug={ex.slug}
+              targetMuscles={ex.targetMuscles}
+              defaultView="auto"
+              size="md"
+              className="mx-auto"
+            />
+          </div>
+        )}
+
+        {/* Instructions */}
+        {ex.instructions && ex.instructions.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
+              style={{ color: "var(--color-text-muted)" }}>Execução</p>
+            <ol className="space-y-2">
+              {ex.instructions.map((step, i) => (
+                <li key={i} className="flex gap-3 text-sm" style={{ color: "var(--color-text)" }}>
+                  <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                    style={{ background: "var(--color-primary)", color: "var(--color-primary-text)" }}>
+                    {i + 1}
+                  </span>
+                  <span className="leading-relaxed">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Equipment */}
+        {ex.equipments && ex.equipments.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2"
+              style={{ color: "var(--color-text-muted)" }}>Equipamento</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ex.equipments.map((eq) => (
+                <span key={eq} className="badge badge-gray">{eq}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom spacer for nav */}
+        <div className="h-8" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Active Exercise Card ─────────────────────────────────────────────────────
 
-function ActiveExerciseCard({ ex, config, sessionState, onChange }: {
+function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail }: {
   ex: Exercise; config: ExerciseSet;
   sessionState: ExerciseSessionState;
   onChange: (s: ExerciseSessionState) => void;
+  onViewDetail: () => void;
 }) {
   const doneSets = sessionState.sets.filter((s) => s.completed).length;
   const allDone = doneSets === sessionState.sets.length;
@@ -106,8 +236,11 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange }: {
     <div className={`rounded-2xl overflow-hidden border transition-colors ${
       allDone ? "border-[var(--color-success-border)]" : "border-[var(--color-border)]"
     }`} style={{ background: "var(--color-surface)" }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-3 py-3">
+      {/* Header — tap to view details */}
+      <button
+        className="w-full flex items-center gap-3 px-3 py-3 text-left"
+        onClick={onViewDetail}
+      >
         <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0">
           <ExerciseMedia exercise={ex} className="w-full h-full" />
         </div>
@@ -119,8 +252,12 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange }: {
             {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
           </p>
         </div>
+        <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1"
+          style={{ color: "var(--color-text-muted)", background: "var(--color-surface-2)" }}>
+          ℹ
+        </span>
         <button
-          onClick={markAll}
+          onClick={(e) => { e.stopPropagation(); markAll(); }}
           className={`text-xs px-2.5 py-1.5 rounded-lg border font-medium transition-colors shrink-0 ${
             allDone
               ? "bg-[var(--color-success-bg)] border-[var(--color-success-border)] text-[var(--color-success-text)]"
@@ -129,7 +266,7 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange }: {
         >
           {allDone ? "✓ Feito" : "Marcar todas"}
         </button>
-      </div>
+      </button>
 
       {/* Sets */}
       <div className="px-3 pb-3 space-y-1.5 border-t pt-2.5" style={{ borderColor: "var(--color-border)" }}>
@@ -455,6 +592,7 @@ export default function WorkoutEditorPage() {
   const [hideRisky, setHideRisky] = useState(false);
   const [respectEnv, setRespectEnv] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
+  const [detailEx, setDetailEx] = useState<Exercise | null>(null);
   const [workout, setWorkout] = useState<Workout | null>(null);
 
   // ── Session mode state ──────────────────────────────────────────────────────
@@ -617,6 +755,10 @@ export default function WorkoutEditorPage() {
 
   return (
     <>
+      {detailEx && (
+        <ExerciseDetailSheet ex={detailEx} onClose={() => setDetailEx(null)} />
+      )}
+
       {showPicker && (
         <ExercisePicker
           allExercises={allExercises} search={search} onSearchChange={setSearch}
@@ -721,6 +863,7 @@ export default function WorkoutEditorPage() {
                   ex={ex} config={config}
                   sessionState={state}
                   onChange={(ns) => updateSetLog(exerciseId, ns)}
+                  onViewDetail={() => setDetailEx(ex)}
                 />
               );
             })}
