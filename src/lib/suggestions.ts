@@ -33,6 +33,7 @@ import {
 } from "./rehab";
 import { getPrimaryEquipments } from "./exercise-corrections";
 import { calculateFreshness, normalizeMuscle, GROUP_LABELS } from "./recovery";
+import { getExercisePreferences } from "./storage";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -283,7 +284,12 @@ export function suggestWorkout(
   });
 
   // ── 4. Sort: prefer compound, fresh muscles, harder exercises first
-  const scored = candidates.map((ex) => {
+  const preferences = getExercisePreferences();
+
+  // Remove excluded exercises
+  const nonExcluded = candidates.filter((ex) => preferences.get(ex.id) !== "excluded");
+
+  const scored = nonExcluded.map((ex) => {
     let score = 0;
     if (ex.mechanic === "compound") score += 3;
     if (ex.utility === "basic") score += 2;
@@ -299,6 +305,12 @@ export function suggestWorkout(
 
     if (ex.difficulty === fitnessLevel) score += 1;
     if (ex.isRehabSafe) score += 1;
+
+    // Apply user preference multiplier
+    const pref = preferences.get(ex.id);
+    if (pref === "more") score *= 2;
+    else if (pref === "less") score *= 0.5;
+
     score += Math.random() * 0.5; // small shuffle for variety
     return { ex, score };
   });

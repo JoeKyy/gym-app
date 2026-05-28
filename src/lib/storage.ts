@@ -1,4 +1,4 @@
-import type { InjuredMuscle, Injury, Workout, WeeklyPlan, WorkoutSession } from "./types";
+import type { InjuredMuscle, Injury, Workout, WeeklyPlan, WorkoutSession, UserProfile, ExercisePreference, ExercisePreferenceState } from "./types";
 
 const KEYS = {
   injuries: "gymapp:injuries",
@@ -8,6 +8,8 @@ const KEYS = {
   activePlanId: "gymapp:activePlanId",
   sessions: "gymapp:sessions",
   equipment: "gymapp:equipment",
+  profile: "gymapp:profile",
+  exPreferences: "gymapp:exercise_preferences",
 } as const;
 
 function load<T>(key: string, fallback: T): T {
@@ -166,4 +168,124 @@ export function generateId(): string {
 
 export function now(): string {
   return new Date().toISOString();
+}
+
+// ─── User Profile ─────────────────────────────────────────────────────────────
+
+const DEFAULT_PROFILE: UserProfile = {
+  goal: "general_fitness",
+  experienceLevel: "intermediate",
+  split: "full_body",
+  durationMinutes: 60,
+  units: "kg",
+  bodyStats: {},
+};
+
+export function getProfile(): UserProfile {
+  return load<UserProfile>(KEYS.profile, DEFAULT_PROFILE);
+}
+
+export function saveProfile(profile: UserProfile): void {
+  save(KEYS.profile, profile);
+}
+
+// ─── 1RM Estimation (Epley formula) ──────────────────────────────────────────
+
+/** Epley: estimated 1RM = weight × (1 + reps/30). Min 1 rep, min 0 weight. */
+export function epley1RM(weight: number, reps: number): number {
+  if (reps <= 0 || weight <= 0) return 0;
+  if (reps === 1) return weight;
+  return Math.round(weight * (1 + reps / 30));
+}
+
+export interface EstimatedStrength {
+  exerciseId: string;
+  estimated1RM: number;
+  weight: number;
+  reps: number | string;
+  date: string;
+}
+
+/** Returns the best estimated 1RM for an exercise across all sessions. */
+export function getBestEstimated1RM(exerciseId: string): EstimatedStrength | null {
+  let best: EstimatedStrength | null = null;
+  for (const session of getSessions()) {
+    for (const log of session.exercises) {
+      if (log.exerciseId !== exerciseId) continue;
+      for (const set of log.sets) {
+        if (!set.completed) continue;
+        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        if (isNaN(reps) || reps <= 0) continue;
+        const w = set.weight ?? 0;
+        const e1rm = epley1RM(w, reps);
+        if (!best || e1rm > best.estimated1RM) {
+          best = { exerciseId, estimated1RM: e1rm, weight: w, reps: set.reps, date: session.date };
+        }
+      }
+    }
+  }
+  return best;
+}
+
+/** Returns estimated 1RM history (one entry per session) for an exercise. */
+export function getStrengthHistory(exerciseId: string): { date: string; estimated1RM: number }[] {
+  const history: { date: string; estimated1RM: number }[] = [];
+  const sessions = getSessions().sort((a, b) => a.date.localeCompare(b.date));
+  for (const session of sessions) {
+    for (const log of session.exercises) {
+      if (log.exerciseId !== exerciseId) continue;
+      let bestInSession = 0;
+      for (const set of log.sets) {
+        if (!set.completed) continue;
+        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        if (isNaN(reps) || reps <= 0) continue;
+        const w = set.weight ?? 0;
+        const e = epley1RM(w, reps);
+        if (e > bestInSession) bestInSession = e;
+      }
+      if (bestInSession > 0) {
+        history.push({ date: session.date, estimated1RM: bestInSession });
+      }
+    }
+  }
+  return history;
+}
+
+/** Returns top N exercises by highest estimated 1RM. */
+export function getTopStrengthExercises(n = 8): EstimatedStrength[] {
+  const sessions = getSessions();
+  const map = new Map<string, EstimatedStrength>();
+  for (const session of sessions) {
+    for (const log of session.exercises) {
+      for (const set of log.sets) {
+        if (!set.completed) continue;
+        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        if (isNaN(reps) || reps <= 0) continue;
+        const w = set.weight ?? 0;
+        const e1rm = epley1RM(w, reps);
+        const prev = map.get(log.exerciseId);
+        if (!prev || e1rm > prev.estimated1RM) {
+          map.set(log.exerciseId, { exerciseId: log.exerciseId, estimated1RM: e1rm, weight: w, reps: set.reps, date: session.date });
+        }
+      }
+    }
+  }
+  return [...map.values()].sort((a, b) => b.estimated1RM - a.estimated1RM).slice(0, n);
+}
+
+// ─── Exercise Preferences ─────────────────────────────────────────────────────
+
+export function getExercisePreferences(): Map<string, ExercisePreferenceState> {
+  const arr = load<ExercisePreference[]>(KEYS.exPreferences, []);
+  return new Map(arr.map((p) => [p.exerciseId, p.state]));
+}
+
+export function setExercisePreference(exerciseId: string, state: ExercisePreferenceState): void {
+  const prefs = load<ExercisePreference[]>(KEYS.exPreferences, []).filter((p) => p.exerciseId !== exerciseId);
+  if (state !== "default") prefs.push({ exerciseId, state });
+  save(KEYS.exPreferences, prefs);
+}
+
+export function getExercisePreference(exerciseId: string): ExercisePreferenceState {
+  return getExercisePreferences().get(exerciseId) ?? "default";
 }

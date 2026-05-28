@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
-import { saveSession, generateId, now as nowISO } from "@/lib/storage";
+import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM } from "@/lib/storage";
 import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
@@ -101,9 +101,10 @@ function RestTimerOverlay({ remaining, total, onSkip }: {
 
 // ─── Active Set Row ───────────────────────────────────────────────────────────
 
-function ActiveSetRow({ setNum, state, onChange, defaultReps }: {
+function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
   setNum: number; state: SetState; defaultReps: string;
   onChange: (s: SetState) => void;
+  isPR?: boolean;
 }) {
   return (
     <div className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
@@ -138,6 +139,13 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps }: {
         className="input text-xs text-center py-1 px-1 w-14 shrink-0"
       />
       <span className="text-[10px] shrink-0" style={{ color: "var(--color-text-muted)" }}>reps</span>
+
+      {isPR && state.completed && (
+        <span className="text-[10px] font-bold shrink-0 px-1.5 py-0.5 rounded-md"
+          style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)", border: "1px solid var(--color-warning-border)" }}>
+          🏆 PR
+        </span>
+      )}
     </div>
   );
 }
@@ -269,6 +277,23 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
   const doneSets = sessionState.sets.filter((s) => s.completed).length;
   const allDone = doneSets === sessionState.sets.length;
 
+  // PR tracking: load best 1RM for this exercise once
+  const [prev1RM, setPrev1RM] = useState<number>(0);
+  useEffect(() => {
+    const best = getBestEstimated1RM(ex.id);
+    setPrev1RM(best?.estimated1RM ?? 0);
+  }, [ex.id]);
+
+  // Compute PR status for each set
+  const prFlags = sessionState.sets.map((s) => {
+    if (!s.completed) return false;
+    const reps = parseInt(s.reps);
+    const weight = parseFloat(s.weight);
+    if (isNaN(reps) || isNaN(weight) || reps <= 0 || weight <= 0) return false;
+    return epley1RM(weight, reps) > prev1RM;
+  });
+  const hasPR = prFlags.some(Boolean);
+
   const markAll = () => {
     const nowAllDone = !allDone;
     onChange({ sets: sessionState.sets.map((s) => ({ ...s, completed: nowAllDone })) });
@@ -290,6 +315,8 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm truncate capitalize" style={{ color: "var(--color-text)" }}>
             {ex.name}
+            {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md"
+              style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}>🏆 PR!</span>}
           </p>
           <p className="text-xs mt-0.5" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
             {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
@@ -317,13 +344,13 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
           <ActiveSetRow
             key={i} setNum={i + 1} state={setS}
             defaultReps={String(config.reps)}
+            isPR={prFlags[i]}
             onChange={(ns) => {
               const wasCompleted = setS.completed;
               const nowCompleted = ns.completed;
               const newSets = [...sessionState.sets];
               newSets[i] = ns;
               onChange({ sets: newSets });
-              // Trigger rest timer when a set is newly completed
               if (!wasCompleted && nowCompleted) {
                 onSetCompleted(typeof config.rest === "number" ? config.rest : 60);
               }
@@ -346,10 +373,11 @@ function FinishModal({
   exerciseMap: Map<string, Exercise>;
   startedAt: string;
   elapsed: number;
-  onSave: (rating: number | null, notes: string) => void;
+  onSave: (rating: number | null, rir: number | null, notes: string) => void;
   onCancel: () => void;
 }) {
   const [rating, setRating] = useState<number | null>(null);
+  const [rir, setRir] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
 
   const completedExercises = Object.entries(sessionLogs).filter(
@@ -436,6 +464,36 @@ function FinishModal({
             )}
           </div>
 
+          {/* RiR — Reps in Reserve */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--color-text-secondary)" }}>
+              Reps que sobraram no tank?
+            </p>
+            <p className="text-[11px] mb-2" style={{ color: "var(--color-text-muted)" }}>
+              0 = fui ao limite · 5+ = muito fácil
+            </p>
+            <div className="flex gap-1.5">
+              {[0, 1, 2, 3, 4, 5].map((n) => (
+                <button key={n} onClick={() => setRir(rir === n ? null : n)}
+                  className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${
+                    rir === n
+                      ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                      : "border-[var(--color-border)] text-[var(--color-text-muted)]"
+                  }`}
+                  style={{
+                    background: rir === n ? "var(--color-primary-soft)" : "var(--color-surface-2)",
+                  }}>
+                  {n === 5 ? "5+" : n}
+                </button>
+              ))}
+            </div>
+            {rir !== null && (
+              <p className="text-xs text-center mt-1" style={{ color: "var(--color-text-muted)" }}>
+                {rir === 0 ? "💪 Foi no limite!" : rir <= 2 ? "Bom esforço" : rir <= 4 ? "Podia puxar mais" : "Muito confortável"}
+              </p>
+            )}
+          </div>
+
           {/* Notes */}
           <textarea
             placeholder="Observações (opcional)..."
@@ -452,7 +510,7 @@ function FinishModal({
               className="btn btn-secondary flex-1">
               Continuar
             </button>
-            <button onClick={() => onSave(rating, notes)}
+            <button onClick={() => onSave(rating, rir, notes)}
               className="btn btn-primary flex-1 font-semibold">
               Salvar treino ✓
             </button>
@@ -782,7 +840,7 @@ export default function WorkoutEditorPage() {
     setRestTimer(null);
   }, []);
 
-  const handleSaveSession = useCallback((rating: number | null, notes: string) => {
+  const handleSaveSession = useCallback((rating: number | null, rir: number | null, notes: string) => {
     if (!workout || !sessionStartedAt) return;
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
 
@@ -807,6 +865,7 @@ export default function WorkoutEditorPage() {
       durationMinutes: Math.max(1, Math.round(elapsed / 60)),
       exercises: exerciseLogs,
       rating: (rating as WorkoutSession["rating"]) ?? undefined,
+      rir: rir ?? undefined,
       notes: notes || undefined,
     };
 

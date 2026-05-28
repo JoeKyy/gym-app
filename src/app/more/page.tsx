@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 const MORE_ITEMS = [
+  { href: "/profile",   icon: "👤", label: "Meu Perfil",           desc: "Objetivo, nível, split e dados corporais" },
   { href: "/suggest",   icon: "🤖", label: "Sugerir Treino",       desc: "Treino adaptado ao seu perfil e lesões" },
   { href: "/injuries",  icon: "🩹", label: "Gerir Lesões",          desc: "Protocolos McGill, McKenzie e outros" },
   { href: "/plans",     icon: "📅", label: "Planos Semanais",       desc: "Organizar treinos por dia da semana" },

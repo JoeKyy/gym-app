@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getExercises } from "@/lib/data";
-import { getEquipmentProfile, getInjuriesV2, saveWorkout } from "@/lib/storage";
+import { getEquipmentProfile, getInjuriesV2, saveWorkout, getProfile } from "@/lib/storage";
 import {
   generateWorkout,
   generatedToWorkout,
@@ -59,6 +59,29 @@ export default function GeneratePage() {
     // Pre-fill equipment from profile
     const saved = getEquipmentProfile();
     if (saved.length > 0) setEquipment(saved);
+    // Pre-fill from user profile
+    const profile = getProfile();
+    setDifficulty(profile.experienceLevel);
+    // Map profile goal → generator goal
+    const goalMap: Record<string, TrainingGoal> = {
+      build_muscle: "hypertrophy",
+      get_stronger: "strength",
+      get_lean: "endurance",
+      general_fitness: "hypertrophy",
+      rehab: "hypertrophy",
+    };
+    setGoal(goalMap[profile.goal] ?? "hypertrophy");
+    // Map split → focus
+    const splitMap: Record<string, TrainingFocus> = {
+      full_body: "full_body",
+      upper_lower: "upper",
+      ppl: "push",
+      fresh_muscle: "full_body",
+    };
+    setFocus(splitMap[profile.split] ?? "full_body");
+    // Map duration → exercise count
+    const countMap: Record<number, number> = { 30: 4, 45: 6, 60: 8, 75: 9, 90: 10 };
+    setExerciseCount(countMap[profile.durationMinutes] ?? 6);
   }, []);
 
   // Injured muscles to avoid

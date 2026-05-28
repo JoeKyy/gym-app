@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { getSessions, deleteSession } from "@/lib/storage";
+import { getSessions, deleteSession, getTopStrengthExercises, getStrengthHistory, getProfile } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import BodyMapImage from "@/components/BodyMapImage";
 import type { WorkoutSession, Exercise } from "@/lib/types";
+import type { EstimatedStrength } from "@/lib/storage";
 
 const DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const MONTH_LABELS = [
@@ -24,9 +25,29 @@ export default function ProgressPage() {
   const [exercises, setExercises] = useState<Map<string, Exercise>>(new Map());
   const [bodyMapPeriod, setBodyMapPeriod] = useState<"7d" | "30d" | "all">("30d");
 
+  // Strength / 1RM data
+  const [topStrength, setTopStrength] = useState<(EstimatedStrength & { exercise?: Exercise })[]>([]);
+  const [weeklyTargets, setWeeklyTargets] = useState<{ muscle: string; target: number }[]>([]);
+
   useEffect(() => {
     setSessions(getSessions().sort((a, b) => b.date.localeCompare(a.date)));
-    getExercises().then((exs) => setExercises(new Map(exs.map((e) => [e.id, e]))));
+    getExercises().then((exs) => {
+      const map = new Map(exs.map((e) => [e.id, e]));
+      setExercises(map);
+      const top = getTopStrengthExercises(6);
+      setTopStrength(top.map((t) => ({ ...t, exercise: map.get(t.exerciseId) })));
+    });
+
+    const profile = getProfile();
+    const TARGETS: Record<string, Record<string, number>> = {
+      build_muscle:    { Peito: 16, Costas: 16, Pernas: 20, Ombros: 12, Bíceps: 10, Tríceps: 10, Core: 8 },
+      get_stronger:    { Peito: 12, Costas: 12, Pernas: 16, Ombros: 8,  Bíceps: 6,  Tríceps: 6,  Core: 6 },
+      get_lean:        { Peito: 12, Costas: 12, Pernas: 14, Ombros: 10, Bíceps: 8,  Tríceps: 8,  Core: 10 },
+      general_fitness: { Peito: 10, Costas: 10, Pernas: 12, Ombros: 8,  Bíceps: 6,  Tríceps: 6,  Core: 8 },
+      rehab:           { Peito: 6,  Costas: 8,  Pernas: 8,  Ombros: 6,  Bíceps: 4,  Tríceps: 4,  Core: 10 },
+    };
+    const targets = TARGETS[profile.goal] ?? TARGETS.general_fitness;
+    setWeeklyTargets(Object.entries(targets).map(([muscle, target]) => ({ muscle, target })));
   }, []);
 
   const refresh = () =>
@@ -91,6 +112,41 @@ export default function ProgressPage() {
     return Object.entries(vol)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8);
+  }, [sessions, exercises]);
+
+  // Weekly volume: sets per muscle this calendar week
+  const thisWeekVolume = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sun
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - dayOfWeek);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const MUSCLE_MAP: Record<string, string> = {
+      chest: "Peito", "pectoralis major": "Peito", pecs: "Peito",
+      back: "Costas", lats: "Costas", "latissimus dorsi": "Costas", traps: "Costas",
+      legs: "Pernas", quads: "Pernas", quadriceps: "Pernas", hamstrings: "Pernas", glutes: "Pernas", calves: "Pernas",
+      shoulders: "Ombros", deltoids: "Ombros", delts: "Ombros",
+      biceps: "Bíceps",
+      triceps: "Tríceps",
+      abs: "Core", core: "Core", obliques: "Core",
+    };
+
+    const vol: Record<string, number> = {};
+    for (const s of sessions) {
+      const d = new Date(s.startedAt);
+      if (d < weekStart) continue;
+      for (const log of s.exercises) {
+        const ex = exercises.get(log.exerciseId);
+        if (!ex) continue;
+        const done = log.sets.filter((st) => st.completed).length;
+        for (const m of ex.targetMuscles) {
+          const key = MUSCLE_MAP[m.toLowerCase()] ?? null;
+          if (key) vol[key] = (vol[key] ?? 0) + done;
+        }
+      }
+    }
+    return vol;
   }, [sessions, exercises]);
 
   const maxVol = muscleVolume[0]?.[1] ?? 1;
@@ -271,6 +327,82 @@ export default function ProgressPage() {
             </div>
           )}
 
+          {/* ── Força — 1RM estimates ─────────────────────────────── */}
+          {topStrength.length > 0 && (
+            <div className="card p-4">
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">💪 Força — 1RM Estimado</p>
+              <div className="space-y-3">
+                {topStrength.map(({ exerciseId, exercise, estimated1RM }) => {
+                  const history = getStrengthHistory(exerciseId);
+                  const max = Math.max(...history.map((h) => h.estimated1RM), 1);
+                  const w = 80;
+                  const h = 28;
+                  const pts = history.map((p, i) => {
+                    const x = history.length < 2 ? w / 2 : (i / (history.length - 1)) * w;
+                    const y = h - (p.estimated1RM / max) * h;
+                    return `${x},${y}`;
+                  }).join(" ");
+                  return (
+                    <div key={exerciseId} className="flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{exercise?.name ?? exerciseId}</p>
+                      </div>
+                      {history.length >= 2 && (
+                        <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
+                          <polyline points={pts}
+                            fill="none" stroke="var(--color-primary)" strokeWidth="1.5"
+                            strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                      <span className="text-sm font-bold text-[var(--color-primary)] w-16 text-right shrink-0">
+                        {estimated1RM.toFixed(1)} kg
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-[var(--color-text-muted)] mt-2">
+                Estimativa via fórmula de Epley: 1RM = peso × (1 + reps/30)
+              </p>
+            </div>
+          )}
+
+          {/* ── Esta Semana — volume targets ──────────────────────── */}
+          {weeklyTargets.length > 0 && (
+            <div className="card p-4">
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">📅 Esta semana — meta de volume</p>
+              <div className="space-y-2.5">
+                {weeklyTargets.map(({ muscle, target }) => {
+                  const current = thisWeekVolume[muscle] ?? 0;
+                  const pct = Math.min(100, (current / target) * 100);
+                  const done = current >= target;
+                  return (
+                    <div key={muscle}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className={done ? "text-[var(--color-success)] font-semibold" : "text-[var(--color-text-secondary)]"}>
+                          {done ? "✓ " : ""}{muscle}
+                        </span>
+                        <span className="text-[var(--color-text-muted)]">{current}/{target} sets</span>
+                      </div>
+                      <div className="bg-[var(--color-surface-2)] rounded-full h-1.5">
+                        <div
+                          className="h-1.5 rounded-full transition-all"
+                          style={{
+                            width: `${pct}%`,
+                            background: done ? "var(--color-success)" : "var(--color-primary)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <Link href="/profile" className="text-[10px] text-[var(--color-primary)] mt-2 inline-block">
+                Alterar objetivo no perfil →
+              </Link>
+            </div>
+          )}
+
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
               Histórico de Sessões
@@ -295,6 +427,9 @@ export default function ProgressPage() {
                         )}
                         {session.rating && (
                           <span>· {"⭐".repeat(session.rating)}</span>
+                        )}
+                        {session.rir !== undefined && (
+                          <span>· RiR {session.rir}</span>
                         )}
                       </div>
                       {/* Health metrics row */}

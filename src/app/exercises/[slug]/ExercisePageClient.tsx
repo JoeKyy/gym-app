@@ -6,7 +6,9 @@ import { getExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { DIFFICULTY_PT, EQUIPMENT_PT } from "@/lib/translations";
 import BodyMapImage from "@/components/BodyMapImage";
+import { getExercisePreference, setExercisePreference } from "@/lib/storage";
 import type { Exercise } from "@/lib/types";
+import type { ExercisePreferenceState } from "@/lib/types";
 
 interface SetRow { id: number; weight: string; reps: string; done: boolean; }
 const DEFAULT_SETS = 3;
@@ -67,15 +69,19 @@ export default function ExerciseDetailPage() {
   const [sets, setSets] = useState<SetRow[]>(initSets);
   const [restingAfter, setRestingAfter] = useState<number | null>(null);
   const [allDone, setAllDone] = useState(false);
+  const [preference, setPreference] = useState<ExercisePreferenceState>("default");
 
   useEffect(() => {
     getExercises().then((exs) => {
       const found = exs.find((e) => e.slug === slug || e.id === slug);
       setExercise(found ?? null);
-      if (found?.videoUrls) {
-        const angles = ["frontMale", "sideMale", "frontFemale", "sideFemale"] as const;
-        const first = angles.find((a) => found.videoUrls?.[a]);
-        if (first) setVideoAngle(first);
+      if (found) {
+        setPreference(getExercisePreference(found.id));
+        if (found.videoUrls) {
+          const angles = ["frontMale", "sideMale", "frontFemale", "sideFemale"] as const;
+          const first = angles.find((a) => found.videoUrls?.[a]);
+          if (first) setVideoAngle(first);
+        }
       }
     });
   }, [slug]);
@@ -186,6 +192,43 @@ export default function ExerciseDetailPage() {
             ))}
             {risky && <span className="badge badge-red">⚠ Risco: {riskyMuscles.join(", ")}</span>}
           </div>
+        </div>
+
+        {/* Preference buttons */}
+        <div className="card p-3">
+          <p className="text-[10px] uppercase tracking-wide mb-2" style={{ color: "var(--color-text-muted)" }}>
+            Preferência no gerador
+          </p>
+          <div className="flex gap-2">
+            {([
+              { state: "more" as const,     label: "👍 Mais",    desc: "Priorizar" },
+              { state: "less" as const,     label: "👎 Menos",   desc: "Reduzir" },
+              { state: "excluded" as const, label: "🚫 Excluir", desc: "Nunca sugerir" },
+            ]).map(({ state, label }) => {
+              const active = preference === state;
+              return (
+                <button key={state}
+                  onClick={() => {
+                    const next: ExercisePreferenceState = active ? "default" : state;
+                    setExercisePreference(exercise!.id, next);
+                    setPreference(next);
+                  }}
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                    active
+                      ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                      : "border-[var(--color-border)] text-[var(--color-text-muted)]"
+                  }`}
+                  style={{ background: active ? "var(--color-primary-soft)" : "var(--color-surface-2)" }}>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {preference !== "default" && (
+            <p className="text-[10px] text-[var(--color-primary)] mt-1.5 text-center">
+              {preference === "more" ? "Priorizado no gerador" : preference === "less" ? "Reduzido no gerador" : "Nunca será sugerido"}
+            </p>
+          )}
         </div>
 
         {/* Muscles + bodymap */}

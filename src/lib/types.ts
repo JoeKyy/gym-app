@@ -131,6 +131,7 @@ export interface WorkoutSession {
   durationMinutes?: number;
   exercises: ExerciseLog[];
   rating?: 1 | 2 | 3 | 4 | 5; // session feel
+  rir?: number;                 // Reps in Reserve (0=failure, 5=very easy)
   notes?: string;
   // ─── Health / external sync ───────────────────────────────────────────────
   heartRateAvg?: number;       // bpm
@@ -203,6 +204,44 @@ export interface WorkoutSuggestion {
   warnings: string[];
   isRehabProtocol?: boolean;
   protocolName?: string;  // e.g. "McGill Big 3"
+}
+
+// ─── User Profile (Fitbod-style "My Plan") ───────────────────────────────────
+
+export type FitnessGoal =
+  | "build_muscle"
+  | "get_stronger"
+  | "get_lean"
+  | "general_fitness"
+  | "rehab";
+
+export type TrainingSplit =
+  | "fresh_muscle"
+  | "full_body"
+  | "upper_lower"
+  | "ppl";
+
+export interface UserProfile {
+  goal: FitnessGoal;
+  experienceLevel: FitnessLevel;
+  split: TrainingSplit;
+  durationMinutes: 30 | 45 | 60 | 75 | 90;
+  units: "kg" | "lb";
+  bodyStats: {
+    age?: number;
+    weight?: number;    // kg
+    height?: number;    // cm
+    gender?: "male" | "female" | "other";
+  };
+}
+
+// ─── Exercise Preferences (Fitbod-style Recommend More/Less/Exclude) ─────────
+
+export type ExercisePreferenceState = "default" | "more" | "less" | "excluded";
+
+export interface ExercisePreference {
+  exerciseId: string;
+  state: ExercisePreferenceState;
 }
 
 // ─── App State ───────────────────────────────────────────────────────────────
