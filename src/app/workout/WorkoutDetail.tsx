@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkouts } from "@/hooks/useWorkouts";
@@ -10,7 +10,6 @@ import { saveSession, generateId, now as nowISO } from "@/lib/storage";
 import { parseNum } from "@/lib/parse";
 import { Dumbbell, Home, Zap, Timer, Play, ChevronLeft } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
-import { formatElapsed } from "./types";
 import { useRestTimer } from "./hooks/useRestTimer";
 import { useSessionLogs } from "./hooks/useSessionLogs";
 import { RestTimerOverlay } from "./components/RestTimerOverlay";
@@ -19,6 +18,7 @@ import { ExercisePicker } from "./components/ExercisePicker";
 import { ActiveExerciseCard } from "./components/ActiveExerciseCard";
 import { FinishModal } from "./components/FinishModal";
 import { ExerciseDetailSheet } from "./components/ExerciseDetailSheet";
+import { ElapsedBadge } from "./components/ElapsedBadge";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
 const ENV_ICON: Record<string, React.ReactNode> = {
@@ -51,10 +51,8 @@ export default function WorkoutEditorPage() {
   const [mode, setMode] = useState<"edit" | "session">("edit");
   const [sessionStartedAt, setSessionStartedAt] = useState<string | null>(null);
   const { sessionLogs, setSessionLogs, initLogs, updateSetLog, clearLogs } = useSessionLogs();
-  const [elapsed, setElapsed] = useState(0);
   const [showFinish, setShowFinish] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { restTimer, startRestTimer, skipRestTimer, clearOnUnmount } = useRestTimer();
 
@@ -68,7 +66,6 @@ export default function WorkoutEditorPage() {
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
       clearOnUnmount();
     };
   }, [clearOnUnmount]);
@@ -167,26 +164,21 @@ export default function WorkoutEditorPage() {
     if (!workout) return;
     initLogs(workout);
     setSessionStartedAt(nowISO());
-    setElapsed(0);
     setMode("session");
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
   }, [initLogs, workout]);
 
   const handleExitSession = useCallback(() => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     skipRestTimer();
     setMode("edit");
     clearLogs();
     setSessionStartedAt(null);
-    setElapsed(0);
     setShowFinish(false);
   }, [clearLogs, skipRestTimer]);
 
   const handleSaveSession = useCallback((rating: number | null, rir: number | null, notes: string) => {
     if (!workout || !sessionStartedAt) return;
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
 
+    const computedElapsed = Math.floor((Date.now() - Date.parse(sessionStartedAt)) / 1000);
     const validIds = new Set(workout.exercises.map((e) => e.exerciseId));
     const exerciseLogs: ExerciseLog[] = Object.entries(sessionLogs)
       .filter(([exerciseId, state]) => validIds.has(exerciseId) && state.sets.some((s) => s.completed))
@@ -206,7 +198,7 @@ export default function WorkoutEditorPage() {
       date: new Date().toISOString().slice(0, 10),
       startedAt: sessionStartedAt,
       finishedAt: nowISO(),
-      durationMinutes: Math.max(1, Math.round(elapsed / 60)),
+      durationMinutes: Math.max(1, Math.round(computedElapsed / 60)),
       exercises: exerciseLogs,
       rating: (rating as WorkoutSession["rating"]) ?? undefined,
       rir: rir ?? undefined,
@@ -219,7 +211,7 @@ export default function WorkoutEditorPage() {
       return;
     }
     router.push("/progress");
-  }, [workout, sessionStartedAt, sessionLogs, elapsed, router]);
+  }, [workout, sessionStartedAt, sessionLogs, router]);
 
   // ── Guards ──────────────────────────────────────────────────────────────────
 
@@ -280,7 +272,8 @@ export default function WorkoutEditorPage() {
         <FinishModal
           workout={workout} sessionLogs={sessionLogs}
           exerciseMap={exerciseMap} startedAt={sessionStartedAt}
-          elapsed={elapsed} onSave={handleSaveSession} onCancel={() => setShowFinish(false)}
+          elapsed={Math.floor((Date.now() - Date.parse(sessionStartedAt)) / 1000)}
+          onSave={handleSaveSession} onCancel={() => setShowFinish(false)}
         />
       )}
 
@@ -323,9 +316,9 @@ export default function WorkoutEditorPage() {
                   {riskyCount > 0 && (
                     <span className="badge badge-red">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>
                   )}
-                  {mode === "session" && (
+                  {mode === "session" && sessionStartedAt && (
                     <span className="badge flex items-center gap-1" style={{ background: "var(--color-primary-soft)", color: "var(--color-primary)", border: "1px solid var(--color-primary-border)" }}>
-                      <Timer size={11} /><span className="font-mono">{formatElapsed(elapsed)}</span>
+                      <Timer size={11} /><span className="font-mono"><ElapsedBadge startedAt={sessionStartedAt} /></span>
                     </span>
                   )}
                 </div>
