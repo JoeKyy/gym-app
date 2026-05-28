@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PartyPopper, XCircle } from "lucide-react";
 import { exchangeStravaCode, getStravaSettings } from "@/lib/strava";
 
 export default function StravaCallbackPage() {
@@ -49,14 +50,14 @@ export default function StravaCallbackPage() {
       )}
       {status === "success" && (
         <>
-          <div className="text-5xl">🎉</div>
+          <PartyPopper size={48} style={{ color: "var(--color-success)" }} />
           <h2 className="text-xl font-bold text-green-500">Conectado!</h2>
           <p className="text-[var(--color-text-muted)]">{message}</p>
         </>
       )}
       {status === "error" && (
         <>
-          <div className="text-5xl">❌</div>
+          <XCircle size={48} style={{ color: "var(--color-danger)" }} />
           <h2 className="text-xl font-bold text-red-500">Erro</h2>
           <p className="text-[var(--color-text-muted)]">{message}</p>
           <button

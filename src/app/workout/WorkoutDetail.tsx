@@ -11,7 +11,7 @@ import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/Exe
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
-import { Dumbbell, Home, Zap } from "lucide-react";
+import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
@@ -71,7 +71,7 @@ function RestTimerOverlay({ remaining, total, onSkip }: {
     }`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{isAlmostDone ? "✅" : "⏱"}</span>
+        <span className="text-lg">{isAlmostDone ? <CheckCircle size={20} className="text-green-500" /> : <Timer size={20} style={{ color: "var(--color-primary)" }} />}</span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
               {isAlmostDone ? "Quase lá!" : "Descansando"}
@@ -147,9 +147,9 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
       <span className="text-[10px] shrink-0" style={{ color: "var(--color-text-muted)" }}>reps</span>
 
       {isPR && state.completed && (
-        <span className="text-[10px] font-bold shrink-0 px-1.5 py-0.5 rounded-md"
+        <span className="text-[10px] font-bold shrink-0 px-1.5 py-0.5 rounded-md flex items-center gap-0.5"
           style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)", border: "1px solid var(--color-warning-border)" }}>
-          🏆 PR
+          <Trophy size={10} />PR
         </span>
       )}
     </div>
@@ -323,16 +323,16 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm truncate capitalize" style={{ color: "var(--color-text)" }}>
             {ex.name}
-            {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-              style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}>🏆 PR!</span>}
+            {hasPR && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5"
+              style={{ background: "var(--color-warning-bg)", color: "var(--color-warning)" }}><Trophy size={9} />PR!</span>}
           </p>
           <p className="text-xs mt-0.5" style={{ color: allDone ? "var(--color-success-text)" : "var(--color-text-muted)" }}>
             {allDone ? "✓ Concluído" : `${doneSets}/${config.sets} séries`} · alvo {config.reps} reps
           </p>
         </div>
-        <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1"
+        <span className="text-xs shrink-0 px-2 py-1 rounded-lg mr-1 flex items-center"
           style={{ color: "var(--color-text-muted)", background: "var(--color-surface-2)" }}>
-          ℹ
+          <Info size={13} />
         </span>
         <button
           onClick={(e) => { e.stopPropagation(); markAll(); }}
@@ -416,7 +416,9 @@ function FinishModal({
         <div className="p-5 space-y-5">
           {/* Title */}
           <div className="text-center">
-            <p className="text-3xl mb-1">🎉</p>
+            <div className="flex justify-center mb-2">
+              <PartyPopper size={32} style={{ color: "var(--color-primary)" }} />
+            </div>
             <h2 className="text-xl font-bold" style={{ color: "var(--color-text)" }}>Treino concluído!</h2>
             <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>{workout.name}</p>
           </div>
@@ -458,16 +460,18 @@ function FinishModal({
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((n) => (
                 <button key={n} onClick={() => setRating(rating === n ? null : n)}
-                  className={`flex-1 py-2 rounded-xl text-xl transition-all ${
-                    rating !== null && n <= rating ? "opacity-100 scale-110" : "opacity-40"
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+                    rating !== null && n <= rating
+                      ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                      : "border-[var(--color-border)] text-[var(--color-text-muted)]"
                   }`}>
-                  {n <= 2 ? "😓" : n === 3 ? "😐" : n === 4 ? "💪" : "🔥"}
+                  {n}
                 </button>
               ))}
             </div>
             {rating && (
               <p className="text-xs text-center mt-1" style={{ color: "var(--color-text-muted)" }}>
-                {rating <= 2 ? "Pesado, mas valeu!" : rating === 3 ? "Treino sólido" : rating === 4 ? "Ótimo treino!" : "Treino incrível! 🔥"}
+                {rating <= 2 ? "Pesado, mas valeu!" : rating === 3 ? "Treino sólido" : rating === 4 ? "Ótimo treino!" : "Treino incrível!"}
               </p>
             )}
           </div>
@@ -497,7 +501,7 @@ function FinishModal({
             </div>
             {rir !== null && (
               <p className="text-xs text-center mt-1" style={{ color: "var(--color-text-muted)" }}>
-                {rir === 0 ? "💪 Foi no limite!" : rir <= 2 ? "Bom esforço" : rir <= 4 ? "Podia puxar mais" : "Muito confortável"}
+                {rir === 0 ? "Foi no limite!" : rir <= 2 ? "Bom esforço" : rir <= 4 ? "Podia puxar mais" : "Muito confortável"}
               </p>
             )}
           </div>
@@ -943,8 +947,8 @@ export default function WorkoutEditorPage() {
               {ENV_ICON[workout.environment]} {ENV_LABEL[workout.environment]} · {workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}
               {riskyCount > 0 && <span className="ml-2 text-[var(--color-danger)]">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>}
               {mode === "session" && (
-                <span className="ml-2 font-mono font-semibold" style={{ color: "var(--color-primary)" }}>
-                  ⏱ {formatElapsed(elapsed)}
+                <span className="ml-2 font-mono font-semibold flex items-center gap-0.5" style={{ color: "var(--color-primary)" }}>
+                  <Timer size={12} />{formatElapsed(elapsed)}
                 </span>
               )}
             </p>
@@ -952,8 +956,8 @@ export default function WorkoutEditorPage() {
 
           {/* Start session button (edit mode only) */}
           {mode === "edit" && workout.exercises.length > 0 && (
-            <button onClick={handleStartSession} className="btn btn-primary shrink-0 text-sm">
-              ▶ Iniciar
+            <button onClick={handleStartSession} className="btn btn-primary shrink-0 text-sm flex items-center gap-1.5">
+              <Play size={14} />Iniciar
             </button>
           )}
         </div>
@@ -980,7 +984,7 @@ export default function WorkoutEditorPage() {
         {/* Exercise list */}
         {workout.exercises.length === 0 ? (
           <div className="card p-10 text-center">
-            <p className="text-4xl mb-3">🏋</p>
+            <div className="flex justify-center mb-3"><Dumbbell size={40} style={{ color: "var(--color-text-muted)", opacity: 0.3 }} /></div>
             <p className="font-semibold" style={{ color: "var(--color-text)" }}>Nenhum exercício</p>
             <p className="text-sm mt-1 mb-4" style={{ color: "var(--color-text-muted)" }}>Adicione exercícios ao seu treino</p>
             <button onClick={() => setShowPicker(true)} className="btn btn-primary">+ Adicionar exercício</button>

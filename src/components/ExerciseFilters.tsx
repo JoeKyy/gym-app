@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { Home, Dumbbell, Activity, Settings, Search } from "lucide-react";
 import type { AppFilters, WorkoutEnvironment } from "@/lib/types";
 import { BODYPART_PT, EQUIPMENT_PT } from "@/lib/translations";
 
@@ -11,11 +12,11 @@ interface Props {
   userEquipment?: string[];
 }
 
-const ENV_OPTIONS: { value: WorkoutEnvironment | "all"; label: string }[] = [
-  { value: "all", label: "Todos" },
-  { value: "home", label: "🏠 Casa" },
-  { value: "gym", label: "🏋 Academia" },
-  { value: "pilates", label: "🧘 Pilates" },
+const ENV_OPTIONS: { value: WorkoutEnvironment | "all"; label: string; icon?: React.ReactNode }[] = [
+  { value: "all",     label: "Todos" },
+  { value: "home",    label: "Casa",     icon: <Home size={12} /> },
+  { value: "gym",     label: "Academia", icon: <Dumbbell size={12} /> },
+  { value: "pilates", label: "Pilates",  icon: <Activity size={12} /> },
 ];
 
 const btn = (active: boolean) =>
@@ -36,7 +37,7 @@ export default function ExerciseFilters({ filters, onChange, bodyParts, equipmen
     <div className="flex flex-col gap-3">
       <input
         type="search"
-        placeholder="🔍  Buscar exercício..."
+        placeholder="Buscar exercício..."
         value={filters.search}
         onChange={(e) => set({ search: e.target.value })}
         className="input"
@@ -44,9 +45,9 @@ export default function ExerciseFilters({ filters, onChange, bodyParts, equipmen
 
       <div className="flex flex-wrap gap-2 items-center">
         <div className="flex gap-1 flex-wrap">
-          {ENV_OPTIONS.map(({ value, label }) => (
+          {ENV_OPTIONS.map(({ value, label, icon }) => (
             <button key={value} onClick={() => set({ environment: value })} className={btn(filters.environment === value)}>
-              {label}
+              <span className="flex items-center gap-1">{icon}{label}</span>
             </button>
           ))}
         </div>
@@ -56,7 +57,7 @@ export default function ExerciseFilters({ filters, onChange, bodyParts, equipmen
             onClick={() => set({ myEquipmentOnly: !filters.myEquipmentOnly })}
             className={btn(!!filters.myEquipmentOnly)}
           >
-            ⚙ Meu Equipamento
+            <span className="flex items-center gap-1"><Settings size={12} />Meu Equipamento</span>
           </button>
         )}
 
@@ -91,8 +92,8 @@ export default function ExerciseFilters({ filters, onChange, bodyParts, equipmen
           <span className="text-xs text-[var(--color-text-muted)]">Ocultar exerc. arriscados</span>
         </label>
 
-        <Link href="/equipment" className="text-xs text-[var(--color-primary)] hover:underline ml-auto">
-          ⚙ Configurar equipamentos →
+        <Link href="/equipment" className="text-xs text-[var(--color-primary)] hover:underline ml-auto flex items-center gap-1">
+          <Settings size={12} />Configurar equipamentos →
         </Link>
       </div>
     </div>

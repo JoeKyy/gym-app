@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Calendar } from "lucide-react";
 import { usePlans } from "@/hooks/usePlans";
 
 export default function PlansPage() {
@@ -51,7 +52,7 @@ export default function PlansPage() {
 
       {plans.length === 0 ? (
         <div className="text-center py-20 text-[var(--color-text-muted)]">
-          <p className="text-4xl mb-3">📅</p>
+          <div className="flex justify-center mb-3"><Calendar size={40} style={{ opacity: 0.3 }} /></div>
           <p className="font-medium text-[var(--color-text)]">Nenhum plano ainda</p>
           <p className="text-sm mt-1">Crie um plano semanal para organizar seus treinos</p>
         </div>

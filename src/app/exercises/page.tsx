@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getEquipmentProfile } from "@/lib/storage";
-import { HeartPulse } from "lucide-react";
+import { HeartPulse, Activity } from "lucide-react";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
 import InjuryPanel from "@/components/InjuryPanel";
@@ -149,9 +149,9 @@ export default function ExercisesPage() {
           </div>
           <button
             onClick={() => setFilters((f) => ({ ...f, environment: "pilates", hideRisky: true }))}
-            className="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary flex items-center gap-1"
           >
-            🧘 Ver Pilates / Recuperação
+            <Activity size={13} />Ver Pilates / Recuperação
           </button>
         </div>
       )}

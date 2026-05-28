@@ -1,10 +1,11 @@
 "use client";
 import { useInjuries } from "@/hooks/useInjuries";
+import { HeartPulse } from "lucide-react";
 import BodyDiagram from "@/components/BodyDiagram";
 import type { InjurySeverity } from "@/lib/types";
 
 const MUSCLE_GROUPS: Record<string, string[]> = {
-  "🔴 Coluna / Lombar": [
+  "Coluna / Lombar": [
     "lower back",
     "erector spinae",
     "spine",
@@ -13,7 +14,7 @@ const MUSCLE_GROUPS: Record<string, string[]> = {
     "abdominals",
     "obliques",
   ],
-  "🦵 Membros Inferiores": [
+  "Membros Inferiores": [
     "quadriceps",
     "hamstrings",
     "glutes",
@@ -22,7 +23,7 @@ const MUSCLE_GROUPS: Record<string, string[]> = {
     "inner thighs",
     "adductors",
   ],
-  "💪 Membros Superiores": [
+  "Membros Superiores": [
     "biceps",
     "triceps",
     "forearms",
@@ -30,7 +31,7 @@ const MUSCLE_GROUPS: Record<string, string[]> = {
     "rotator cuff",
     "wrist flexors",
   ],
-  "🏋 Peitoral / Costas": [
+  "Peitoral / Costas": [
     "chest",
     "pecs",
     "lats",
@@ -40,20 +41,20 @@ const MUSCLE_GROUPS: Record<string, string[]> = {
     "serratus anterior",
     "rear delts",
   ],
-  "🧠 Pescoço / Outros": ["neck", "shins", "hands", "grip muscles"],
+  "Pescoço / Outros": ["neck", "shins", "hands", "grip muscles"],
 };
 
 const PRESETS: Record<string, { label: string; muscles: string[] }> = {
   "hernia-disco": {
-    label: "🦴 Hérnia de Disco (Lombar)",
+    label: "Hérnia de Disco (Lombar)",
     muscles: ["lower back", "erector spinae", "iliopsoas", "piriformis"],
   },
   "lesao-ombro": {
-    label: "💪 Lesão no Ombro",
+    label: "Lesão no Ombro",
     muscles: ["shoulders", "rotator cuff", "rear delts"],
   },
   "lesao-joelho": {
-    label: "🦵 Lesão no Joelho",
+    label: "Lesão no Joelho",
     muscles: ["quadriceps", "hamstrings"],
   },
 };
@@ -81,7 +82,8 @@ export default function InjuryPanel() {
   return (
     <div className="card p-4 space-y-4">
       <h2 className="font-semibold text-base flex items-center gap-2">
-        🩹 Músculos em recuperação
+        <HeartPulse size={16} style={{ color: "var(--color-primary)" }} />
+        Músculos em recuperação
       </h2>
 
       {/* Visual body diagram — click regions to mark injured */}
@@ -133,8 +135,8 @@ export default function InjuryPanel() {
                   onChange={(e) => updateSeverity(inj.muscle, e.target.value as InjurySeverity)}
                   className="bg-transparent text-xs focus:outline-none cursor-pointer"
                 >
-                  <option value="recovering">🟡 recuperando</option>
-                  <option value="injured">🔴 lesionado</option>
+                  <option value="recovering">recuperando</option>
+                  <option value="injured">lesionado</option>
                 </select>
                 <button
                   onClick={() => removeInjury(inj.muscle)}

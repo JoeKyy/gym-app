@@ -20,14 +20,15 @@ import {
 import { ALL_EQUIPMENT } from "@/lib/equipment";
 import EquipmentIcon from "@/components/EquipmentIcon";
 import ExerciseMedia from "@/components/ExerciseMedia";
+import { Zap, RefreshCw, Play, LayoutList, Clock, Target, Dumbbell, Save, Shuffle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Exercise } from "@/lib/types";
 
 type Step = "focus" | "equipment" | "settings" | "result";
 
 const DIFFICULTIES = [
-  { id: "beginner",     label: "Iniciante",      emoji: "🌱" },
-  { id: "intermediate", label: "Intermediário",   emoji: "🔥" },
-  { id: "advanced",     label: "Avançado",        emoji: "⚡" },
+  { id: "beginner",     label: "Iniciante",      color: "#22c55e" },
+  { id: "intermediate", label: "Intermediário",   color: "#f59e0b" },
+  { id: "advanced",     label: "Avançado",        color: "#ef4444" },
 ] as const;
 
 const COUNT_OPTIONS = [4, 6, 8, 10];
@@ -216,9 +217,8 @@ export default function GeneratePage() {
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">{opt.emoji}</span>
                   {focus === opt.id && (
-                    <span className="text-[var(--color-primary)] font-bold text-lg leading-none">✓</span>
+                    <Check size={16} style={{ color: "var(--color-primary)" }} className="ml-auto" />
                   )}
                 </div>
                 <p className="font-semibold text-sm">{opt.label}</p>
@@ -339,8 +339,7 @@ export default function GeneratePage() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-2xl">{g.emoji}</span>
-                    {goal === g.id && <span className="text-[var(--color-primary)] font-bold">✓</span>}
+                    {goal === g.id && <Check size={16} style={{ color: "var(--color-primary)" }} className="ml-auto" />}
                   </div>
                   <p className="font-semibold text-sm">{g.label}</p>
                   <p className="text-xs text-[var(--color-text-muted)] mt-0.5 leading-snug">{g.description}</p>
@@ -361,7 +360,7 @@ export default function GeneratePage() {
                       : "card-interactive"
                   }`}
                 >
-                  <div className="text-xl mb-1">{d.emoji}</div>
+                  <div className="w-3 h-3 rounded-full mx-auto mb-1" style={{ background: d.color }} />
                   <p className="text-xs font-semibold">{d.label}</p>
                 </button>
               ))}
@@ -389,20 +388,23 @@ export default function GeneratePage() {
           {/* Summary card */}
           <div className="card p-4 space-y-1.5 text-sm">
             <p className="font-semibold text-[var(--color-text-muted)] text-xs uppercase tracking-wide mb-2">Resumo</p>
-            <p>🎯 <strong>Foco:</strong> {FOCUS_LABELS[focus]}</p>
-            <p>🏋️ <strong>Equipamento:</strong> {equipment.length} item{equipment.length !== 1 ? "s" : ""}</p>
-            <p>📈 <strong>Objetivo:</strong> {GOAL_LABELS[goal]}</p>
-            <p>🌱 <strong>Nível:</strong> {DIFFICULTIES.find((d) => d.id === difficulty)?.label}</p>
-            <p>🔢 <strong>Exercícios:</strong> {exerciseCount}</p>
+            <p className="flex items-center gap-1.5"><Target size={13} style={{ color: "var(--color-primary)" }} /><strong>Foco:</strong> {FOCUS_LABELS[focus]}</p>
+            <p className="flex items-center gap-1.5"><Dumbbell size={13} style={{ color: "var(--color-primary)" }} /><strong>Equipamento:</strong> {equipment.length} item{equipment.length !== 1 ? "s" : ""}</p>
+            <p className="flex items-center gap-1.5"><Zap size={13} style={{ color: "var(--color-primary)" }} /><strong>Objetivo:</strong> {GOAL_LABELS[goal]}</p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-full" style={{ background: DIFFICULTIES.find((d) => d.id === difficulty)?.color }} />
+              <strong>Nível:</strong> {DIFFICULTIES.find((d) => d.id === difficulty)?.label}
+            </p>
+            <p className="flex items-center gap-1.5"><LayoutList size={13} style={{ color: "var(--color-primary)" }} /><strong>Exercícios:</strong> {exerciseCount}</p>
           </div>
 
           <div className="sticky bottom-28 flex justify-end pt-4">
             <button
               onClick={handleGenerate}
               disabled={exercises.length === 0}
-              className="btn btn-primary btn-lg shadow-lg"
+              className="btn btn-primary btn-lg shadow-lg flex items-center gap-2"
             >
-              ⚡ Gerar Treino
+              <Zap size={16} />Gerar Treino
             </button>
           </div>
         </div>
@@ -417,14 +419,14 @@ export default function GeneratePage() {
               <div>
                 <h2 className="font-bold text-lg leading-tight">{generatedWorkout.name}</h2>
                 <div className="flex flex-wrap gap-2 mt-2 text-sm text-[var(--color-text-secondary)]">
-                  <span>🔢 {generatedWorkout.exercises.length} exercícios</span>
-                  <span>📋 {generatedWorkout.totalSets} séries</span>
-                  <span>⏱ ~{generatedWorkout.estimatedMinutes} min</span>
+                  <span>{generatedWorkout.exercises.length} exercícios</span>
+                  <span className="flex items-center gap-1"><LayoutList size={12} />{generatedWorkout.totalSets} séries</span>
+                  <span className="flex items-center gap-1"><Clock size={12} />~{generatedWorkout.estimatedMinutes} min</span>
                 </div>
               </div>
               <button onClick={handleRegenerate}
-                className="btn btn-secondary text-sm shrink-0">
-                🔄 Gerar novamente
+                className="btn btn-secondary text-sm shrink-0 flex items-center gap-1.5">
+                <RefreshCw size={14} />Gerar novamente
               </button>
             </div>
           </div>
@@ -462,8 +464,8 @@ export default function GeneratePage() {
                     {ge.exercise.mechanic === "compound" ? "Composto" : "Isolamento"} · {ge.exercise.equipments[0] ?? "Peso corporal"}
                   </span>
                   <button onClick={() => swapExercise(idx)}
-                    className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors">
-                    🔁 Trocar
+                    className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1">
+                    <Shuffle size={12} />Trocar
                   </button>
                 </div>
               </div>
@@ -472,12 +474,12 @@ export default function GeneratePage() {
 
           {/* Action buttons */}
           <div className="space-y-3 pt-2">
-            <button onClick={handleStartNow} className="btn btn-primary btn-lg w-full">
-              ▶ Iniciar treino agora
+            <button onClick={handleStartNow} className="btn btn-primary btn-lg w-full flex items-center justify-center gap-2">
+              <Play size={16} />Iniciar treino agora
             </button>
             <button onClick={handleSave}
-              className={`btn w-full ${savedMsg ? "btn-secondary" : "btn-secondary"}`}>
-              {savedMsg ? "✓ Treino salvo!" : "💾 Salvar treino"}
+              className={`btn w-full btn-secondary flex items-center justify-center gap-2`}>
+              {savedMsg ? <><Check size={16} />Treino salvo!</> : <><Save size={16} />Salvar treino</>}
             </button>
             <button onClick={() => setStep("settings")}
               className="btn btn-ghost w-full text-[var(--color-text-muted)]">

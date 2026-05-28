@@ -5,6 +5,8 @@
  * Minimal line-art style, renders at any size.
  */
 
+import { Dumbbell } from "lucide-react";
+
 interface Props {
   id: string; // equipment id from exercises.json
   size?: number;
@@ -147,34 +149,15 @@ const ICONS: Record<string, (c: string) => React.ReactNode> = {
   ),
 };
 
-// Fallback emoji map for any missing equipment
-const EMOJI_FALLBACK: Record<string, string> = {
-  Bodyweight: "🧍",
-  Dumbbells: "🏋️",
-  Barbell: "⚖️",
-  Kettlebells: "🫙",
-  Cables: "🔗",
-  Machine: "🤖",
-  Band: "🎗️",
-  "Medicine-Ball": "⚽",
-  "Bosu-Ball": "🟡",
-  Plate: "🔘",
-  "Smith-Machine": "🏗️",
-  TRX: "🪢",
-  Cardio: "🏃",
-  Stretches: "🤸",
-  Recovery: "🩹",
-  Yoga: "🧘",
-};
-
+// Fallback icon for any missing equipment
 export default function EquipmentIcon({ id, size = 40, className = "", color }: Props) {
   const resolvedColor = color ?? "currentColor";
   const iconFn = ICONS[id];
 
   if (!iconFn) {
     return (
-      <span className={className} style={{ fontSize: size * 0.7, lineHeight: 1 }}>
-        {EMOJI_FALLBACK[id] ?? "🏋️"}
+      <span className={className} style={{ display: "inline-flex", width: size, height: size, flexShrink: 0, alignItems: "center", justifyContent: "center", color: resolvedColor }}>
+        <Dumbbell size={size * 0.65} />
       </span>
     );
   }

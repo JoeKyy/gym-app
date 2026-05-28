@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dumbbell } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
   { href: "/exercises", label: "Exercícios" },
   { href: "/workouts", label: "Treinos" },
-  { href: "/suggest", label: "🤖 Sugerir" },
-  { href: "/injuries", label: "🩹 Lesões" },
-  { href: "/progress", label: "📊 Progresso" },
+  { href: "/suggest", label: "Sugerir" },
+  { href: "/injuries", label: "Lesões" },
+  { href: "/progress", label: "Progresso" },
   { href: "/plans", label: "Planos" },
 ];
 
@@ -18,8 +19,8 @@ export default function Navbar() {
   return (
     <nav className="bg-[var(--color-surface)] border-b border-[var(--color-border-subtle)] sticky top-0 z-50">
       <div className="container mx-auto px-4 max-w-7xl flex items-center justify-between h-14">
-        <Link href="/" className="font-bold text-lg text-[var(--color-primary)] tracking-tight">
-          💪 GymApp
+        <Link href="/" className="font-bold text-lg text-[var(--color-primary)] tracking-tight flex items-center gap-1.5">
+          <Dumbbell size={18} />GymApp
         </Link>
         <ul className="flex gap-1">
           {NAV_LINKS.map(({ href, label }) => {

@@ -9,7 +9,7 @@ import { getRehabProtocolsForConditions, INJURY_CONDITIONS_MAP } from "@/lib/reh
 import { exerciseMatchesEquipment } from "@/lib/suggestions";
 import { calculateFreshness, recommendFocusFromFreshness, GROUP_LABELS } from "@/lib/recovery";
 import ExerciseMedia from "@/components/ExerciseMedia";
-import { Dumbbell, HeartPulse, Sparkles, Target, Zap, Flame } from "lucide-react";
+import { Dumbbell, HeartPulse, Sparkles, Target, Zap, Flame, RefreshCw, X, Save } from "lucide-react";
 import type {
   Exercise,
   WorkoutSuggestion,
@@ -357,7 +357,7 @@ export default function SuggestPage() {
               const cond = INJURY_CONDITIONS_MAP.get(inj.conditionId);
               return (
                 <span key={inj.id} className="badge badge-amber">
-                  {cond?.icon} {cond?.name ?? inj.conditionId} · Fase: {inj.phase}
+                  <HeartPulse size={12} className="shrink-0" /> {cond?.name ?? inj.conditionId} · Fase: {inj.phase}
                 </span>
               );
             })}
@@ -446,9 +446,9 @@ export default function SuggestPage() {
               {!saved ? (
                 <button
                   onClick={handleSave}
-                  className="btn btn-primary"
+                  className="btn btn-primary flex items-center gap-1.5"
                 >
-                  💾 Salvar Treino
+                  <Save size={14} />Salvar Treino
                 </button>
               ) : (
                 <Link
@@ -548,7 +548,7 @@ export default function SuggestPage() {
                             style={{ color: "var(--color-text)" }}
                           >{ex.name}</Link>
                           {se.warning && (
-                            <span className="ml-2 text-xs" style={{ color: "var(--color-warning-text)" }}>⚠️ {se.warning}</span>
+                            <span className="ml-2 text-xs" style={{ color: "var(--color-warning-text)" }}>&#9888; {se.warning}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
@@ -561,13 +561,17 @@ export default function SuggestPage() {
                             title="Substituir exercício"
                             className="p-1.5 rounded-lg transition-colors hover:opacity-80"
                             style={{ color: "var(--color-primary)" }}
-                          >🔄</button>
+                          >
+                            <RefreshCw size={14} />
+                          </button>
                           <button
                             onClick={() => handleRemove(i)}
                             title="Remover exercício"
                             className="p-1.5 rounded-lg transition-colors hover:opacity-80"
                             style={{ color: "var(--color-text-muted)" }}
-                          >✕</button>
+                          >
+                            <X size={14} />
+                          </button>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1">
@@ -655,7 +659,7 @@ export default function SuggestPage() {
                     : "bg-[var(--color-surface)] border-[var(--color-border-subtle)] opacity-60"
                 }`}
               >
-                <p className="text-base">{tpl.icon}</p>
+                <Dumbbell size={16} style={{ color: "var(--color-text-muted)" }} className="mb-1" />
                 <p className="text-sm font-semibold mt-1">{tpl.name}</p>
                 <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{tpl.description}</p>
                 {tpl.targetConditions && tpl.targetConditions.some((c) => conditionIds.includes(c)) && (

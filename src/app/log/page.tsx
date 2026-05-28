@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { getSessions, deleteSession } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
-import { Settings, Flame, Trash2, Heart, Zap, ChevronRight } from "lucide-react";
+import { Settings, Flame, Trash2, Heart, Zap, ChevronRight, Star } from "lucide-react";
 import type { WorkoutSession, Exercise } from "@/lib/types";
 
 const DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -18,7 +18,11 @@ function formatDuration(min?: number) {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <span className="text-amber-400 text-xs">{"★".repeat(rating)}{"☆".repeat(5 - rating)}</span>
+    <span className="flex items-center gap-0.5">
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star key={i} size={11} fill={i < rating ? "currentColor" : "none"} className="text-amber-400" />
+      ))}
+    </span>
   );
 }
 

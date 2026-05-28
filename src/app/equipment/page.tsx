@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ALL_EQUIPMENT, EQUIPMENT_CATEGORIES, EQUIPMENT_CATEGORY_LABELS } from "@/lib/equipment";
 import { getEquipmentProfile, saveEquipmentProfile } from "@/lib/storage";
 import EquipmentIcon from "@/components/EquipmentIcon";
+import { Dumbbell } from "lucide-react";
 
 export default function EquipmentPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -51,7 +52,7 @@ export default function EquipmentPage() {
       </div>
 
       <div className="card p-3 flex items-center gap-3">
-        <span className="text-2xl">🏋</span>
+        <Dumbbell size={24} style={{ color: "var(--color-text-muted)" }} />
         <div>
           <p className="font-semibold text-sm">{selectedCount} equipamento{selectedCount !== 1 ? "s" : ""} selecionado{selectedCount !== 1 ? "s" : ""}</p>
           <p className="text-xs text-[var(--color-text-muted)]">Os treinos serão filtrados com base nisso</p>

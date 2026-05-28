@@ -2,14 +2,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Zap, LayoutList, Home, Dumbbell, Activity } from "lucide-react";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import type { WorkoutEnvironment } from "@/lib/types";
 
-const ENV_OPTIONS: { value: WorkoutEnvironment; label: string; icon: string }[] = [
-  { value: "home", label: "Casa", icon: "🏠" },
-  { value: "gym", label: "Academia", icon: "🏋" },
-  { value: "pilates", label: "Pilates", icon: "🧘" },
-  { value: "any", label: "Qualquer", icon: "⚡" },
+const ENV_OPTIONS: { value: WorkoutEnvironment; label: string; icon: React.ReactNode }[] = [
+  { value: "home",    label: "Casa",      icon: <Home size={14} /> },
+  { value: "gym",     label: "Academia",  icon: <Dumbbell size={14} /> },
+  { value: "pilates", label: "Pilates",   icon: <Activity size={14} /> },
+  { value: "any",     label: "Qualquer",  icon: <Zap size={14} /> },
 ];
 
 export default function WorkoutsPage() {
@@ -32,11 +33,11 @@ export default function WorkoutsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Meus Treinos</h1>
         <div className="flex gap-2">
-          <Link href="/generate" className="btn btn-primary">
-            ⚡ Gerar treino
+          <Link href="/generate" className="btn btn-primary flex items-center gap-1.5">
+            <Zap size={14} />Gerar treino
           </Link>
-          <Link href="/workouts/templates" className="btn btn-secondary">
-            📋 Templates
+          <Link href="/workouts/templates" className="btn btn-secondary flex items-center gap-1.5">
+            <LayoutList size={14} />Templates
           </Link>
           <button onClick={() => setShowForm((v) => !v)} className="btn btn-secondary">
             + Manual
@@ -47,7 +48,9 @@ export default function WorkoutsPage() {
       {/* Generator promo card (shown when no workouts) */}
       {workouts.length === 0 && (
         <Link href="/generate" className="card card-interactive p-5 flex items-center gap-4 border-[var(--color-primary-border)] bg-[var(--color-primary-soft)]">
-          <div className="text-4xl">⚡</div>
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl" style={{ background: "var(--color-primary-soft-strong)" }}>
+            <Zap size={24} style={{ color: "var(--color-primary)" }} />
+          </div>
           <div>
             <p className="font-bold text-base text-[var(--color-primary)]">Gerador de Treino</p>
             <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
@@ -106,7 +109,10 @@ export default function WorkoutsPage() {
                     <div>
                       <p className="font-semibold">{workout.name}</p>
                       <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                        {envOpt?.icon} {envOpt?.label} • {workout.exercises.length} exercícios
+                <div className="flex items-center gap-0.5">
+                  {envOpt?.icon}
+                  <span className="ml-1">{envOpt?.label}</span> • {workout.exercises.length} exercícios
+                </div>
                       </p>
                     </div>
                     <button
@@ -130,7 +136,7 @@ export default function WorkoutsPage() {
 
           {/* Quick link to generator at bottom */}
           <Link href="/generate" className="card card-interactive p-4 flex items-center gap-3">
-            <span className="text-2xl">⚡</span>
+            <Zap size={20} style={{ color: "var(--color-primary)" }} />
             <span className="text-sm font-medium">Gerar novo treino automaticamente</span>
             <span className="ml-auto text-[var(--color-text-muted)]">→</span>
           </Link>

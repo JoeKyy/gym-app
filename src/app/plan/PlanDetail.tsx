@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Home, Dumbbell, Activity, Zap, Check } from "lucide-react";
 import { usePlans, DAY_ORDER, DAY_LABELS } from "@/hooks/usePlans";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import type { WeeklyPlan, DayOfWeek } from "@/lib/types";
@@ -38,7 +39,12 @@ export default function PlanEditorPage() {
   };
 
   const workoutMap = new Map(workouts.map((w) => [w.id, w]));
-  const ENV_ICON: Record<string, string> = { home: "🏠", gym: "🏋", pilates: "🧘", any: "⚡" };
+  const ENV_ICON: Record<string, React.ReactNode> = {
+    home: <Home size={12} />,
+    gym: <Dumbbell size={12} />,
+    pilates: <Activity size={12} />,
+    any: <Zap size={12} />,
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -84,7 +90,7 @@ export default function PlanEditorPage() {
                         key={wid}
                         className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] text-[var(--color-primary)]"
                       >
-                        <span>{ENV_ICON[w.environment]}</span>
+                        <span className="flex items-center">{ENV_ICON[w.environment] ?? <Zap size={12} />}</span>
                         <Link href={`/workout?id=${w.id}`} className="hover:text-[var(--color-text)]">{w.name}</Link>
                         <button onClick={() => toggleWorkout(day, wid)} className="text-[var(--color-primary)] hover:text-[var(--color-danger)] ml-0.5">×</button>
                       </div>
@@ -110,7 +116,7 @@ export default function PlanEditorPage() {
                             : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]"
                         }`}
                       >
-                        {assigned ? "✓ " : ""}{ENV_ICON[w.environment]} {w.name}
+                        {assigned ? <Check size={10} className="shrink-0" /> : null}{ENV_ICON[w.environment] ?? <Zap size={12} />} {w.name}
                       </button>
                     );
                   })}

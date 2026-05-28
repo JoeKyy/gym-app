@@ -17,6 +17,7 @@ import {
   HealthDataPoint,
 } from "@/lib/appleHealth";
 import { getSessions, saveSession } from "@/lib/storage";
+import { CheckCircle, XCircle, Heart, Flame, Calendar, Download, ArrowDownToLine } from "lucide-react";
 
 type Tab = "strava" | "apple";
 
@@ -99,7 +100,7 @@ export default function SyncPage() {
     setImportedCount(count);
     setStravaMsg(
       count
-        ? `✅ ${count} sessão(ões) enriquecida(s) com dados do Strava!`
+        ? `${count} sessão(ões) enriquecida(s) com dados do Strava!`
         : "Nenhuma sessão correspondeu às atividades encontradas."
     );
     setStravaLoading(false);
@@ -135,7 +136,7 @@ export default function SyncPage() {
       });
       setAppleMsg(
         count
-          ? `✅ ${count} sessão(ões) enriquecida(s) com dados do Apple Health!`
+          ? `${count} sessão(ões) enriquecida(s) com dados do Apple Health!`
           : `Arquivo processado (${healthData.length} treinos), mas nenhuma sessão correspondeu.`
       );
     } catch {
@@ -176,7 +177,7 @@ export default function SyncPage() {
           {connected ? (
             <div className="card p-4 space-y-3">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">✅</span>
+                <CheckCircle size={24} style={{ color: "var(--color-success)" }} />
                 <div>
                   <p className="font-semibold">Strava conectado</p>
                   <p className="text-xs text-[var(--color-text-muted)]">
@@ -191,7 +192,7 @@ export default function SyncPage() {
                   onClick={handleStravaImport}
                   disabled={stravaLoading}
                 >
-                  {stravaLoading ? "Importando..." : "📥 Importar dados (60 dias)"}
+                  {stravaLoading ? "Importando..." : "Importar dados (60 dias)"}
                 </button>
                 <button
                   className="btn btn-ghost text-sm"
@@ -265,9 +266,9 @@ export default function SyncPage() {
           <div className="card p-4 space-y-2">
             <p className="text-sm font-semibold">O que é importado?</p>
             <ul className="text-xs text-[var(--color-text-muted)] space-y-1">
-              <li>❤️ Frequência cardíaca média e máxima</li>
-              <li>🔥 Calorias ativas</li>
-              <li>📅 Match por data com suas sessões existentes</li>
+              <li className="flex items-center gap-1.5"><Heart size={11} />Frequência cardíaca média e máxima</li>
+              <li className="flex items-center gap-1.5"><Flame size={11} />Calorias ativas</li>
+              <li className="flex items-center gap-1.5"><Calendar size={11} />Match por data com suas sessões existentes</li>
             </ul>
           </div>
         </div>
@@ -288,7 +289,7 @@ export default function SyncPage() {
 
           {/* Import */}
           <div className="card p-4 space-y-3">
-            <p className="font-semibold">📥 Importar do Apple Health</p>
+            <p className="font-semibold">Importar do Apple Health</p>
             <ol className="text-xs text-[var(--color-text-muted)] leading-relaxed space-y-1">
               <li>1. No iPhone: app Saúde → foto de perfil → Exportar dados de saúde</li>
               <li>2. Extraia o ZIP e encontre o arquivo <code className="bg-[var(--color-surface-2)] px-1 rounded">export.xml</code></li>
@@ -317,9 +318,9 @@ export default function SyncPage() {
           <div className="card p-4 space-y-2">
             <p className="text-sm font-semibold">O que é importado?</p>
             <ul className="text-xs text-[var(--color-text-muted)] space-y-1">
-              <li>❤️ Frequência cardíaca (de leituras Apple Watch)</li>
-              <li>🔥 Calorias ativas (Active Energy Burned)</li>
-              <li>🏋️ Match por data com HKWorkout de força</li>
+              <li className="flex items-center gap-1.5"><Heart size={11} />Frequência cardíaca (de leituras Apple Watch)</li>
+              <li className="flex items-center gap-1.5"><Flame size={11} />Calorias ativas (Active Energy Burned)</li>
+              <li className="flex items-center gap-1.5"><ArrowDownToLine size={11} />Match por data com HKWorkout de força</li>
             </ul>
           </div>
         </div>
@@ -358,10 +359,10 @@ function SessionTCXList() {
             <p className="text-xs text-[var(--color-text-muted)]">{s.date}</p>
           </div>
           <button
-            className="btn btn-ghost text-xs shrink-0"
+            className="btn btn-ghost text-xs shrink-0 flex items-center gap-1"
             onClick={() => downloadTCX(s)}
           >
-            ⬇ .tcx
+            <Download size={12} />.tcx
           </button>
         </div>
       ))}

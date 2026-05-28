@@ -1,5 +1,6 @@
 "use client";
 import { useTheme } from "@/hooks/useTheme";
+import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle() {
   const { theme, toggle } = useTheme();
@@ -14,7 +15,7 @@ export default function ThemeToggle() {
         color: "var(--color-primary)",
       }}
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
 }

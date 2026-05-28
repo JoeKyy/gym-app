@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Clock, Folder, Calendar, LayoutList, Play, Save, Zap } from "lucide-react";
 import { saveWorkout, generateId, now as nowISO } from "@/lib/storage";
 import type { Workout } from "@/lib/types";
 
@@ -112,9 +113,9 @@ function WorkoutTemplateCard({ workout, onStart, onSave }: {
         )}
 
         <div className="flex flex-wrap gap-2 text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
-          {exerciseCount > 0 && <span>🔢 {exerciseCount} exercícios</span>}
-          {workout.duration_minutes && <span>⏱ ~{workout.duration_minutes} min</span>}
-          {workout.category && <span>📂 {workout.category}</span>}
+          {exerciseCount > 0 && <span>{exerciseCount} exercícios</span>}
+          {workout.duration_minutes && <span className="flex items-center gap-0.5"><Clock size={11} />~{workout.duration_minutes} min</span>}
+          {workout.category && <span className="flex items-center gap-0.5"><Folder size={11} />{workout.category}</span>}
         </div>
 
         {muscles.length > 0 && (
@@ -131,17 +132,11 @@ function WorkoutTemplateCard({ workout, onStart, onSave }: {
 
       {/* Actions */}
       <div className="border-t px-4 py-3 flex gap-2" style={{ borderColor: "var(--color-border)" }}>
-        <button
-          onClick={onSave}
-          className="flex-1 btn btn-secondary text-xs py-2"
-        >
-          💾 Salvar
+        <button onClick={onSave} className="flex-1 btn btn-secondary text-xs py-2 flex items-center justify-center gap-1">
+          <Save size={12} />Salvar
         </button>
-        <button
-          onClick={onStart}
-          className="flex-1 btn btn-primary text-xs py-2"
-        >
-          ▶ Iniciar
+        <button onClick={onStart} className="flex-1 btn btn-primary text-xs py-2 flex items-center justify-center gap-1">
+          <Play size={12} />Iniciar
         </button>
       </div>
     </div>
@@ -174,8 +169,8 @@ function RoutineTemplateCard({ routine, onExpand }: {
       )}
 
       <div className="flex flex-wrap gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
-        {routine.days_per_week && <span>📅 {routine.days_per_week}x/semana</span>}
-        {routine.workouts?.length && <span>🗓 {routine.workouts.length} treinos</span>}
+        {routine.days_per_week && <span className="flex items-center gap-0.5"><Calendar size={11} />{routine.days_per_week}x/semana</span>}
+        {routine.workouts?.length && <span className="flex items-center gap-0.5"><LayoutList size={11} />{routine.workouts.length} treinos</span>}
       </div>
 
       <p className="text-xs mt-2 text-right" style={{ color: "var(--color-primary)" }}>Ver treinos →</p>
@@ -189,7 +184,7 @@ function EmptyState() {
   return (
     <div className="space-y-6">
       <div className="card p-6 text-center space-y-4">
-        <div className="text-5xl">📋</div>
+        <div className="flex justify-center"><LayoutList size={48} style={{ color: "var(--color-text-muted)", opacity: 0.3 }} /></div>
         <div>
           <h2 className="font-bold text-lg">Nenhum template ainda</h2>
           <p className="text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
@@ -220,7 +215,7 @@ function EmptyState() {
         <p className="section-label">Enquanto isso, tente</p>
         <Link href="/generate"
           className="card card-interactive p-4 flex items-center gap-3">
-          <span className="text-2xl">⚡</span>
+          <Zap size={22} style={{ color: "var(--color-primary)" }} />
           <div>
             <p className="font-semibold text-sm">Gerador de Treino</p>
             <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -331,7 +326,7 @@ export default function TemplatesPage() {
 
       {loading ? (
         <div className="text-center py-20" style={{ color: "var(--color-text-muted)" }}>
-          <p className="text-4xl mb-3 animate-pulse">📋</p>
+          <div className="flex justify-center mb-3"><LayoutList size={40} style={{ opacity: 0.3 }} /></div>
           <p>Carregando templates...</p>
         </div>
       ) : !hasData ? (
@@ -420,9 +415,9 @@ export default function TemplatesPage() {
                         {expandedRoutine.description}
                       </p>
                     )}
-                    {expandedRoutine.days_per_week && (
-                      <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
-                        📅 {expandedRoutine.days_per_week}x por semana
+                      {expandedRoutine.days_per_week && (
+                      <p className="text-sm mt-1 flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
+                        <Calendar size={13} />{expandedRoutine.days_per_week}x por semana
                       </p>
                     )}
                   </div>

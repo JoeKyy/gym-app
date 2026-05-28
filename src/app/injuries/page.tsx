@@ -11,22 +11,22 @@ import type { Injury, InjuryPhase, Exercise } from "@/lib/types";
 
 const PHASE_LABELS: Record<InjuryPhase, { label: string; color: string; description: string }> = {
   acute: {
-    label: "🔴 Agudo",
+    label: "Agudo",
     color: "text-[var(--color-danger-text)] border-[var(--color-danger-border)] bg-[var(--color-danger-bg)]",
     description: "0-2 semanas — repouso relativo, mobilização suave",
   },
   subacute: {
-    label: "🟡 Subagudo",
+    label: "Subagudo",
     color: "text-[var(--color-warning-text)] border-[var(--color-warning-border)] bg-[var(--color-warning-bg)]",
     description: "2-6 semanas — fortalecimento progressivo",
   },
   chronic: {
-    label: "🟢 Crônico/Reabilitação",
+    label: "Crônico/Reabilitação",
     color: "text-[var(--color-primary)] border-[var(--color-primary-border)] bg-[var(--color-primary-soft)]",
     description: "6+ semanas — exercício funcional com adaptações",
   },
   recovered: {
-    label: "✅ Recuperado",
+    label: "Recuperado",
     color: "text-[var(--color-text-secondary)] border-[var(--color-border)] bg-[var(--color-surface-2)]",
     description: "Retorno ao exercício normal",
   },
@@ -129,7 +129,7 @@ export default function InjuriesPage() {
 
       {activeInjuries.length === 0 && !showAdd && (
         <div className="card p-8 text-center">
-          <p className="text-4xl mb-3">✅</p>
+          <div className="flex justify-center mb-3"><HeartPulse size={40} style={{ color: "var(--color-success)", opacity: 0.5 }} /></div>
           <p className="text-[var(--color-text-secondary)] font-medium">Sem lesões ativas</p>
           <p className="text-[var(--color-text-muted)] text-sm mt-1">
             Registre uma condição para receber adaptações de treino e protocolos de reabilitação
@@ -148,7 +148,7 @@ export default function InjuriesPage() {
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xl">{condition?.icon ?? "🩹"}</span>
+                  <span className="text-xl"><HeartPulse size={20} style={{ color: "var(--color-danger)" }} /></span>
                   <h2 className="font-semibold text-[var(--color-text)]">{condition?.name ?? inj.conditionId}</h2>
                   <span className={`text-xs px-2 py-0.5 rounded-full border ${phaseInfo.color}`}>
                     {phaseInfo.label}
@@ -445,7 +445,7 @@ export default function InjuriesPage() {
 
       <div className="bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-xl p-4">
         <p className="text-xs text-[var(--color-text-muted)] text-center">
-          ⚕️ Esta ferramenta fornece orientações baseadas em evidências científicas publicadas.
+          Esta ferramenta fornece orientações baseadas em evidências científicas publicadas.
           Sempre consulte um fisioterapeuta, médico ou educador físico antes de iniciar qualquer
           programa de exercícios com lesão ativa.
         </p>
