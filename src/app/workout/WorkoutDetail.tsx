@@ -121,6 +121,8 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
     }`}>
       <button
         onClick={() => onChange({ ...state, completed: !state.completed })}
+        aria-label={`Marcar série ${setNum} concluída`}
+        aria-pressed={state.completed}
         className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold transition-all ${
           state.completed
             ? "bg-[var(--color-success)] border-[var(--color-success)] text-black"
@@ -134,6 +136,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
 
       <input
         type="number" inputMode="decimal" placeholder="—"
+        aria-label={`Peso série ${setNum} (kg)`}
         value={state.weight}
         onChange={(e) => onChange({ ...state, weight: e.target.value })}
         className="input text-xs text-center py-1 px-1 min-w-0 flex-1"
@@ -143,6 +146,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
       <input
         type="text" inputMode="numeric"
         placeholder={defaultReps}
+        aria-label={`Repetições série ${setNum}`}
         value={state.reps}
         onChange={(e) => onChange({ ...state, reps: e.target.value })}
         className="input text-xs text-center py-1 px-1 min-w-0 flex-1"
@@ -425,6 +429,8 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, on
               <div key={set.id} className={`flex items-center gap-2 rounded-xl px-1 py-1.5 transition-all ${set.done ? "opacity-50" : ""}`}>
                 <button
                   onClick={() => toggleSet(set.id)}
+                  aria-label={`Marcar série ${set.id} concluída`}
+                  aria-pressed={set.done}
                   className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                     set.done
                       ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-text)]"
@@ -435,11 +441,13 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, on
                 </button>
                 <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">{idx + 1}</span>
                 <input type="number" inputMode="decimal" placeholder="—"
+                  aria-label={`Peso série ${set.id} (kg)`}
                   value={set.weight}
                   onChange={(e) => updateSet(set.id, "weight", e.target.value)}
                   className={`input flex-1 text-center py-2 ${set.done ? "opacity-50" : ""}`}
                 />
                 <input type="number" inputMode="numeric" placeholder={SHEET_DEFAULT_REPS}
+                  aria-label={`Repetições série ${set.id}`}
                   value={set.reps}
                   onChange={(e) => updateSet(set.id, "reps", e.target.value)}
                   className={`input flex-1 text-center py-2 ${set.done ? "opacity-50" : ""}`}
@@ -1111,8 +1119,9 @@ export default function WorkoutEditorPage() {
     if (!workout || !sessionStartedAt) return;
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
 
+    const validIds = new Set(workout.exercises.map((e) => e.exerciseId));
     const exerciseLogs: ExerciseLog[] = Object.entries(sessionLogs)
-      .filter(([, state]) => state.sets.some((s) => s.completed))
+      .filter(([exerciseId, state]) => validIds.has(exerciseId) && state.sets.some((s) => s.completed))
       .map(([exerciseId, state]) => ({
         exerciseId,
         sets: state.sets.map<SetLog>((s) => ({
