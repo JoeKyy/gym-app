@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Model, { type IExerciseData, type Muscle } from "react-body-highlighter";
+import { useTheme } from "@/hooks/useTheme";
 
 export type MuscleDisplayStatus = "injured" | "recovering" | "sore" | "fresh" | "fatigued" | "normal";
 
@@ -117,6 +118,9 @@ export default function BodyDiagram({
   };
 
   const data = buildData();
+  const { theme } = useTheme();
+  const bodyColor = theme === "light" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.08)";
+  const highlightedColors = ["#22c55e", "#f59e0b", "#ef4444"];
 
   const handleMuscleClick = (ev: { muscle: string }) => {
     if (readOnly || !onToggleRegion) return;
@@ -138,8 +142,8 @@ export default function BodyDiagram({
           <Model
             type="anterior"
             data={data}
-            highlightedColors={["#22c55e", "#f59e0b", "#ef4444"]}
-            bodyColor="rgba(255,255,255,0.06)"
+            highlightedColors={highlightedColors}
+            bodyColor={bodyColor}
             style={modelStyle}
             onClick={readOnly ? undefined : handleMuscleClick}
           />
@@ -150,8 +154,8 @@ export default function BodyDiagram({
           <Model
             type="posterior"
             data={data}
-            highlightedColors={["#22c55e", "#f59e0b", "#ef4444"]}
-            bodyColor="rgba(255,255,255,0.06)"
+            highlightedColors={highlightedColors}
+            bodyColor={bodyColor}
             style={modelStyle}
             onClick={readOnly ? undefined : handleMuscleClick}
           />

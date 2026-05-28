@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Home, Dumbbell, Activity, Zap, Check } from "lucide-react";
+import { Home, Dumbbell, Activity, Zap, Check, ChevronLeft } from "lucide-react";
 import { usePlans, DAY_ORDER, DAY_LABELS } from "@/hooks/usePlans";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import type { WeeklyPlan, DayOfWeek } from "@/lib/types";
@@ -50,7 +50,12 @@ export default function PlanEditorPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-3 flex-wrap justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/plans" className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] text-sm">← Planos</Link>
+          <button
+            onClick={() => history.back()}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            style={{ background: "var(--color-surface-2)", color: "var(--color-text-muted)" }}>
+            <ChevronLeft size={18} />
+          </button>
           <div>
             <h1 className="text-xl font-bold">{plan.name}</h1>
             {isActive && <span className="text-xs text-[var(--color-primary)]">✓ Plano ativo</span>}

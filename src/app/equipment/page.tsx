@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Dumbbell } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { ALL_EQUIPMENT, EQUIPMENT_CATEGORIES, EQUIPMENT_CATEGORY_LABELS } from "@/lib/equipment";
 import { getEquipmentProfile, saveEquipmentProfile } from "@/lib/storage";
 import EquipmentIcon from "@/components/EquipmentIcon";
-import { Dumbbell } from "lucide-react";
 
 export default function EquipmentPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -35,9 +36,7 @@ export default function EquipmentPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Link href="/more" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] mb-2 inline-flex items-center gap-1">
-            ← Mais
-          </Link>
+          <BackButton className="mb-2" />
           <h1 className="text-2xl font-bold">Meus Equipamentos</h1>
           <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
             Selecione o que você tem disponível — em casa ou na academia

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getExercises } from "@/lib/data";
 import { getEquipmentProfile, getInjuriesV2, saveWorkout, getProfile } from "@/lib/storage";
+import BackButton from "@/components/BackButton";
 import {
   generateWorkout,
   generatedToWorkout,
@@ -178,9 +179,7 @@ export default function GeneratePage() {
     <div className="space-y-6 pb-8">
       {/* Header */}
       <div>
-        <Link href="/" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] inline-flex items-center gap-1 mb-2">
-          ← Início
-        </Link>
+        <BackButton className="mb-2" />
         <h1 className="text-2xl font-bold">Gerador de Treino</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">Monte um treino em segundos</p>
       </div>

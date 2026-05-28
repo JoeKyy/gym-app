@@ -17,7 +17,8 @@ import {
   HealthDataPoint,
 } from "@/lib/appleHealth";
 import { getSessions, saveSession } from "@/lib/storage";
-import { CheckCircle, XCircle, Heart, Flame, Calendar, Download, ArrowDownToLine } from "lucide-react";
+import { CheckCircle, XCircle, Heart, Flame, Calendar, Download, ArrowDownToLine, Bike, Apple } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 type Tab = "strava" | "apple";
 
@@ -148,6 +149,7 @@ export default function SyncPage() {
   return (
     <div className="space-y-6">
       <div>
+        <BackButton className="mb-1" />
         <h1 className="text-2xl font-bold">Sincronizar</h1>
         <p className="text-[var(--color-text-muted)] text-sm mt-0.5">
           Integrar com Strava e Apple Health
@@ -166,7 +168,7 @@ export default function SyncPage() {
                 : "text-[var(--color-text-muted)]"
             }`}
           >
-            {t === "strava" ? "🚴 Strava" : "🍎 Apple Health"}
+            {t === "strava" ? <><Bike size={14} /> Strava</> : <><Apple size={14} /> Apple Health</>}
           </button>
         ))}
       </div>

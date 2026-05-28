@@ -2,9 +2,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ThumbsUp, ThumbsDown, Ban, Trophy, Dumbbell } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Ban, Trophy, Dumbbell, ChevronLeft } from "lucide-react";
 import { getExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
+import { useRouter } from "next/navigation";
 import { DIFFICULTY_PT, EQUIPMENT_PT } from "@/lib/translations";
 import BodyMapImage from "@/components/BodyMapImage";
 import { getExercisePreference, setExercisePreference } from "@/lib/storage";
@@ -60,6 +61,7 @@ function RestTimer({ onDone }: { onDone: () => void }) {
 
 export default function ExerciseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [videoAngle, setVideoAngle] = useState<"frontMale" | "sideMale" | "frontFemale" | "sideFemale">("frontMale");
   const [videoError, setVideoError] = useState(false);
@@ -153,11 +155,12 @@ export default function ExerciseDetailPage() {
         )}
 
         {/* Back button overlaid top-left */}
-        <Link href="/exercises"
-          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg backdrop-blur-sm"
+        <button
+          onClick={() => router.back()}
+          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
           style={{ background: "rgba(0,0,0,0.45)" }}>
-          ←
-        </Link>
+          <ChevronLeft size={20} />
+        </button>
 
         {/* Angle switcher overlaid bottom */}
         {allAngles.length > 1 && (

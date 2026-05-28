@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getSessions, deleteSession, getTopStrengthExercises, getStrengthHistory, getProfile } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import BodyMapImage from "@/components/BodyMapImage";
+import BackButton from "@/components/BackButton";
 import { Dumbbell, Calendar, Star, Heart, Zap, Check } from "lucide-react";
 import type { WorkoutSession, Exercise } from "@/lib/types";
 import type { EstimatedStrength } from "@/lib/storage";
@@ -189,12 +190,10 @@ export default function ProgressPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
+          <BackButton className="mb-1" />
           <h1 className="text-2xl font-bold">Progresso</h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">Histórico de sessões e volume de treino</p>
         </div>
-        <Link href="/log" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
-          ← Log
-        </Link>
       </div>
 
       <div className="grid grid-cols-3 gap-3">

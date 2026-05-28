@@ -10,6 +10,7 @@ import { exerciseMatchesEquipment } from "@/lib/suggestions";
 import { calculateFreshness, recommendFocusFromFreshness, GROUP_LABELS } from "@/lib/recovery";
 import ExerciseMedia from "@/components/ExerciseMedia";
 import { Dumbbell, HeartPulse, Sparkles, Target, Zap, Flame, RefreshCw, X, Save } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import type {
   Exercise,
   WorkoutSuggestion,
@@ -334,6 +335,7 @@ export default function SuggestPage() {
       })()}
       <div className="flex items-center justify-between">
         <div>
+          <BackButton className="mb-1" />
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Sparkles size={22} style={{ color: "var(--color-primary)" }} />
             Sugestão de Treino
@@ -342,9 +344,6 @@ export default function SuggestPage() {
             Treino gerado com base nas suas lesões, equipamento disponível e histórico recente
           </p>
         </div>
-        <Link href="/workouts" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
-          ← Meus Treinos
-        </Link>
       </div>
 
       {injuries.length > 0 && (

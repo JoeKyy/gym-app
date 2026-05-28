@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Dumbbell, Flame, Zap, HeartPulse, RefreshCw, Layers, ArrowUpDown, Grid3X3, Check, Weight } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { getProfile, saveProfile } from "@/lib/storage";
 import type { UserProfile, FitnessGoal, TrainingSplit } from "@/lib/types";
 import type { LucideIcon } from "lucide-react";
@@ -71,10 +72,7 @@ export default function ProfilePage() {
     <div className="space-y-6 pb-6">
       {/* Header */}
       <div>
-        <Link href="/settings" className="text-sm inline-flex items-center gap-1 mb-2"
-          style={{ color: "var(--color-text-muted)" }}>
-          ← Settings
-        </Link>
+        <BackButton className="mb-2" />
         <h1 className="text-2xl font-bold">Meu Perfil</h1>
         <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
           Configure seu objetivo e preferências de treino

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HeartPulse, Sparkles } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { getInjuriesV2, saveInjuryV2, deleteInjuryV2, updateInjuryV2, generateId } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import { INJURY_CONDITIONS, getRehabProtocolsForConditions } from "@/lib/rehab";
@@ -115,6 +116,7 @@ export default function InjuriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
+          <BackButton className="mb-1" />
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <HeartPulse size={22} style={{ color: "var(--color-primary)" }} /> Gestão de Lesões
           </h1>

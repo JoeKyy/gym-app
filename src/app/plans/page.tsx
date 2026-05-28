@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Calendar } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { usePlans } from "@/hooks/usePlans";
 
 export default function PlansPage() {
@@ -22,7 +23,10 @@ export default function PlansPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold">Planos Semanais</h1>
+        <div>
+          <BackButton className="mb-1" />
+          <h1 className="text-2xl font-bold">Planos Semanais</h1>
+        </div>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="btn btn-primary"
