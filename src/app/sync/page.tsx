@@ -29,6 +29,7 @@ export default function SyncPage() {
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [connected, setConnected] = useState(false);
+  const [showStravaForm, setShowStravaForm] = useState(false);
   const [stravaMsg, setStravaMsg] = useState("");
   const [stravaLoading, setStravaLoading] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
@@ -51,6 +52,15 @@ export default function SyncPage() {
 
   // ── Strava helpers ────────────────────────────────────────────────────────
 
+  function handleAuthorize() {
+    if (!clientId.trim() || !clientSecret.trim()) {
+      setStravaMsg("Preencha o Client ID e o Client Secret.");
+      return;
+    }
+    saveStravaSettings({ clientId: clientId.trim(), clientSecret: clientSecret.trim() });
+    redirectToStravaAuth(clientId.trim());
+  }
+
   function handleSaveSettings() {
     if (!clientId.trim() || !clientSecret.trim()) {
       setStravaMsg("Preencha Client ID e Client Secret.");
@@ -60,14 +70,6 @@ export default function SyncPage() {
     setStravaMsg("Configurações salvas!");
     clearTimeout(stravaMsgTimer.current);
     stravaMsgTimer.current = setTimeout(() => setStravaMsg(""), 2000);
-  }
-
-  function handleConnect() {
-    if (!clientId.trim()) {
-      setStravaMsg("Salve o Client ID primeiro.");
-      return;
-    }
-    redirectToStravaAuth(clientId.trim());
   }
 
   function handleDisconnect() {
@@ -180,17 +182,15 @@ export default function SyncPage() {
       {tab === "strava" && (
         <div className="space-y-4">
           {connected ? (
+            /* ── Connected state ─────────────────────────────────────────── */
             <div className="card p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <CheckCircle size={24} style={{ color: "var(--color-success)" }} />
                 <div>
                   <p className="font-semibold">Strava conectado</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Token armazenado localmente
-                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)]">Token armazenado localmente</p>
                 </div>
               </div>
-
               <div className="flex gap-2">
                 <button
                   className="btn btn-primary flex-1"
@@ -199,49 +199,46 @@ export default function SyncPage() {
                 >
                   {stravaLoading ? "Importando..." : "Importar dados (60 dias)"}
                 </button>
-                <button
-                  className="btn btn-ghost text-sm"
-                  onClick={handleDisconnect}
-                >
+                <button className="btn btn-ghost text-sm" onClick={handleDisconnect}>
                   Desconectar
                 </button>
               </div>
-
-              {stravaMsg && (
-                <p className="text-sm text-[var(--color-text-muted)]">{stravaMsg}</p>
+              {importedCount > 0 && (
+                <p className="text-xs text-[var(--color-success)]">
+                  {importedCount} sessão(ões) enriquecida(s) com dados do Strava
+                </p>
               )}
+              {stravaMsg && <p className="text-sm text-[var(--color-text-muted)]">{stravaMsg}</p>}
             </div>
-          ) : (
+          ) : showStravaForm ? (
+            /* ── Credential form ─────────────────────────────────────────── */
             <div className="card p-4 space-y-4">
               <div>
-                <p className="font-semibold mb-1">Configurar app Strava</p>
+                <p className="font-semibold mb-1">Credenciais do app Strava</p>
                 <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
-                  1. Acesse{" "}
+                  Precisa criar um app em{" "}
                   <a
-                    href="https://developers.strava.com/docs/getting-started/"
+                    href="https://www.strava.com/settings/api"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[var(--color-accent)] underline"
+                    className="underline"
+                    style={{ color: "var(--color-primary)" }}
                   >
-                    developers.strava.com
-                  </a>{" "}
-                  e crie um app<br />
-                  2. Em "Authorization Callback Domain" coloque:{" "}
-                  <code className="bg-[var(--color-surface-2)] px-1 rounded text-xs">
-                    gym.joekyy.com.br
-                  </code>
-                  <br />
-                  3. Cole o Client ID e Secret abaixo
+                    strava.com/settings/api
+                  </a>
+                  . Em "Authorization Callback Domain" coloque{" "}
+                  <code className="bg-[var(--color-surface-2)] px-1 rounded">gym.joekyy.com.br</code>
                 </p>
               </div>
-
               <div className="space-y-2">
                 <input
                   type="text"
+                  inputMode="numeric"
                   placeholder="Client ID (número)"
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
                   className="input w-full"
+                  autoFocus
                 />
                 <input
                   type="password"
@@ -249,31 +246,51 @@ export default function SyncPage() {
                   value={clientSecret}
                   onChange={(e) => setClientSecret(e.target.value)}
                   className="input w-full"
+                  onKeyDown={(e) => e.key === "Enter" && handleAuthorize()}
                 />
               </div>
-
+              {stravaMsg && <p className="text-sm" style={{ color: "var(--color-danger)" }}>{stravaMsg}</p>}
               <div className="flex gap-2">
-                <button className="btn btn-ghost flex-1 text-sm" onClick={handleSaveSettings}>
-                  Salvar
+                <button
+                  className="btn btn-ghost flex-1 text-sm"
+                  onClick={() => { setShowStravaForm(false); setStravaMsg(""); }}
+                >
+                  Cancelar
                 </button>
-                <button className="btn btn-primary flex-1" onClick={handleConnect}>
-                  🔗 Conectar com Strava
+                <button className="btn btn-primary flex-1" onClick={handleAuthorize}>
+                  Autorizar no Strava
                 </button>
               </div>
-
-              {stravaMsg && (
-                <p className="text-sm text-[var(--color-text-muted)]">{stravaMsg}</p>
-              )}
+            </div>
+          ) : (
+            /* ── Not connected CTA ───────────────────────────────────────── */
+            <div className="card p-6 flex flex-col items-center gap-4 text-center">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                style={{ background: "var(--color-surface-2)" }}>
+                <Bike size={28} style={{ color: "var(--color-text-muted)" }} />
+              </div>
+              <div>
+                <p className="font-semibold text-lg">Conectar com Strava</p>
+                <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                  Sincronize frequência cardíaca e calorias com suas sessões
+                </p>
+              </div>
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => setShowStravaForm(true)}
+              >
+                Conectar com Strava
+              </button>
             </div>
           )}
 
           {/* What gets imported */}
           <div className="card p-4 space-y-2">
-            <p className="text-sm font-semibold">O que é importado?</p>
-            <ul className="text-xs text-[var(--color-text-muted)] space-y-1">
-              <li className="flex items-center gap-1.5"><Heart size={11} />Frequência cardíaca média e máxima</li>
-              <li className="flex items-center gap-1.5"><Flame size={11} />Calorias ativas</li>
-              <li className="flex items-center gap-1.5"><Calendar size={11} />Match por data com suas sessões existentes</li>
+            <p className="text-sm font-semibold">O que é sincronizado?</p>
+            <ul className="text-xs text-[var(--color-text-muted)] space-y-1.5">
+              <li className="flex items-center gap-2"><Heart size={12} />Frequência cardíaca média e máxima</li>
+              <li className="flex items-center gap-2"><Flame size={12} />Calorias ativas</li>
+              <li className="flex items-center gap-2"><Calendar size={12} />Match automático por data com suas sessões</li>
             </ul>
           </div>
         </div>

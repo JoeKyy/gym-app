@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   User, Settings, Calendar, HeartPulse, RefreshCw,
-  Dumbbell, ChevronRight, ChevronLeft, Database,
+  Dumbbell, ChevronRight, Database,
 } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 const SECTIONS = [
   {
@@ -38,19 +38,11 @@ const SECTIONS = [
 ];
 
 export default function SettingsPage() {
-  const router = useRouter();
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 pt-1">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center justify-center w-8 h-8 rounded-full transition-colors"
-          style={{ background: "var(--color-surface-2)", color: "var(--color-text-muted)" }}>
-          <ChevronLeft size={18} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>Configurações</h1>
-        </div>
+      <div className="pt-1">
+        <BackButton className="mb-2" />
+        <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>Configurações</h1>
       </div>
 
       {SECTIONS.map(({ label, items }) => (

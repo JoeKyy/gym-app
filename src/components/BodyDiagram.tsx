@@ -131,7 +131,7 @@ export default function BodyDiagram({
     return () => observer.disconnect();
   }, []);
 
-  const bodyColor = theme === "light" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.08)";
+  const bodyColor = theme === "light" ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.18)";
   const highlightedColors = ["#22c55e", "#f59e0b", "#ef4444"];
 
   const handleMuscleClick = (ev: { muscle: string }) => {
@@ -146,7 +146,10 @@ export default function BodyDiagram({
   const modelStyle = { width: sideWidth, cursor: readOnly ? "default" : "pointer" };
 
   return (
-    <div>
+    <div
+      className="rounded-2xl p-4"
+      style={{ background: "var(--color-surface-2)" }}
+    >
       <div className="flex gap-6 justify-center items-start">
         <div className="flex flex-col items-center gap-1">
           <p className="text-[10px] font-semibold uppercase tracking-wide"
