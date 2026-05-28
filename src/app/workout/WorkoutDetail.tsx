@@ -12,7 +12,7 @@ import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/Exe
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
 import ExerciseCard from "@/components/ExerciseCard";
-import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper, Link2, Link2Off } from "lucide-react";
+import { Dumbbell, Home, Zap, Timer, CheckCircle, Trophy, Info, Play, PartyPopper, Link2, Link2Off, ChevronLeft } from "lucide-react";
 import type { Exercise, Workout, ExerciseSet, WorkoutSession, ExerciseLog, SetLog } from "@/lib/types";
 
 const DEFAULT_SET: ExerciseSet = { sets: 3, reps: 12, rest: 60 };
@@ -23,6 +23,12 @@ const ENV_ICON: Record<string, React.ReactNode> = {
   any:     <Zap    size={20} />,
 };
 const ENV_LABEL: Record<string, string> = { home: "Casa", gym: "Academia", pilates: "Pilates/Mobilidade", any: "Qualquer" };
+const ENV_BG: Record<string, string> = {
+  home:    "linear-gradient(135deg, #1e3a5f 0%, #2d4a7a 100%)",
+  gym:     "linear-gradient(135deg, #1a1a2e 0%, #3d2c2c 100%)",
+  pilates: "linear-gradient(135deg, #064e3b 0%, #0f4c5c 100%)",
+  any:     "linear-gradient(135deg, #312e81 0%, #4338ca 100%)",
+};
 
 // ─── Active Session Types ─────────────────────────────────────────────────────
 
@@ -188,9 +194,9 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
 
         {/* Back button overlaid top-left */}
         <button onClick={onClose}
-          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg backdrop-blur-sm"
+          className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
           style={{ background: "rgba(0,0,0,0.45)" }}>
-          ←
+          <ChevronLeft size={20} />
         </button>
 
         {/* Angle switcher overlaid bottom */}
@@ -989,55 +995,83 @@ export default function WorkoutEditorPage() {
         />
       )}
 
-      <div className="space-y-5 pb-32">
-        {/* Header */}
-        <div className="flex items-start gap-3">
-          {mode === "edit" ? (
-            <Link href="/workouts" className="text-lg mt-0.5 leading-none"
-              style={{ color: "var(--color-text-muted)" }}>←</Link>
-          ) : (
-            <button onClick={handleExitSession} className="text-lg mt-0.5 leading-none"
-              style={{ color: "var(--color-text-muted)" }}>←</button>
-          )}
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold truncate">{workout.name}</h1>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-              {ENV_ICON[workout.environment]} {ENV_LABEL[workout.environment]} · {workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}
-              {riskyCount > 0 && <span className="ml-2 text-[var(--color-danger)]">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>}
-              {mode === "session" && (
-                <span className="ml-2 font-mono font-semibold flex items-center gap-0.5" style={{ color: "var(--color-primary)" }}>
-                  <Timer size={12} />{formatElapsed(elapsed)}
+      {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
+      <div className="-mx-4 -mt-5 relative overflow-hidden" style={{ minHeight: "160px", background: ENV_BG[workout.environment] ?? ENV_BG.any }}>
+        {/* subtle light accent */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)" }} />
+
+        {/* Back button */}
+        {mode === "edit" ? (
+          <Link href="/workouts"
+            className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
+            style={{ background: "rgba(0,0,0,0.35)" }}>
+            <ChevronLeft size={20} />
+          </Link>
+        ) : (
+          <button onClick={handleExitSession}
+            className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg backdrop-blur-sm"
+            style={{ background: "rgba(0,0,0,0.35)" }}>
+            <ChevronLeft size={20} />
+          </button>
+        )}
+
+        {/* Hero content */}
+        <div className="px-4 pt-14 pb-5">
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
+                Treino
+              </p>
+              <h1 className="text-2xl font-bold text-white leading-tight truncate">{workout.name}</h1>
+              <div className="flex items-center gap-2 mt-2 flex-wrap text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+                <span className="flex items-center gap-1">
+                  {ENV_ICON[workout.environment]}
+                  {ENV_LABEL[workout.environment]}
                 </span>
-              )}
-            </p>
+                <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
+                <span>{workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}</span>
+                {riskyCount > 0 && (
+                  <>
+                    <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
+                    <span className="text-red-300">⚠ {riskyCount} arriscado{riskyCount !== 1 ? "s" : ""}</span>
+                  </>
+                )}
+                {mode === "session" && (
+                  <>
+                    <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
+                    <span className="font-mono font-semibold flex items-center gap-0.5 text-white">
+                      <Timer size={12} />{formatElapsed(elapsed)}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+            {mode === "edit" && workout.exercises.length > 0 && (
+              <button onClick={handleStartSession} className="btn btn-primary shrink-0 flex items-center gap-1.5">
+                <Play size={14} />Iniciar
+              </button>
+            )}
           </div>
 
-          {/* Start session button (edit mode only) */}
-          {mode === "edit" && workout.exercises.length > 0 && (
-            <button onClick={handleStartSession} className="btn btn-primary shrink-0 text-sm flex items-center gap-1.5">
-              <Play size={14} />Iniciar
-            </button>
+          {/* Session progress bar */}
+          {mode === "session" && workout.exercises.length > 0 && (
+            <div className="mt-4">
+              <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
+                <span>{completedInSession}/{workout.exercises.length} exercícios</span>
+                <span>{Math.round((completedInSession / workout.exercises.length) * 100)}%</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ background: "rgba(255,255,255,0.85)", width: `${(completedInSession / workout.exercises.length) * 100}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Session mode progress bar */}
-        {mode === "session" && workout.exercises.length > 0 && (
-          <div>
-            <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-text-muted)" }}>
-              <span>{completedInSession}/{workout.exercises.length} exercícios</span>
-              <span>{Math.round((completedInSession / workout.exercises.length) * 100)}%</span>
-            </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-surface-2)" }}>
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  background: "var(--color-success)",
-                  width: `${(completedInSession / workout.exercises.length) * 100}%`,
-                }}
-              />
-            </div>
-          </div>
-        )}
+      <div className="space-y-5 pb-32 pt-5">
 
         {/* Exercise list */}
         {workout.exercises.length === 0 ? (
