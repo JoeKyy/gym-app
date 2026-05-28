@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User, Settings, Calendar, HeartPulse, RefreshCw,
   Dumbbell, ChevronRight, ChevronLeft, Database,
@@ -37,16 +38,18 @@ const SECTIONS = [
 ];
 
 export default function SettingsPage() {
+  const router = useRouter();
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 pt-1">
-        <Link href="/log"
+        <button
+          onClick={() => router.back()}
           className="flex items-center justify-center w-8 h-8 rounded-full transition-colors"
           style={{ background: "var(--color-surface-2)", color: "var(--color-text-muted)" }}>
           <ChevronLeft size={18} />
-        </Link>
+        </button>
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>Settings</h1>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>Configurações</h1>
         </div>
       </div>
 

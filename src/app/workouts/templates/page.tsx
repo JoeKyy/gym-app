@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Clock, Folder, Calendar, LayoutList, Play, Save, Zap } from "lucide-react";
+import { Clock, Folder, Calendar, LayoutList, Play, Save, Zap, ChevronLeft } from "lucide-react";
 import { saveWorkout, generateId, now as nowISO } from "@/lib/storage";
 import type { Workout } from "@/lib/types";
 
@@ -306,10 +306,12 @@ export default function TemplatesPage() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <Link href="/workouts" className="text-sm inline-flex items-center gap-1 mb-2"
+        <button
+          onClick={() => router.back()}
+          className="text-sm inline-flex items-center gap-0.5 mb-2 transition-colors hover:text-[var(--color-text)]"
           style={{ color: "var(--color-text-muted)" }}>
-          ← Meus Treinos
-        </Link>
+          <ChevronLeft size={16} strokeWidth={2.5} /> Voltar
+        </button>
         <h1 className="text-2xl font-bold">Templates</h1>
         <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
           Treinos prontos para usar ou adaptar

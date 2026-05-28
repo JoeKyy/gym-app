@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Model, { type IExerciseData, type Muscle } from "react-body-highlighter";
-import { useTheme } from "@/hooks/useTheme";
 
 export type MuscleDisplayStatus = "injured" | "recovering" | "sore" | "fresh" | "fatigued" | "normal";
 
@@ -118,7 +117,20 @@ export default function BodyDiagram({
   };
 
   const data = buildData();
-  const { theme } = useTheme();
+
+  // Watch data-theme attribute on <html> so bodyColor updates whenever user toggles theme
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  useEffect(() => {
+    const read = () => {
+      const t = document.documentElement.getAttribute("data-theme");
+      setTheme(t === "light" ? "light" : "dark");
+    };
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
   const bodyColor = theme === "light" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.08)";
   const highlightedColors = ["#22c55e", "#f59e0b", "#ef4444"];
 

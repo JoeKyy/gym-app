@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, LayoutList, Home, Dumbbell, Activity } from "lucide-react";
+import { Zap, LayoutList, Home, Dumbbell, Activity, ChevronLeft } from "lucide-react";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import type { WorkoutEnvironment } from "@/lib/types";
 
@@ -31,7 +31,15 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold">Meus Treinos</h1>
+        <div>
+          <button
+            onClick={() => router.back()}
+            className="text-sm inline-flex items-center gap-0.5 mb-1 transition-colors hover:text-[var(--color-text)]"
+            style={{ color: "var(--color-text-muted)" }}>
+            <ChevronLeft size={16} strokeWidth={2.5} /> Voltar
+          </button>
+          <h1 className="text-2xl font-bold">Meus Treinos</h1>
+        </div>
         <div className="flex gap-2">
           <Link href="/generate" className="btn btn-primary flex items-center gap-1.5">
             <Zap size={14} />Gerar treino
