@@ -67,26 +67,64 @@
 
 ---
 
+## 🧭 Navegação & Telas
+
+A navegação principal é uma **barra inferior de 3 tabs** (`src/components/BottomNav.tsx`):
+
+| Tab | Rota | Função |
+|-----|------|--------|
+| **Workout** | `/` | Tela inicial / treino do dia |
+| **Body** | `/body` | Estado de recuperação muscular (freshness) |
+| **Log** | `/log` | Histórico de sessões e progresso |
+
+As demais áreas são acessadas a partir dessas tabs e da tela de Configurações.
+
+- **Workout / Home** (`app/page.tsx`) — saudação contextual + data em PT-BR, banner de
+  streak, condições (lesões) ativas com atalho para sugestão, "Treino de Hoje" (puxado
+  do plano semanal ativo) e cards de acesso rápido.
+- **Body / Recovery** (`app/body/page.tsx`) — diagrama corporal colorido por freshness
+  (verde = pronto, âmbar = recuperando, vermelho = descansando), recomendação de foco do
+  dia e barras de recuperação por grupo muscular.
+- **Log** (`app/log/page.tsx`) — stats (sessões, streak, mês), histórico de sessões com
+  rating/RiR/FC/calorias e link para o progresso detalhado.
+- **Sessão ativa** (`app/workout/WorkoutDetail.tsx`) — opera em **modo edição**
+  (adicionar/reordenar exercícios, ajustar sets/reps/rest, vincular supersets) e **modo
+  sessão** (registro de séries, barra de progresso, timer de descanso e finalização com
+  rating/RiR/notas). Componentes em `app/workout/components/` e hooks em
+  `app/workout/hooks/` (`useRestTimer`, `useSessionLogs`).
+- **Sugestão** (`app/suggest`) — formulário + templates; gera um treino e permite
+  substituir/remover exercícios antes de salvar.
+- **Exercícios** (`app/exercises`) — biblioteca com busca, filtros e mapa corporal;
+  detalhe em `/exercises/[slug]`.
+- **Configurações** (`app/settings`) — porta de entrada para Perfil (`/profile`),
+  Equipamentos (`/equipment`), Planos semanais (`/plans`), Lesões (`/injuries`),
+  Progresso detalhado (`/progress`) e Sincronização (`/sync`).
+
+---
+
 ## 🗂️ Estrutura do Projeto
 
 ```
 gym-app/
 ├── src/
 │   ├── app/                    # Rotas Next.js App Router
-│   │   ├── page.tsx            # Home (hoje + freshness chips)
+│   │   ├── page.tsx            # Tab "Workout" — home / treino do dia
+│   │   ├── body/               # Tab "Body" — recuperação muscular (freshness)
+│   │   ├── log/                # Tab "Log" — histórico de sessões
+│   │   ├── settings/           # Configurações (perfil, dados, saúde)
+│   │   ├── profile/            # Perfil do usuário
 │   │   ├── exercises/          # Browser de exercícios + detalhe
 │   │   ├── workouts/           # Criador de treinos
 │   │   ├── workout/            # Sessão ativa de treino
 │   │   ├── suggest/            # Sugestão automática de treino
 │   │   ├── injuries/           # Gerenciamento de lesões
-│   │   ├── progress/           # Histórico de sessões
+│   │   ├── progress/           # Força (1RM) + volume semanal
 │   │   ├── plans/              # Planos semanais
 │   │   ├── equipment/          # Perfil de equipamentos
 │   │   ├── sync/               # Strava + Apple Health
-│   │   ├── strava-callback/    # OAuth2 callback
-│   │   └── more/               # Menu secundário
+│   │   └── strava-callback/    # OAuth2 callback
 │   ├── components/
-│   │   ├── BottomNav.tsx       # Navegação inferior mobile
+│   │   ├── BottomNav.tsx       # Navegação inferior mobile (Workout/Body/Log)
 │   │   ├── ExerciseCard.tsx    # Card de exercício (lista + detalhe)
 │   │   ├── ExerciseMedia.tsx   # Vídeo/imagem com autoplay
 │   │   ├── ExerciseFilters.tsx # Filtros de busca
@@ -119,6 +157,109 @@ gym-app/
 ├── deploy.sh                   # Build + rsync para HostGator
 └── .gitignore                  # public/data/ excluído (muito grande)
 ```
+
+---
+
+## 🏛️ Arquitetura & Modelo de Dados
+
+O app é dividido em quatro camadas, da UI até os dados:
+
+```
+UI (src/app/**/page.tsx, src/components)
+  → Hooks (src/hooks, src/app/workout/hooks)
+    → Lógica/domínio (src/lib)
+      → Dados (public/data/exercises.json + localStorage)
+```
+
+- **UI** — rotas do App Router e componentes reutilizáveis. O layout raiz
+  (`src/app/layout.tsx`) injeta tema, manifesto PWA, meta tags iOS e a navegação.
+- **Hooks** — encapsulam estado e ciclo de vida (`useWorkouts`, `usePlans`,
+  `useInjuries`, `useTheme`; e os de sessão `useRestTimer`, `useSessionLogs`).
+- **Lógica/domínio** — `src/lib` (motores e utilitários, abaixo).
+- **Dados** — catálogo estático em `public/data/exercises.json` + dados do usuário em
+  `localStorage`.
+
+### Tipos centrais (`src/lib/types.ts`)
+
+| Tipo | Descrição |
+|------|-----------|
+| `Exercise` | Exercício do catálogo: músculos, equipamentos, mídia, instruções e camada científica (evidência A/B/C, carga espinhal, EMG, contraindicações, `isRehabSafe`). |
+| `Workout` | Treino salvo: lista de `WorkoutExercise` (sets/reps/rest + `supersetGroupId` opcional). |
+| `WorkoutSession` | Sessão executada: logs por exercício/série, duração, rating, RiR, FC/calorias. |
+| `Injury` | Lesão clínica: condição, músculos, severidade, **fase** (aguda/subaguda/crônica/recuperada) e check-ins de dor. |
+| `WeeklyPlan` | Plano semanal: dia da semana → IDs de treino. |
+| `UserProfile` | Objetivo, nível, split, duração, unidades (kg/lb) e dados corporais. |
+| `MuscleRecoveryStatus` | Estado de um grupo muscular: freshness 0–100%, horas restantes, status ready/partial/resting. |
+| `SuggestionRequest` / `WorkoutSuggestion` | Entrada e saída do motor de sugestão. |
+
+### Persistência (`src/lib/storage.ts`)
+
+Todo o acesso ao `localStorage` passa por aqui, sob chaves prefixadas com `gymapp:`
+(`gymapp:workouts`, `gymapp:sessions`, `gymapp:injuries_v2`, `gymapp:profile`,
+`gymapp:equipment`, `gymapp:exercise_preferences`, ...). Os helpers `load`/`save` são
+tolerantes a falha (try/catch com fallback), e há migração das lesões do modelo legado
+(v1, `InjuredMuscle`) para o clínico (v2, `Injury`).
+
+---
+
+## ⚙️ Motores / Lógica de Domínio (`src/lib`)
+
+### Motor de sugestão — `suggestions.ts`
+
+`suggestWorkout(request, allExercises)` é o coração do app:
+
+1. **Reabilitação** — se o foco é `rehab` e há lesões, monta um protocolo clínico.
+2. **Restrições** — calcula freshness (via `recovery.ts`), reúne músculos lesionados e
+   determina o limite de carga espinhal conforme as lesões.
+3. **Filtro de candidatos** — descarta o que não bate com equipamento/ambiente, foco,
+   o que é **contraindicado na fase atual**, excede a carga espinhal (classificada por
+   padrões no slug) ou envolve músculos lesionados.
+4. **Pontuação** — favorece compostos, utilidade básica, músculos frescos, dificuldade
+   adequada e segurança para reabilitação; aplica preferências do usuário
+   (Mais ×2 / Menos ×0.5 / Excluir) e um pequeno fator aleatório.
+5. **Seleção diversificada** — compostos primeiro (evitando sobreposição muscular),
+   depois isolamentos; reduz 1 série para músculos em recuperação parcial.
+6. **Avisos** — alerta sobre músculos em recuperação e exercícios removidos por lesão.
+
+Também expõe `WORKOUT_TEMPLATES` (ex.: "Protocolo Hérnia de Disco", "Força na Academia").
+
+### Freshness muscular — `recovery.ts`
+
+Modelo estilo Fitbod: após uma sessão, a freshness de um grupo começa em 0% e sobe
+linearmente até 100% ao longo de uma **janela de recuperação** (horas).
+
+- `MUSCLE_RECOVERY_WINDOWS` — janela base por grupo (ex.: bíceps 24–36h, lombar 60–80h);
+  o volume (séries) estica a janela proporcionalmente.
+- `calculateFreshness(...)` — acumula fadiga das sessões dos últimos 7 dias (primários
+  ×1.0, secundários ×0.5 por série concluída) e classifica em ready/partial/resting.
+- Lesões adjacentes **estendem a janela** por fase (aguda ×2.0, subaguda ×1.5, crônica ×1.25).
+- `recommendFocusFromFreshness(...)` — recomenda o foco do dia (superior/inferior/core/
+  corpo todo) pela média de freshness de cada região.
+
+### Reabilitação clínica — `rehab.ts`
+
+- **Biblioteca de condições** (`INJURY_CONDITIONS`) — músculos afetados, limite de carga
+  espinhal por fase, padrões contraindicados (absolutos vs. apenas aguda/subaguda),
+  padrões de cautela e categorias recomendadas por fase.
+- **Protocolos baseados em evidência** — McGill Big 3 e McKenzie, com séries/reps/descanso.
+- Funções de apoio (`isExerciseContraindicated`, `getRehabProtocolsForConditions`,
+  `getAffectedMusclesForConditions`) consumidas pelo motor de sugestão.
+
+### Gerador de treino — `generator.ts`
+
+Rota alternativa orientada a **objetivo** (força/hipertrofia/resistência/mobilidade):
+`generateWorkout(exercises, opts)` monta um treino por foco com prescrição
+sets×reps×rest por objetivo/dificuldade, seleção gulosa evitando repetir o mesmo músculo
+primário e boost por relevância pessoal (`scoreMap`).
+
+### Apoio
+
+- `data.ts` — loader e filtros do `exercises.json`.
+- `equipment.ts` — catálogo de equipamentos.
+- `translations.ts` — termos PT-BR (músculos, dificuldade, mecânica).
+- `exercise-corrections.ts` — correções de classificação do MuscleWiki em runtime e
+  detecção de equipamentos primários vs. secundários.
+- `strava.ts` / `appleHealth.ts` — integrações de sync (detalhadas abaixo).
 
 ---
 
