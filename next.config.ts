@@ -7,14 +7,16 @@ const withPWA = withPWAInit({
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
+  // publicExcludes uses fast-glob negation patterns against the public/ directory
+  // This is the correct way to exclude static public assets from precaching
+  publicExcludes: [
+    "!noprecache/**/*",
+    "!data/media/bodymaps/**",
+    "!data/media/videos/**",
+    "!data/media/images/**",
+  ],
   workboxOptions: {
     disableDevLogs: true,
-    // Exclude heavy media from precache — fetched on demand via runtimeCaching below
-    exclude: [
-      /\/data\/media\/bodymaps\//,
-      /\/data\/media\/videos\//,
-      /\/data\/media\/images\//,
-    ],
     runtimeCaching: [
       {
         urlPattern: /\/data\/exercises\.json/,
