@@ -241,7 +241,7 @@ export default function ExerciseDetailPage() {
         {(exercise.targetMuscles.length > 0 || exercise.secondaryMuscles.length > 0) && (
           <div className="card p-4 space-y-3">
             <p className="section-label">Músculos</p>
-            <div className="flex gap-6 items-start">
+            <div className="flex gap-6 items-center justify-center">
               <BodyMapImage
                 slug={exercise.slug}
                 targetMuscles={exercise.targetMuscles}

@@ -115,7 +115,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
   isPR?: boolean;
 }) {
   return (
-    <div className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
+    <div className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors min-w-0 ${
       state.completed ? "bg-[var(--color-success-bg)] border border-[var(--color-success-border)]" : "bg-[var(--color-surface-2)]"
     }`}>
       <button
@@ -127,7 +127,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
         }`}
       >✓</button>
 
-      <span className="text-xs font-semibold w-5 shrink-0 text-center" style={{ color: "var(--color-text-muted)" }}>
+      <span className="text-xs font-semibold w-4 shrink-0 text-center" style={{ color: "var(--color-text-muted)" }}>
         {setNum}
       </span>
 
@@ -135,7 +135,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
         type="number" inputMode="decimal" placeholder="—"
         value={state.weight}
         onChange={(e) => onChange({ ...state, weight: e.target.value })}
-        className="input text-xs text-center py-1 px-1 w-14 shrink-0"
+        className="input text-xs text-center py-1 px-1 min-w-0 flex-1"
       />
       <span className="text-[10px] shrink-0" style={{ color: "var(--color-text-muted)" }}>kg</span>
 
@@ -144,7 +144,7 @@ function ActiveSetRow({ setNum, state, onChange, defaultReps, isPR }: {
         placeholder={defaultReps}
         value={state.reps}
         onChange={(e) => onChange({ ...state, reps: e.target.value })}
-        className="input text-xs text-center py-1 px-1 w-14 shrink-0"
+        className="input text-xs text-center py-1 px-1 min-w-0 flex-1"
       />
       <span className="text-[10px] shrink-0" style={{ color: "var(--color-text-muted)" }}>reps</span>
 
@@ -170,16 +170,24 @@ const SHEET_DEFAULT_REPS = "12";
 const SHEET_REST_SECS = 60;
 interface SheetSetRow { id: number; weight: string; reps: string; done: boolean; }
 
-function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise; onClose: () => void; injuredMuscleNames: string[] }) {
+function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, onSessionChange }: {
+  ex: Exercise; onClose: () => void; injuredMuscleNames: string[];
+  sessionState?: ExerciseSessionState;
+  onSessionChange?: (s: ExerciseSessionState) => void;
+}) {
   const availableAngles = getAvailableAngles(ex);
   const [angle, setAngle] = useState<VideoAngle>(availableAngles[0] ?? "frontMale");
   const [videoError, setVideoError] = useState(false);
   const videoUrl = getVideoUrl(ex, angle);
   const [preference, setPreference] = useState<ExercisePreferenceState>(() => getExercisePreference(ex.id));
 
-  // Sets tracker
-  const initSets = (): SheetSetRow[] =>
-    Array.from({ length: SHEET_DEFAULT_SETS }, (_, i) => ({ id: i + 1, weight: "", reps: SHEET_DEFAULT_REPS, done: false }));
+  // Sets tracker — seed from sessionState if available
+  const initSets = (): SheetSetRow[] => {
+    if (sessionState?.sets.length) {
+      return sessionState.sets.map((s, i) => ({ id: i + 1, weight: s.weight, reps: s.reps, done: s.completed }));
+    }
+    return Array.from({ length: SHEET_DEFAULT_SETS }, (_, i) => ({ id: i + 1, weight: "", reps: SHEET_DEFAULT_REPS, done: false }));
+  };
   const [sets, setSets] = useState<SheetSetRow[]>(initSets);
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
   const [allDone, setAllDone] = useState(false);
@@ -192,6 +200,10 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
     restRef.current = setInterval(() => setRestTimeLeft((t) => (t !== null && t > 1 ? t - 1 : null)), 1000);
     return () => { if (restRef.current) clearInterval(restRef.current); };
   }, [restTimeLeft]);
+
+  const syncSession = (updatedSets: SheetSetRow[]) => {
+    onSessionChange?.({ sets: updatedSets.map((s) => ({ reps: s.reps, weight: s.weight, completed: s.done })) });
+  };
 
   const risky = injuredMuscleNames.some((m) =>
     [...ex.targetMuscles, ...ex.secondaryMuscles].map((s) => s.toLowerCase()).includes(m.toLowerCase())
@@ -208,13 +220,25 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames }: { ex: Exercise
         if (updated.find((s) => !s.done)) setRestTimeLeft(SHEET_REST_SECS);
         else setAllDone(true);
       }
+      syncSession(updated);
       return updated;
     });
   };
   const updateSet = (id: number, field: "weight" | "reps", value: string) =>
-    setSets((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
-  const addSet = () => { setSets((prev) => [...prev, { id: Date.now(), weight: "", reps: SHEET_DEFAULT_REPS, done: false }]); setAllDone(false); };
-  const resetSets = () => { setSets(initSets()); setRestTimeLeft(null); setAllDone(false); };
+    setSets((prev) => {
+      const updated = prev.map((s) => (s.id === id ? { ...s, [field]: value } : s));
+      syncSession(updated);
+      return updated;
+    });
+  const addSet = () => {
+    setSets((prev) => {
+      const updated = [...prev, { id: Date.now(), weight: "", reps: SHEET_DEFAULT_REPS, done: false }];
+      syncSession(updated);
+      return updated;
+    });
+    setAllDone(false);
+  };
+  const resetSets = () => { setSets(initSets()); setRestTimeLeft(null); setAllDone(false); syncSession(initSets()); };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: "var(--color-bg)" }}>
@@ -1142,7 +1166,11 @@ export default function WorkoutEditorPage() {
   return (
     <>
       {detailEx && (
-        <ExerciseDetailSheet ex={detailEx} onClose={() => setDetailEx(null)} injuredMuscleNames={injuredMuscleNames} />
+        <ExerciseDetailSheet
+          ex={detailEx} onClose={() => setDetailEx(null)} injuredMuscleNames={injuredMuscleNames}
+          sessionState={sessionLogs[detailEx.id]}
+          onSessionChange={(s) => setSessionLogs((prev) => ({ ...prev, [detailEx.id]: s }))}
+        />
       )}
 
       {showPicker && (
