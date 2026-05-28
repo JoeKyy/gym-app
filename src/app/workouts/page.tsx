@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useWorkouts } from "@/hooks/useWorkouts";
@@ -30,18 +30,34 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold">Treinos</h1>
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="btn btn-primary"
-        >
-          + Novo treino
-        </button>
+        <h1 className="text-2xl font-bold">Meus Treinos</h1>
+        <div className="flex gap-2">
+          <Link href="/generate" className="btn btn-primary">
+            ⚡ Gerar treino
+          </Link>
+          <button onClick={() => setShowForm((v) => !v)} className="btn btn-secondary">
+            + Manual
+          </button>
+        </div>
       </div>
+
+      {/* Generator promo card (shown when no workouts) */}
+      {workouts.length === 0 && (
+        <Link href="/generate" className="card card-interactive p-5 flex items-center gap-4 border-[var(--color-primary-border)] bg-[var(--color-primary-soft)]">
+          <div className="text-4xl">⚡</div>
+          <div>
+            <p className="font-bold text-base text-[var(--color-primary)]">Gerador de Treino</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
+              Monte um treino personalizado em segundos — escolha o foco, equipamento e objetivo
+            </p>
+          </div>
+          <span className="text-[var(--color-primary)] text-xl ml-auto shrink-0">→</span>
+        </Link>
+      )}
 
       {showForm && (
         <div className="card p-4 space-y-4">
-          <h2 className="font-semibold">Criar treino</h2>
+          <h2 className="font-semibold">Criar treino manualmente</h2>
           <input
             autoFocus
             type="text"
@@ -76,43 +92,46 @@ export default function WorkoutsPage() {
         </div>
       )}
 
-      {workouts.length === 0 ? (
-        <div className="text-center py-20 text-[var(--color-text-muted)]">
-          <p className="text-4xl mb-3">📋</p>
-          <p className="font-medium text-[var(--color-text)]">Nenhum treino ainda</p>
-          <p className="text-sm mt-1">Crie seu primeiro treino clicando em "+ Novo treino"</p>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {workouts.map((workout) => {
-            const envOpt = ENV_OPTIONS.find((e) => e.value === workout.environment);
-            return (
-              <div key={workout.id} className="card card-interactive p-4 flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold">{workout.name}</p>
-                    <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                      {envOpt?.icon} {envOpt?.label} • {workout.exercises.length} exercícios
-                    </p>
+      {workouts.length > 0 && (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {workouts.map((workout) => {
+              const envOpt = ENV_OPTIONS.find((e) => e.value === workout.environment);
+              return (
+                <div key={workout.id} className="card card-interactive p-4 flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-semibold">{workout.name}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                        {envOpt?.icon} {envOpt?.label} • {workout.exercises.length} exercícios
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => removeWorkout(workout.id)}
+                      className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg leading-none"
+                      title="Excluir"
+                    >
+                      ×
+                    </button>
                   </div>
-                  <button
-                    onClick={() => removeWorkout(workout.id)}
-                    className="text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg leading-none"
-                    title="Excluir"
+                  <Link
+                    href={`/workout?id=${workout.id}`}
+                    className="rounded-lg text-center py-2 text-sm transition-colors bg-[var(--color-primary-soft)] hover:bg-[var(--color-primary-soft-strong)] text-[var(--color-primary)] border border-[var(--color-primary-border)]"
                   >
-                    ×
-                  </button>
+                    Abrir treino →
+                  </Link>
                 </div>
-                <Link
-                  href={`/workout?id=${workout.id}`}
-                  className="rounded-lg text-center py-2 text-sm transition-colors bg-[var(--color-primary-soft)] hover:bg-[var(--color-primary-soft-strong)] text-[var(--color-primary)] border border-[var(--color-primary-border)]"
-                >
-                  Abrir treino →
-                </Link>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+
+          {/* Quick link to generator at bottom */}
+          <Link href="/generate" className="card card-interactive p-4 flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <span className="text-sm font-medium">Gerar novo treino automaticamente</span>
+            <span className="ml-auto text-[var(--color-text-muted)]">→</span>
+          </Link>
+        </>
       )}
     </div>
   );
