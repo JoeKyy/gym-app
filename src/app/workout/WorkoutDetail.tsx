@@ -7,6 +7,7 @@ import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
 import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM, getProgressionSuggestion, getExercisePreference, setExercisePreference } from "@/lib/storage";
+import { parseNum } from "@/lib/parse";
 import { MUSCLE_PT, DIFFICULTY_PT, MECHANIC_PT, EQUIPMENT_PT } from "@/lib/translations";
 import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
 import type { VideoAngle } from "@/components/ExerciseMedia";
@@ -496,9 +497,9 @@ function ActiveExerciseCard({ ex, config, sessionState, onChange, onViewDetail, 
   // Compute PR status for each set
   const prFlags = sessionState.sets.map((s) => {
     if (!s.completed) return false;
-    const reps = parseInt(s.reps);
-    const weight = parseFloat(s.weight);
-    if (isNaN(reps) || isNaN(weight) || reps <= 0 || weight <= 0) return false;
+    const reps = parseNum(s.reps) ?? 0;
+    const weight = parseNum(s.weight) ?? 0;
+    if (reps <= 0 || weight <= 0) return false;
     return epley1RM(weight, reps) > prev1RM;
   });
   const hasPR = prFlags.some(Boolean);
@@ -1116,7 +1117,7 @@ export default function WorkoutEditorPage() {
         exerciseId,
         sets: state.sets.map<SetLog>((s) => ({
           reps: isNaN(Number(s.reps)) ? s.reps : Number(s.reps),
-          weight: s.weight ? parseFloat(s.weight) : undefined,
+          weight: parseNum(s.weight) ?? undefined,
           completed: s.completed,
         })),
       }));

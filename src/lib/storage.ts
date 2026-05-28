@@ -1,4 +1,5 @@
 import type { InjuredMuscle, Injury, Workout, WeeklyPlan, WorkoutSession, UserProfile, ExercisePreference, ExercisePreferenceState } from "./types";
+import { parseNum } from "./parse";
 
 const KEYS = {
   injuries: "gymapp:injuries",
@@ -220,7 +221,7 @@ export function getBestEstimated1RM(exerciseId: string): EstimatedStrength | nul
       if (log.exerciseId !== exerciseId) continue;
       for (const set of log.sets) {
         if (!set.completed) continue;
-        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        const reps = parseNum(set.reps) ?? 0;
         if (isNaN(reps) || reps <= 0) continue;
         const w = set.weight ?? 0;
         const e1rm = epley1RM(w, reps);
@@ -243,7 +244,7 @@ export function getStrengthHistory(exerciseId: string): { date: string; estimate
       let bestInSession = 0;
       for (const set of log.sets) {
         if (!set.completed) continue;
-        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        const reps = parseNum(set.reps) ?? 0;
         if (isNaN(reps) || reps <= 0) continue;
         const w = set.weight ?? 0;
         const e = epley1RM(w, reps);
@@ -265,7 +266,7 @@ export function getTopStrengthExercises(n = 8): EstimatedStrength[] {
     for (const log of session.exercises) {
       for (const set of log.sets) {
         if (!set.completed) continue;
-        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        const reps = parseNum(set.reps) ?? 0;
         if (isNaN(reps) || reps <= 0) continue;
         const w = set.weight ?? 0;
         const e1rm = epley1RM(w, reps);
@@ -342,7 +343,7 @@ export function getExerciseScoreMap(): Map<string, number> {
 
       for (const set of log.sets) {
         if (!set.completed) continue;
-        const reps = typeof set.reps === "number" ? set.reps : parseInt(String(set.reps));
+        const reps = parseNum(set.reps) ?? 0;
         if (isNaN(reps) || reps <= 0) continue;
         const e = epley1RM(set.weight ?? 0, reps);
         if (e > (best1RMAll.get(id) ?? 0)) best1RMAll.set(id, e);
