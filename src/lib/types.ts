@@ -49,16 +49,25 @@ export interface Exercise {
 export type InjuryPhase = "acute" | "subacute" | "chronic" | "recovered";
 export type InjurySeverity = "recovering" | "injured"; // kept for backwards compat
 
+/** Weekly pain check-in recorded by the user */
+export interface InjuryCheckIn {
+  date: string;                  // ISO date
+  severity: 1 | 2 | 3 | 4 | 5;
+  notes?: string;
+}
+
 export interface Injury {
   id: string;
-  conditionId: string;       // key from INJURY_CONDITIONS library
-  customLabel?: string;      // override display name
-  affectedMuscles: string[]; // muscle names that are injured
+  conditionId: string;           // key from INJURY_CONDITIONS library
+  customLabel?: string;          // override display name
+  affectedMuscles: string[];     // muscle names that are injured
   severity: 1 | 2 | 3 | 4 | 5; // 1=mild discomfort, 5=severe/surgery
   phase: InjuryPhase;
-  startDate: string;         // ISO date
-  expectedRecovery?: string; // ISO date (optional)
+  startDate: string;             // ISO date
+  expectedRecovery?: string;     // ISO date (optional)
   notes?: string;
+  whenItHurts?: string[];        // "rest" | "load" | "range_of_motion"
+  checkIns?: InjuryCheckIn[];    // chronological pain check-in history
 }
 
 // Legacy type — kept so existing localStorage data still loads

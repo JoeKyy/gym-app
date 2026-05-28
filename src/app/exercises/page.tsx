@@ -3,10 +3,12 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getEquipmentProfile } from "@/lib/storage";
-import { HeartPulse, Activity } from "lucide-react";
+import { HeartPulse, Activity, Map as MapIcon, X } from "lucide-react";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
 import InjuryPanel from "@/components/InjuryPanel";
+import BodyDiagram from "@/components/BodyDiagram";
+import { MUSCLE_PT } from "@/lib/translations";
 import type { Exercise, AppFilters } from "@/lib/types";
 
 const PAGE_SIZE = 30;
@@ -20,6 +22,38 @@ const DEFAULT_FILTERS: AppFilters = {
   myEquipmentOnly: false,
 };
 
+// Maps BodyDiagram muscle keys → exercise bodyParts/targetMuscles values
+const BODY_REGION_TO_BODYPARTS: Record<string, string[]> = {
+  "chest":            ["Chest", "Mid and Lower Chest", "Upper Pectoralis"],
+  "pecs":             ["Chest", "Mid and Lower Chest", "Upper Pectoralis"],
+  "biceps":           ["Biceps", "Long Head Bicep", "Short Head Bicep"],
+  "abs":              ["Abdominals", "Upper Abdominals", "Lower Abdominals"],
+  "abdominals":       ["Abdominals", "Upper Abdominals", "Lower Abdominals"],
+  "obliques":         ["Obliques"],
+  "quadriceps":       ["Quads", "Rectus Femoris", "Inner Quadriceps", "Outer Quadricep"],
+  "quads":            ["Quads", "Rectus Femoris", "Inner Quadriceps", "Outer Quadricep"],
+  "forearms":         ["Forearms", "Wrist Extensors", "Wrist Flexors"],
+  "forearm":          ["Forearms", "Wrist Extensors", "Wrist Flexors"],
+  "neck":             ["Neck"],
+  "hamstrings":       ["Hamstrings", "Lateral Hamstrings", "Medial Hamstrings"],
+  "hamstring":        ["Hamstrings", "Lateral Hamstrings", "Medial Hamstrings"],
+  "glutes":           ["Glutes", "Gluteus Maximus", "Gluteus Medius"],
+  "gluteal":          ["Glutes", "Gluteus Maximus", "Gluteus Medius"],
+  "calves":           ["Calves", "Gastrocnemius", "Soleus"],
+  "lower back":       ["Lower back"],
+  "erector spinae":   ["Lower back"],
+  "lats":             ["Lats"],
+  "upper back":       ["Lats", "Traps", "Traps (mid-back)", "Lower Traps", "Upper Traps"],
+  "traps":            ["Traps", "Traps (mid-back)", "Upper Traps", "Lower Traps"],
+  "traps (mid-back)": ["Traps (mid-back)"],
+  "trapezius":        ["Traps", "Upper Traps", "Lower Traps"],
+  "triceps":          ["Triceps", "Long Head Tricep"],
+  "shoulders":        ["Shoulders", "Front Shoulders", "Rear Shoulders", "Anterior Deltoid", "Lateral Deltoid", "Posterior Deltoid"],
+  "rear delts":       ["Rear Shoulders", "Posterior Deltoid"],
+  "rotator cuff":     ["Rear Shoulders"],
+  "serratus anterior":["Chest"],
+};
+
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +63,8 @@ export default function ExercisesPage() {
   const [userEquipment, setUserEquipment] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showBodyMap, setShowBodyMap] = useState(false);
+  const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { injuredMuscleNames, isRisky } = useInjuries();
 
@@ -40,13 +76,41 @@ export default function ExercisesPage() {
     setUserEquipment(getEquipmentProfile());
   }, []);
 
-  // Reset pagination whenever filters/sort change
+  // Reset pagination whenever filters/sort/muscles change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [filters, sortBy]);
+  }, [filters, sortBy, selectedMuscles]);
 
   const bodyParts = useMemo(() => [...new Set(exercises.flatMap((e) => e.bodyParts))].sort(), [exercises]);
   const equipments = useMemo(() => [...new Set(exercises.flatMap((e) => e.equipments))].sort(), [exercises]);
+
+  // Body map statusMap: selected muscles → "fresh" (green highlight)
+  const bodyMapStatusMap = useMemo(() => {
+    const m = new Map<string, string>();
+    selectedMuscles.forEach((muscle) => m.set(muscle, "fresh"));
+    return m;
+  }, [selectedMuscles]);
+
+  const handleBodyMapToggle = (muscles: string[]) => {
+    setSelectedMuscles((prev) => {
+      const anySelected = muscles.some((m) => prev.includes(m));
+      if (anySelected) {
+        return prev.filter((m) => !muscles.includes(m));
+      }
+      return [...prev, ...muscles.filter((m) => !prev.includes(m))];
+    });
+  };
+
+  // Flatten selected muscles → bodyPart values for exercise filtering
+  const selectedBodyPartsSet = useMemo(() => {
+    if (selectedMuscles.length === 0) return new Set<string>();
+    const parts = new Set<string>();
+    selectedMuscles.forEach((m) => {
+      (BODY_REGION_TO_BODYPARTS[m.toLowerCase()] ?? []).forEach((bp) => parts.add(bp.toLowerCase()));
+    });
+    return parts;
+  }, [selectedMuscles]);
+
 
   const DIFF_ORDER: Record<string, number> = { beginner: 0, intermediate: 1, expert: 2, advanced: 2 };
 
@@ -55,13 +119,20 @@ export default function ExercisesPage() {
     if (filters.myEquipmentOnly && userEquipment.length > 0) {
       base = base.filter((ex) => ex.equipments.some((eq) => userEquipment.includes(eq)));
     }
+    // Body-map muscle filter
+    if (selectedBodyPartsSet.size > 0) {
+      base = base.filter((ex) =>
+        ex.bodyParts.some((bp) => selectedBodyPartsSet.has(bp.toLowerCase())) ||
+        ex.targetMuscles.some((tm) => selectedBodyPartsSet.has(tm.toLowerCase()))
+      );
+    }
     return [...base].sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "difficulty") return (DIFF_ORDER[a.difficulty ?? ""] ?? 1) - (DIFF_ORDER[b.difficulty ?? ""] ?? 1);
       if (sortBy === "muscle") return (a.targetMuscles[0] ?? "").localeCompare(b.targetMuscles[0] ?? "");
       return 0;
     });
-  }, [exercises, filters, injuredMuscleNames, sortBy, userEquipment]);
+  }, [exercises, filters, injuredMuscleNames, sortBy, userEquipment, selectedBodyPartsSet]);
 
   const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
@@ -122,6 +193,17 @@ export default function ExercisesPage() {
             >≡</button>
           </div>
           <button
+            onClick={() => { setShowBodyMap((v) => !v); if (showBodyMap) setSelectedMuscles([]); }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+              showBodyMap || selectedMuscles.length > 0
+                ? "border-[var(--color-primary-border)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]"
+            }`}
+          >
+            <MapIcon size={13} />
+            Por Músculo {selectedMuscles.length > 0 && `(${selectedMuscles.length})`}
+          </button>
+          <button
             onClick={() => setShowInjuryPanel((v) => !v)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
               injuredMuscleNames.length > 0
@@ -138,6 +220,44 @@ export default function ExercisesPage() {
       </div>
 
       {showInjuryPanel && <InjuryPanel />}
+
+      {showBodyMap && (
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-[var(--color-text-secondary)]">
+              Toque no músculo para filtrar exercícios
+            </p>
+            {selectedMuscles.length > 0 && (
+              <button
+                onClick={() => setSelectedMuscles([])}
+                className="flex items-center gap-1 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+              >
+                <X size={12} /> Limpar
+              </button>
+            )}
+          </div>
+          <BodyDiagram
+            statusMap={bodyMapStatusMap}
+            onToggleRegion={handleBodyMapToggle}
+            readOnly={false}
+            sideWidth={130}
+            showLegend={false}
+          />
+          {selectedMuscles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {selectedMuscles.map((m) => (
+                <span
+                  key={m}
+                  className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-[var(--color-primary-soft)] border border-[var(--color-primary-border)] text-[var(--color-primary)] cursor-pointer hover:opacity-80"
+                  onClick={() => setSelectedMuscles((prev) => prev.filter((x) => x !== m))}
+                >
+                  {MUSCLE_PT[m] ?? m} <X size={10} />
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {injuredMuscleNames.length > 0 && (
         <div className="card p-4 flex items-center justify-between gap-4 flex-wrap border-[var(--color-border)]">

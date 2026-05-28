@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { HeartPulse, Sparkles } from "lucide-react";
+import { HeartPulse, Sparkles, ClipboardList, PlusCircle, CheckCircle2 } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { getInjuriesV2, saveInjuryV2, deleteInjuryV2, updateInjuryV2, generateId } from "@/lib/storage";
 import { getExercises } from "@/lib/data";
 import { INJURY_CONDITIONS, getRehabProtocolsForConditions } from "@/lib/rehab";
 import BodyMapImage from "@/components/BodyMapImage";
-import type { Injury, InjuryPhase, Exercise } from "@/lib/types";
+import type { Injury, InjuryCheckIn, InjuryPhase, Exercise } from "@/lib/types";
 
 const PHASE_LABELS: Record<InjuryPhase, { label: string; color: string; description: string }> = {
   acute: {
@@ -41,10 +41,77 @@ const SEVERITY_LABELS: Record<number, string> = {
   5: "5 — Grave/cirúrgico",
 };
 
+const WHEN_HURTS_OPTIONS = [
+  { id: "rest", label: "Em repouso" },
+  { id: "load", label: "Ao carregar peso" },
+  { id: "range_of_motion", label: "Em certa amplitude" },
+];
+
+/** Returns true if the last 2 check-ins show severity ≤ 2 (ready for reintroduction) */
+function isReadyForReintro(inj: Injury): boolean {
+  const ci = inj.checkIns ?? [];
+  if (ci.length < 2) return false;
+  const last2 = ci.slice(-2);
+  return last2.every((c) => c.severity <= 2) && inj.severity <= 2;
+}
+
+/** Generate a plain-text physiotherapist report */
+function generatePhysioReport(inj: Injury, conditionName: string, protocols: ReturnType<typeof getRehabProtocolsForConditions>): string {
+  const lines: string[] = [
+    "=== RELATÓRIO DE LESÃO — GymApp ===",
+    `Gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+    "",
+    `CONDIÇÃO: ${conditionName}`,
+    `Fase: ${PHASE_LABELS[inj.phase].label}`,
+    `Severidade atual: ${inj.severity}/5 — ${SEVERITY_LABELS[inj.severity]}`,
+    `Início: ${inj.startDate}`,
+    inj.expectedRecovery ? `Previsão de alta: ${inj.expectedRecovery}` : "",
+    inj.notes ? `Observações: ${inj.notes}` : "",
+    "",
+    `Músculos afetados: ${inj.affectedMuscles.join(", ")}`,
+  ];
+
+  if ((inj.whenItHurts ?? []).length > 0) {
+    const whenLabels = (inj.whenItHurts ?? []).map(
+      (w) => WHEN_HURTS_OPTIONS.find((o) => o.id === w)?.label ?? w
+    );
+    lines.push(`Quando dói: ${whenLabels.join(", ")}`);
+  }
+
+  if ((inj.checkIns ?? []).length > 0) {
+    lines.push("", "HISTÓRICO DE CHECK-INS:");
+    (inj.checkIns ?? []).slice(-10).forEach((ci) => {
+      lines.push(`  ${ci.date}: Severidade ${ci.severity}/5${ci.notes ? ` — "${ci.notes}"` : ""}`);
+    });
+  }
+
+  if (protocols.length > 0) {
+    lines.push("", "PROTOCOLOS SEGUIDOS:");
+    protocols.forEach((proto) => {
+      lines.push(`  • ${proto.name} (${proto.frequency})`);
+      proto.exercises.forEach((ex) => {
+        lines.push(`      - ${ex.name}: ${ex.sets}×${ex.reps}`);
+      });
+    });
+  }
+
+  lines.push(
+    "",
+    "─────────────────────────────────────────",
+    "⚠️  Este relatório é informativo e não substitui avaliação médica.",
+    "    Compartilhe com seu fisioterapeuta ou médico."
+  );
+
+  return lines.filter((l) => l !== undefined).join("\n");
+}
+
 export default function InjuriesPage() {
   const [injuries, setInjuries] = useState<Injury[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [checkInInjuryId, setCheckInInjuryId] = useState<string | null>(null);
+  const [checkInSeverity, setCheckInSeverity] = useState<1 | 2 | 3 | 4 | 5>(2);
+  const [checkInNotes, setCheckInNotes] = useState("");
 
   const [selectedCondition, setSelectedCondition] = useState("");
   const [severity, setSeverity] = useState<1 | 2 | 3 | 4 | 5>(2);
@@ -52,6 +119,7 @@ export default function InjuriesPage() {
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [expectedRecovery, setExpectedRecovery] = useState("");
   const [notes, setNotes] = useState("");
+  const [whenItHurts, setWhenItHurts] = useState<string[]>([]);
 
   useEffect(() => {
     setInjuries(getInjuriesV2());
@@ -74,6 +142,7 @@ export default function InjuriesPage() {
       startDate,
       expectedRecovery: expectedRecovery || undefined,
       notes: notes || undefined,
+      whenItHurts: whenItHurts.length > 0 ? whenItHurts : undefined,
     };
     saveInjuryV2(injury);
     refresh();
@@ -81,6 +150,7 @@ export default function InjuriesPage() {
     setSelectedCondition("");
     setNotes("");
     setExpectedRecovery("");
+    setWhenItHurts([]);
   };
 
   const handleDelete = (id: string) => {
@@ -98,6 +168,34 @@ export default function InjuriesPage() {
   const handleUpdateSeverity = (id: string, newSeverity: number) => {
     updateInjuryV2(id, { severity: newSeverity as 1 | 2 | 3 | 4 | 5 });
     refresh();
+  };
+
+  const handleAddCheckIn = (injuryId: string) => {
+    const inj = injuries.find((i) => i.id === injuryId);
+    if (!inj) return;
+    const newCheckIn: InjuryCheckIn = {
+      date: new Date().toISOString().slice(0, 10),
+      severity: checkInSeverity,
+      notes: checkInNotes || undefined,
+    };
+    const updated = [...(inj.checkIns ?? []), newCheckIn];
+    updateInjuryV2(injuryId, { checkIns: updated, severity: checkInSeverity });
+    setCheckInInjuryId(null);
+    setCheckInNotes("");
+    refresh();
+  };
+
+  const handleExportReport = (inj: Injury) => {
+    const condition = INJURY_CONDITIONS.find((c) => c.id === inj.conditionId);
+    const protocols = getRehabProtocolsForConditions([inj.conditionId], inj.phase);
+    const text = generatePhysioReport(inj, condition?.name ?? inj.conditionId, protocols);
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-lesao-${inj.conditionId}-${inj.startDate}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const activeInjuries = injuries.filter((i) => i.phase !== "recovered");
@@ -144,13 +242,16 @@ export default function InjuriesPage() {
         const protocols = getRehabProtocolsForConditions([inj.conditionId], inj.phase);
         const phaseInfo = PHASE_LABELS[inj.phase];
         const bodymap = findRepresentativeSlug(inj.affectedMuscles);
+        const readyForReintro = isReadyForReintro(inj);
+        const recentCheckIns = (inj.checkIns ?? []).slice(-3);
 
         return (
           <div key={inj.id} className="card p-5 space-y-4">
+            {/* Header */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xl"><HeartPulse size={20} style={{ color: "var(--color-danger)" }} /></span>
+                  <HeartPulse size={20} style={{ color: "var(--color-danger)" }} />
                   <h2 className="font-semibold text-[var(--color-text)]">{condition?.name ?? inj.conditionId}</h2>
                   <span className={`text-xs px-2 py-0.5 rounded-full border ${phaseInfo.color}`}>
                     {phaseInfo.label}
@@ -164,13 +265,16 @@ export default function InjuriesPage() {
                 )}
                 <div className="flex flex-wrap gap-1 mt-2">
                   {inj.affectedMuscles.map((m) => (
-                    <span key={m} className="badge badge-red">
-                      {m}
-                    </span>
+                    <span key={m} className="badge badge-red">{m}</span>
                   ))}
                 </div>
+                {(inj.whenItHurts ?? []).length > 0 && (
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                    Dói: {(inj.whenItHurts ?? []).map((w) => WHEN_HURTS_OPTIONS.find((o) => o.id === w)?.label ?? w).join(" · ")}
+                  </p>
+                )}
                 {inj.notes && (
-                  <p className="text-[var(--color-text-muted)] text-xs mt-2 italic">{inj.notes}</p>
+                  <p className="text-[var(--color-text-muted)] text-xs mt-1 italic">{inj.notes}</p>
                 )}
               </div>
               {bodymap && (
@@ -192,6 +296,18 @@ export default function InjuriesPage() {
               </button>
             </div>
 
+            {/* Reintroduction hint */}
+            {readyForReintro && (
+              <div className="rounded-lg p-3 text-xs border border-[var(--color-success-border,#22c55e33)] bg-[var(--color-success-bg,#22c55e10)] text-[var(--color-success,#22c55e)] flex items-start gap-2">
+                <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Pronto para reintrodução gradual</p>
+                  <p className="opacity-80 mt-0.5">Seus últimos 2 check-ins mostram melhora. Considere testar exercícios antes evitados com carga leve.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Phase info */}
             <div className={`rounded-lg p-3 text-xs border ${phaseInfo.color}`}>
               <p className="font-medium">{phaseInfo.label}</p>
               <p className="mt-0.5 opacity-80">{phaseInfo.description}</p>
@@ -200,6 +316,7 @@ export default function InjuriesPage() {
               )}
             </div>
 
+            {/* Phase buttons */}
             <div>
               <p className="text-xs text-[var(--color-text-muted)] mb-2">Atualizar fase:</p>
               <div className="flex flex-wrap gap-1.5">
@@ -219,6 +336,7 @@ export default function InjuriesPage() {
               </div>
             </div>
 
+            {/* Severity */}
             <div>
               <p className="text-xs text-[var(--color-text-muted)] mb-2">Severidade atual:</p>
               <div className="flex gap-1.5">
@@ -243,10 +361,86 @@ export default function InjuriesPage() {
               <p className="text-xs text-[var(--color-text-muted)] mt-1">{SEVERITY_LABELS[inj.severity]}</p>
             </div>
 
+            {/* Check-in history */}
+            {recentCheckIns.length > 0 && (
+              <div className="border-t border-[var(--color-border-subtle)] pt-3">
+                <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2">Últimos check-ins:</p>
+                <div className="space-y-1">
+                  {recentCheckIns.map((ci, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+                      <span className="text-[var(--color-text-muted)]">{ci.date}</span>
+                      <span className={`font-bold ${ci.severity <= 2 ? "text-[var(--color-primary)]" : ci.severity <= 3 ? "text-[var(--color-warning-text)]" : "text-[var(--color-danger-text)]"}`}>
+                        {ci.severity}/5
+                      </span>
+                      {ci.notes && <span className="italic text-[var(--color-text-muted)] truncate">{ci.notes}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Check-in form */}
+            {checkInInjuryId === inj.id ? (
+              <div className="border border-[var(--color-border)] rounded-xl p-4 space-y-3 bg-[var(--color-surface-2)]">
+                <p className="text-sm font-medium">Como está a dor hoje?</p>
+                <div className="flex gap-1.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setCheckInSeverity(s as 1 | 2 | 3 | 4 | 5)}
+                      className={`w-9 h-9 rounded-lg text-sm font-bold border transition-colors ${
+                        checkInSeverity === s
+                          ? s <= 2
+                            ? "bg-[var(--color-primary-soft)] border-[var(--color-primary-border)] text-[var(--color-primary)]"
+                            : s <= 3
+                            ? "bg-[var(--color-warning-bg)] border-[var(--color-warning-border)] text-[var(--color-warning-text)]"
+                            : "bg-[var(--color-danger-bg)] border-[var(--color-danger-border)] text-[var(--color-danger-text)]"
+                          : "bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-secondary)]"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-[var(--color-text-muted)]">{SEVERITY_LABELS[checkInSeverity]}</p>
+                <textarea
+                  value={checkInNotes}
+                  onChange={(e) => setCheckInNotes(e.target.value)}
+                  placeholder="Observação opcional..."
+                  rows={2}
+                  className="input resize-none text-sm"
+                />
+                <div className="flex gap-2">
+                  <button onClick={() => handleAddCheckIn(inj.id)} className="flex-1 btn btn-primary text-sm py-2">
+                    Salvar check-in
+                  </button>
+                  <button onClick={() => setCheckInInjuryId(null)} className="btn btn-secondary text-sm py-2">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => { setCheckInInjuryId(inj.id); setCheckInSeverity(inj.severity); setCheckInNotes(""); }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)] transition-colors"
+                >
+                  <PlusCircle size={13} /> Check-in de hoje
+                </button>
+                <button
+                  onClick={() => handleExportReport(inj)}
+                  className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)] transition-colors"
+                >
+                  <ClipboardList size={13} /> Relatório para fisio
+                </button>
+              </div>
+            )}
+
+            {/* Rehab protocols */}
             {protocols.length > 0 && (
               <div className="border-t border-[var(--color-border-subtle)] pt-3">
                 <p className="text-xs text-[var(--color-text-secondary)] font-medium mb-2 flex items-center gap-1">
-                  📚 Protocolos de Reabilitação para esta fase
+                  Protocolos de Reabilitação para esta fase
                 </p>
                 {protocols.map((proto) => (
                   <div key={proto.id} className="bg-[var(--color-surface-2)] border border-[var(--color-border)] rounded-lg p-3 mb-2">
@@ -261,13 +455,13 @@ export default function InjuriesPage() {
                           <p className="text-xs text-[var(--color-text-muted)] pl-3 leading-relaxed">{ex.description}</p>
                           {ex.scienceNote && (
                             <p className="text-xs text-[var(--color-text-muted)] pl-3 italic mt-0.5">
-                              🔬 {ex.scienceNote}
+                              {ex.scienceNote}
                             </p>
                           )}
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-[var(--color-text-secondary)] mt-2">📚 {proto.source}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-2">{proto.source}</p>
                     <p className="text-xs text-[var(--color-text-muted)] mt-1 italic">{proto.notes}</p>
                   </div>
                 ))}
@@ -323,6 +517,29 @@ export default function InjuriesPage() {
 
           {selectedCondition && (
             <>
+              <div className="space-y-1.5">
+                <label className="text-xs text-[var(--color-text-muted)] block">Quando dói?</label>
+                <div className="flex flex-wrap gap-2">
+                  {WHEN_HURTS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() =>
+                        setWhenItHurts((prev) =>
+                          prev.includes(opt.id) ? prev.filter((x) => x !== opt.id) : [...prev, opt.id]
+                        )
+                      }
+                      className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                        whenItHurts.includes(opt.id)
+                          ? "bg-[var(--color-warning-bg)] border-[var(--color-warning-border)] text-[var(--color-warning-text)]"
+                          : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-text-muted)]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-xs text-[var(--color-text-muted)] block">Fase atual</label>
                 <div className="flex flex-wrap gap-1.5">
