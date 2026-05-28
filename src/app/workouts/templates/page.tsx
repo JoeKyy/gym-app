@@ -56,12 +56,19 @@ function difficultyLabel(d?: string): string {
   return d ?? "—";
 }
 
+function categoryToEnvironment(category?: string): Workout["environment"] {
+  const c = (category ?? "").toLowerCase();
+  if (c.includes("casa") || c.includes("bodyweight")) return "home";
+  if (c.includes("pilates") || c.includes("reabilit") || c.includes("recuper") || c.includes("mobilid")) return "pilates";
+  return "gym";
+}
+
 function mwWorkoutToGymWorkout(mw: MWWorkout): Workout {
   const ts = nowISO();
   return {
     id: generateId(),
     name: mw.name,
-    environment: "any",
+    environment: categoryToEnvironment(mw.category),
     createdAt: ts,
     updatedAt: ts,
     exercises: (mw.exercises ?? []).map((ex) => ({
@@ -248,22 +255,16 @@ export default function TemplatesPage() {
     let mounted = true;
     async function load() {
       try {
-        const [wRes, rRes] = await Promise.all([
-          fetch("/data/mw_workouts.json"),
-          fetch("/data/mw_routines.json"),
-        ]);
-
+        const res = await fetch("/data/workout_templates.json");
         if (!mounted) return;
-
-        const wData = wRes.ok ? await wRes.json() : [];
-        const rData = rRes.ok ? await rRes.json() : [];
-
-        setWorkouts(Array.isArray(wData) ? wData : []);
-        setRoutines(Array.isArray(rData) ? rData : []);
-        setHasData((Array.isArray(wData) && wData.length > 0) ||
-                   (Array.isArray(rData) && rData.length > 0));
+        if (res.ok) {
+          const data = await res.json();
+          setWorkouts(Array.isArray(data.workouts) ? data.workouts : []);
+          setRoutines(Array.isArray(data.routines) ? data.routines : []);
+          setHasData(true);
+        }
       } catch {
-        // Files don't exist yet
+        // silently fail
       } finally {
         if (mounted) setLoading(false);
       }
@@ -316,7 +317,7 @@ export default function TemplatesPage() {
         </Link>
         <h1 className="text-2xl font-bold">Templates</h1>
         <p className="text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
-          Treinos prontos do MuscleWiki para usar ou adaptar
+          Treinos prontos para usar ou adaptar
         </p>
       </div>
 

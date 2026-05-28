@@ -1,0 +1,2398 @@
+{
+  "workouts": [
+    {
+      "id": 1,
+      "name": "Push Day – Academia",
+      "description": "Peito, ombros e tríceps com foco em força e hipertrofia. Ideal para segunda ou quinta-feira num split PPL.",
+      "difficulty": "intermediate",
+      "category": "Academia",
+      "tags": [
+        "push",
+        "força",
+        "hipertrofia"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Ombros",
+        "Tríceps"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-reverse-grip-bench-press",
+          "name": "Barbell Reverse Grip Bench Press",
+          "sets": 4,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "dumbbell-neutral-incline-bench-press",
+          "name": "Dumbbell Neutral Incline Bench Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-arnold-press",
+          "name": "Dumbbell Arnold Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "cable-rope-overhead-tricep-extension",
+          "name": "Cable Rope Overhead Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-overhead-tricep-press",
+          "name": "Cable Overhead Tricep Press",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "machine-plate-loaded-decline-chest-press",
+          "name": "Machine Plate Loaded Decline Chest Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        }
+      ],
+      "duration_minutes": 55
+    },
+    {
+      "id": 2,
+      "name": "Pull Day – Academia",
+      "description": "Costas e bíceps com ênfase em espessura e largura dos dorsais.",
+      "difficulty": "intermediate",
+      "category": "Academia",
+      "tags": [
+        "pull",
+        "força",
+        "hipertrofia"
+      ],
+      "muscle_groups": [
+        "Costas",
+        "Bíceps",
+        "Trapézio"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-pronated-pendlay-row",
+          "name": "Barbell Pronated Pendlay Row",
+          "sets": 4,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "dumbbell-laying-incline-row",
+          "name": "Dumbbell Laying Incline Row",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "machine-plate-loaded-row",
+          "name": "Machine Plate Loaded Row",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-bar-reverse-grip-curl",
+          "name": "Cable Bar Reverse Grip Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-seated-bayesian-reverse-curl",
+          "name": "Cable Seated Bayesian Reverse Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "machine-chest-supported-t-bar-row",
+          "name": "Machine Chest Supported T Bar Row",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        }
+      ],
+      "duration_minutes": 55
+    },
+    {
+      "id": 3,
+      "name": "Legs Day – Academia",
+      "description": "Quadríceps, posteriores e glúteos. Inclui agachamento, terra e leg press.",
+      "difficulty": "intermediate",
+      "category": "Academia",
+      "tags": [
+        "legs",
+        "força",
+        "hipertrofia"
+      ],
+      "muscle_groups": [
+        "Quadríceps",
+        "Posteriores",
+        "Glúteos",
+        "Panturrilha"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-pause-squat",
+          "name": "Barbell Pause Squat",
+          "sets": 4,
+          "reps": 6,
+          "rest": 120
+        },
+        {
+          "id": "barbell-block-conventional-deadlift",
+          "name": "Barbell Block Conventional Deadlift",
+          "sets": 3,
+          "reps": 6,
+          "rest": 120
+        },
+        {
+          "id": "machine-hack-squat",
+          "name": "Machine Hack Squat",
+          "sets": 3,
+          "reps": 10,
+          "rest": 90
+        },
+        {
+          "id": "seated-leg-curl",
+          "name": "Seated Leg Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "machine-hip-thrust",
+          "name": "Machine Hip Thrust",
+          "sets": 3,
+          "reps": 12,
+          "rest": 75
+        },
+        {
+          "id": "machine-seated-calf-raises",
+          "name": "Machine Seated Calf Raises",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 60
+    },
+    {
+      "id": 4,
+      "name": "Upper Body – Academia",
+      "description": "Treino completo de membros superiores para dias de frequência 4x/semana.",
+      "difficulty": "intermediate",
+      "category": "Academia",
+      "tags": [
+        "upper",
+        "força"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Costas",
+        "Ombros",
+        "Bíceps",
+        "Tríceps"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-reverse-grip-bench-press",
+          "name": "Barbell Reverse Grip Bench Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-laying-incline-row",
+          "name": "Dumbbell Laying Incline Row",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-arnold-press",
+          "name": "Dumbbell Arnold Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "cable-bar-reverse-grip-curl",
+          "name": "Cable Bar Reverse Grip Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-rope-overhead-tricep-extension",
+          "name": "Cable Rope Overhead Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-seated-single-arm-face-pull",
+          "name": "Cable Seated Single Arm Face Pull",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 50
+    },
+    {
+      "id": 5,
+      "name": "Lower Body – Academia",
+      "description": "Treino de membros inferiores focado em pernas e glúteos.",
+      "difficulty": "intermediate",
+      "category": "Academia",
+      "tags": [
+        "lower",
+        "força"
+      ],
+      "muscle_groups": [
+        "Quadríceps",
+        "Posteriores",
+        "Glúteos",
+        "Panturrilha"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-pause-squat",
+          "name": "Barbell Pause Squat",
+          "sets": 4,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "machine-horizontal-leg-press",
+          "name": "Machine Horizontal Leg Press",
+          "sets": 3,
+          "reps": 12,
+          "rest": 75
+        },
+        {
+          "id": "barbell-block-conventional-deadlift",
+          "name": "Barbell Block Conventional Deadlift",
+          "sets": 3,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "seated-leg-curl",
+          "name": "Seated Leg Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "machine-hip-thrust",
+          "name": "Machine Hip Thrust",
+          "sets": 3,
+          "reps": 12,
+          "rest": 75
+        },
+        {
+          "id": "machine-seated-calf-raises",
+          "name": "Machine Seated Calf Raises",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 55
+    },
+    {
+      "id": 6,
+      "name": "Full Body – Academia (Iniciante)",
+      "description": "Treino de corpo todo com equipamentos de academia. Ótimo ponto de partida.",
+      "difficulty": "beginner",
+      "category": "Academia",
+      "tags": [
+        "full body",
+        "iniciante"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Costas",
+        "Pernas",
+        "Ombros"
+      ],
+      "exercises": [
+        {
+          "id": "barbell-pause-squat",
+          "name": "Barbell Pause Squat",
+          "sets": 3,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "barbell-reverse-grip-bench-press",
+          "name": "Barbell Reverse Grip Bench Press",
+          "sets": 3,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "barbell-pronated-pendlay-row",
+          "name": "Barbell Pronated Pendlay Row",
+          "sets": 3,
+          "reps": 8,
+          "rest": 90
+        },
+        {
+          "id": "dumbbell-arnold-press",
+          "name": "Dumbbell Arnold Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "seated-leg-curl",
+          "name": "Seated Leg Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "cable-rope-overhead-tricep-extension",
+          "name": "Cable Rope Overhead Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        }
+      ],
+      "duration_minutes": 50
+    },
+    {
+      "id": 7,
+      "name": "Full Body – Halteres",
+      "description": "Treino completo usando apenas halteres. Perfeito para academia ou treinar em casa.",
+      "difficulty": "intermediate",
+      "category": "Halteres",
+      "tags": [
+        "halteres",
+        "full body"
+      ],
+      "muscle_groups": [
+        "Quadríceps",
+        "Peito",
+        "Costas",
+        "Ombros",
+        "Bíceps",
+        "Tríceps"
+      ],
+      "exercises": [
+        {
+          "id": "dumbbell-goblet-pulse-squat",
+          "name": "Dumbbell Goblet Pulse Squat",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "dumbbell-neutral-incline-bench-press",
+          "name": "Dumbbell Neutral Incline Bench Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-laying-incline-row",
+          "name": "Dumbbell Laying Incline Row",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-arnold-press",
+          "name": "Dumbbell Arnold Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "dumbbell-cross-body-romanian-deadlift",
+          "name": "Dumbbell Cross Body Romanian Deadlift",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-incline-twisting-curl",
+          "name": "Dumbbell Incline Twisting Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "dumbbell-single-arm-overhead-tricep-extension",
+          "name": "Dumbbell Single Arm Overhead Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 50
+    },
+    {
+      "id": 8,
+      "name": "Upper Body – Halteres",
+      "description": "Membros superiores completos com halteres.",
+      "difficulty": "intermediate",
+      "category": "Halteres",
+      "tags": [
+        "halteres",
+        "upper"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Costas",
+        "Ombros",
+        "Bíceps",
+        "Tríceps"
+      ],
+      "exercises": [
+        {
+          "id": "dumbbell-neutral-incline-bench-press",
+          "name": "Dumbbell Neutral Incline Bench Press",
+          "sets": 4,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-laying-incline-row",
+          "name": "Dumbbell Laying Incline Row",
+          "sets": 4,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-arnold-press",
+          "name": "Dumbbell Arnold Press",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "dumbbell-incline-twisting-curl",
+          "name": "Dumbbell Incline Twisting Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "dumbbell-single-arm-overhead-tricep-extension",
+          "name": "Dumbbell Single Arm Overhead Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "cable-seated-single-arm-face-pull",
+          "name": "Cable Seated Single Arm Face Pull",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 45
+    },
+    {
+      "id": 9,
+      "name": "Lower Body – Halteres",
+      "description": "Pernas e glúteos com halteres. Pode ser feito em casa.",
+      "difficulty": "intermediate",
+      "category": "Halteres",
+      "tags": [
+        "halteres",
+        "lower"
+      ],
+      "muscle_groups": [
+        "Quadríceps",
+        "Glúteos",
+        "Posteriores",
+        "Panturrilha"
+      ],
+      "exercises": [
+        {
+          "id": "dumbbell-goblet-pulse-squat",
+          "name": "Dumbbell Goblet Pulse Squat",
+          "sets": 4,
+          "reps": 12,
+          "rest": 75
+        },
+        {
+          "id": "dumbbell-swing-lunge",
+          "name": "Dumbbell Swing Lunge",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "dumbbell-cross-body-romanian-deadlift",
+          "name": "Dumbbell Cross Body Romanian Deadlift",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+          "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "calf-raises",
+          "name": "Calf Raises",
+          "sets": 3,
+          "reps": 20,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 40
+    },
+    {
+      "id": 10,
+      "name": "Full Body – Casa (Peso Corporal)",
+      "description": "Treino de corpo todo sem equipamento. Pode ser feito em qualquer lugar.",
+      "difficulty": "beginner",
+      "category": "Casa",
+      "tags": [
+        "casa",
+        "bodyweight",
+        "iniciante"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Costas",
+        "Pernas",
+        "Core"
+      ],
+      "exercises": [
+        {
+          "id": "split-squat",
+          "name": "Split Squat",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "burpee",
+          "name": "Burpee",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+          "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ring-standing-chest-fly",
+          "name": "Ring Standing Chest Fly",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "bodyweight-close-grip-inverted-curl",
+          "name": "Bodyweight Close Grip Inverted Curl",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "long-lever-plank",
+          "name": "Long Lever Plank",
+          "sets": 3,
+          "reps": 30,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 35
+    },
+    {
+      "id": 11,
+      "name": "Upper Body – Casa",
+      "description": "Membros superiores sem equipamento usando peso corporal.",
+      "difficulty": "intermediate",
+      "category": "Casa",
+      "tags": [
+        "casa",
+        "bodyweight"
+      ],
+      "muscle_groups": [
+        "Peito",
+        "Costas",
+        "Bíceps",
+        "Tríceps",
+        "Core"
+      ],
+      "exercises": [
+        {
+          "id": "ring-standing-chest-fly",
+          "name": "Ring Standing Chest Fly",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "bodyweight-close-grip-inverted-curl",
+          "name": "Bodyweight Close Grip Inverted Curl",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "bench-dips",
+          "name": "Bench Dips",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "l-sit-chin-up",
+          "name": "L Sit Chin Up",
+          "sets": 3,
+          "reps": 8,
+          "rest": 75
+        },
+        {
+          "id": "bodyweight-knee-tricep-extension",
+          "name": "Bodyweight Knee Tricep Extension",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "hand-side-plank",
+          "name": "Hand Side Plank",
+          "sets": 3,
+          "reps": 30,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 30
+    },
+    {
+      "id": 12,
+      "name": "Lower Body – Casa",
+      "description": "Pernas e glúteos usando peso corporal. Sem equipamento necessário.",
+      "difficulty": "beginner",
+      "category": "Casa",
+      "tags": [
+        "casa",
+        "bodyweight"
+      ],
+      "muscle_groups": [
+        "Quadríceps",
+        "Glúteos",
+        "Posteriores",
+        "Panturrilha"
+      ],
+      "exercises": [
+        {
+          "id": "split-squat",
+          "name": "Split Squat",
+          "sets": 3,
+          "reps": 15,
+          "rest": 60
+        },
+        {
+          "id": "curtsy-lunge",
+          "name": "Curtsy Lunge",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+          "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+          "sets": 4,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "calf-raises",
+          "name": "Calf Raises",
+          "sets": 3,
+          "reps": 20,
+          "rest": 30
+        },
+        {
+          "id": "laying-alternating-leg-raise",
+          "name": "Laying Alternating Leg Raise",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "supermans",
+          "name": "Supermans",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 30
+    },
+    {
+      "id": 13,
+      "name": "Core & Abs",
+      "description": "Foco total em abdômen, core e oblíquos para fortalecer a região central.",
+      "difficulty": "beginner",
+      "category": "Core",
+      "tags": [
+        "core",
+        "abs",
+        "casa"
+      ],
+      "muscle_groups": [
+        "Abdômen",
+        "Oblíquos",
+        "Core"
+      ],
+      "exercises": [
+        {
+          "id": "long-lever-plank",
+          "name": "Long Lever Plank",
+          "sets": 3,
+          "reps": 40,
+          "rest": 45
+        },
+        {
+          "id": "hand-side-plank-reach-through",
+          "name": "Hand Side Plank Reach Through",
+          "sets": 3,
+          "reps": 10,
+          "rest": 45
+        },
+        {
+          "id": "reverse-crunch",
+          "name": "Reverse Crunch",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "laying-alternating-leg-raise",
+          "name": "Laying Alternating Leg Raise",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "bodyweight-stability-ball-crunch",
+          "name": "Bodyweight Stability Ball Crunch",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "burpee",
+          "name": "Burpee",
+          "sets": 2,
+          "reps": 10,
+          "rest": 60
+        }
+      ],
+      "duration_minutes": 25
+    },
+    {
+      "id": 14,
+      "name": "Kettlebell – Full Body",
+      "description": "Treino metabólico com kettlebell. Alta intensidade e condicionamento.",
+      "difficulty": "intermediate",
+      "category": "Kettlebell",
+      "tags": [
+        "kettlebell",
+        "full body",
+        "metabólico"
+      ],
+      "muscle_groups": [
+        "Glúteos",
+        "Ombros",
+        "Core",
+        "Posteriores"
+      ],
+      "exercises": [
+        {
+          "id": "kettlebell-swing-double",
+          "name": "Kettlebell Swing (Double)",
+          "sets": 4,
+          "reps": 15,
+          "rest": 60
+        },
+        {
+          "id": "kettlebell-alternating-forward-lunge",
+          "name": "Kettlebell Alternating Forward Lunge",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "kettlebell-single-leg-deadlift",
+          "name": "Kettlebell Single Leg Deadlift",
+          "sets": 3,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "kettlebell-goblet-curl",
+          "name": "Kettlebell Goblet Curl",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "kettlebell-russian-twist",
+          "name": "Kettlebell Russian Twist",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "kettlebell-single-arm-lateral-raise",
+          "name": "Kettlebell Single Arm Lateral Raise",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 40
+    },
+    {
+      "id": 15,
+      "name": "Mobilidade Lombar – Hérnia de Disco",
+      "description": "Protocolo de mobilidade e alívio para hérnia de disco lombar. Movimentos suaves e seguros.",
+      "difficulty": "beginner",
+      "category": "Reabilitação",
+      "tags": [
+        "reabilitação",
+        "lombar",
+        "hérnia",
+        "mobilidade"
+      ],
+      "muscle_groups": [
+        "Lombar",
+        "Quadril",
+        "Core"
+      ],
+      "exercises": [
+        {
+          "id": "happy-baby",
+          "name": "Happy Baby",
+          "sets": 3,
+          "reps": 30,
+          "rest": 30
+        },
+        {
+          "id": "cobra-pose",
+          "name": "Cobra Pose",
+          "sets": 3,
+          "reps": 30,
+          "rest": 30
+        },
+        {
+          "id": "lumbar-rotation-3-supine-passive-ankle-over-opposite-knee",
+          "name": "Lumbar Rotation 3",
+          "sets": 3,
+          "reps": 30,
+          "rest": 30
+        },
+        {
+          "id": "lumbar-rotation-4-supine-active-crossed-legs",
+          "name": "Lumbar Rotation 4",
+          "sets": 3,
+          "reps": 30,
+          "rest": 30
+        },
+        {
+          "id": "child-pose-arms-extended-left-right",
+          "name": "Child Pose Arms Extended Left Right",
+          "sets": 3,
+          "reps": 40,
+          "rest": 30
+        },
+        {
+          "id": "pigeon-pose",
+          "name": "Pigeon Pose",
+          "sets": 2,
+          "reps": 45,
+          "rest": 30
+        }
+      ],
+      "duration_minutes": 25
+    },
+    {
+      "id": 16,
+      "name": "Pilates Core – Iniciante",
+      "description": "Exercícios de pilates para fortalecer o core e a coluna. Ideal para reabilitação.",
+      "difficulty": "beginner",
+      "category": "Pilates",
+      "tags": [
+        "pilates",
+        "core",
+        "reabilitação"
+      ],
+      "muscle_groups": [
+        "Core",
+        "Lombar",
+        "Abdômen"
+      ],
+      "exercises": [
+        {
+          "id": "long-lever-plank",
+          "name": "Long Lever Plank",
+          "sets": 4,
+          "reps": 40,
+          "rest": 45
+        },
+        {
+          "id": "hand-side-plank",
+          "name": "Hand Side Plank",
+          "sets": 3,
+          "reps": 30,
+          "rest": 45
+        },
+        {
+          "id": "cobra-pose",
+          "name": "Cobra Pose",
+          "sets": 3,
+          "reps": 30,
+          "rest": 30
+        },
+        {
+          "id": "happy-baby",
+          "name": "Happy Baby",
+          "sets": 3,
+          "reps": 40,
+          "rest": 30
+        },
+        {
+          "id": "supermans",
+          "name": "Supermans",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "reverse-crunch",
+          "name": "Reverse Crunch",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        }
+      ],
+      "duration_minutes": 30
+    },
+    {
+      "id": 17,
+      "name": "Alongamento Global",
+      "description": "Sequência completa de alongamento para melhorar mobilidade e reduzir tensão.",
+      "difficulty": "beginner",
+      "category": "Mobilidade",
+      "tags": [
+        "alongamento",
+        "mobilidade",
+        "flexibilidade"
+      ],
+      "muscle_groups": [
+        "Corpo Todo"
+      ],
+      "exercises": [
+        {
+          "id": "child-pose-arms-extended-left-right",
+          "name": "Child Pose Arms Extended Left Right",
+          "sets": 2,
+          "reps": 45,
+          "rest": 15
+        },
+        {
+          "id": "pigeon-pose",
+          "name": "Pigeon Pose",
+          "sets": 2,
+          "reps": 45,
+          "rest": 15
+        },
+        {
+          "id": "half-monkey-pose",
+          "name": "Half Monkey Pose",
+          "sets": 2,
+          "reps": 40,
+          "rest": 15
+        },
+        {
+          "id": "downward-dog-toe-to-heel",
+          "name": "Downward Dog Toe To Heel",
+          "sets": 2,
+          "reps": 40,
+          "rest": 15
+        },
+        {
+          "id": "cobra-pose",
+          "name": "Cobra Pose",
+          "sets": 2,
+          "reps": 35,
+          "rest": 15
+        },
+        {
+          "id": "happy-baby",
+          "name": "Happy Baby",
+          "sets": 2,
+          "reps": 40,
+          "rest": 15
+        }
+      ],
+      "duration_minutes": 20
+    },
+    {
+      "id": 18,
+      "name": "Recuperação Ativa",
+      "description": "Movimentos suaves para acelerar a recuperação após treinos intensos.",
+      "difficulty": "beginner",
+      "category": "Recuperação",
+      "tags": [
+        "recuperação",
+        "mobilidade",
+        "low-intensity"
+      ],
+      "muscle_groups": [
+        "Coluna",
+        "Quadril",
+        "Corpo Todo"
+      ],
+      "exercises": [
+        {
+          "id": "happy-baby",
+          "name": "Happy Baby",
+          "sets": 3,
+          "reps": 40,
+          "rest": 20
+        },
+        {
+          "id": "cobra-pose",
+          "name": "Cobra Pose",
+          "sets": 3,
+          "reps": 30,
+          "rest": 20
+        },
+        {
+          "id": "pigeon-pose",
+          "name": "Pigeon Pose",
+          "sets": 2,
+          "reps": 45,
+          "rest": 20
+        },
+        {
+          "id": "half-monkey-pose",
+          "name": "Half Monkey Pose",
+          "sets": 2,
+          "reps": 40,
+          "rest": 20
+        },
+        {
+          "id": "supermans",
+          "name": "Supermans",
+          "sets": 3,
+          "reps": 12,
+          "rest": 30
+        },
+        {
+          "id": "lumbar-rotation-3-supine-passive-ankle-over-opposite-knee",
+          "name": "Lumbar Rotation 3",
+          "sets": 3,
+          "reps": 30,
+          "rest": 20
+        }
+      ],
+      "duration_minutes": 20
+    }
+  ],
+  "routines": [
+    {
+      "id": 101,
+      "name": "PPL – Push, Pull, Legs (3x/semana)",
+      "description": "A divisão mais popular para hipertrofia: um dia empurra, um dia puxa, um dia perna. Repete 2x por semana para 6 dias ou 1x para 3 dias.",
+      "difficulty": "intermediate",
+      "days_per_week": 3,
+      "tags": [
+        "academia",
+        "ppl",
+        "hipertrofia"
+      ],
+      "workouts": [
+        {
+          "id": 1,
+          "name": "Push Day – Academia",
+          "description": "Peito, ombros e tríceps com foco em força e hipertrofia. Ideal para segunda ou quinta-feira num split PPL.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "push",
+            "força",
+            "hipertrofia"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Ombros",
+            "Tríceps"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 4,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "dumbbell-neutral-incline-bench-press",
+              "name": "Dumbbell Neutral Incline Bench Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-overhead-tricep-press",
+              "name": "Cable Overhead Tricep Press",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "machine-plate-loaded-decline-chest-press",
+              "name": "Machine Plate Loaded Decline Chest Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            }
+          ],
+          "duration_minutes": 55
+        },
+        {
+          "id": 2,
+          "name": "Pull Day – Academia",
+          "description": "Costas e bíceps com ênfase em espessura e largura dos dorsais.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "pull",
+            "força",
+            "hipertrofia"
+          ],
+          "muscle_groups": [
+            "Costas",
+            "Bíceps",
+            "Trapézio"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pronated-pendlay-row",
+              "name": "Barbell Pronated Pendlay Row",
+              "sets": 4,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "dumbbell-laying-incline-row",
+              "name": "Dumbbell Laying Incline Row",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "machine-plate-loaded-row",
+              "name": "Machine Plate Loaded Row",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-bar-reverse-grip-curl",
+              "name": "Cable Bar Reverse Grip Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-seated-bayesian-reverse-curl",
+              "name": "Cable Seated Bayesian Reverse Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "machine-chest-supported-t-bar-row",
+              "name": "Machine Chest Supported T Bar Row",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            }
+          ],
+          "duration_minutes": 55
+        },
+        {
+          "id": 3,
+          "name": "Legs Day – Academia",
+          "description": "Quadríceps, posteriores e glúteos. Inclui agachamento, terra e leg press.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "legs",
+            "força",
+            "hipertrofia"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Posteriores",
+            "Glúteos",
+            "Panturrilha"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 4,
+              "reps": 6,
+              "rest": 120
+            },
+            {
+              "id": "barbell-block-conventional-deadlift",
+              "name": "Barbell Block Conventional Deadlift",
+              "sets": 3,
+              "reps": 6,
+              "rest": 120
+            },
+            {
+              "id": "machine-hack-squat",
+              "name": "Machine Hack Squat",
+              "sets": 3,
+              "reps": 10,
+              "rest": 90
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "machine-hip-thrust",
+              "name": "Machine Hip Thrust",
+              "sets": 3,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "machine-seated-calf-raises",
+              "name": "Machine Seated Calf Raises",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 60
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Upper / Lower (4x/semana)",
+      "description": "Divisão upper/lower 4 dias por semana. Segunda e quinta upper, terça e sexta lower. Bom volume e frequência por grupo muscular.",
+      "difficulty": "intermediate",
+      "days_per_week": 4,
+      "tags": [
+        "academia",
+        "upper-lower",
+        "força"
+      ],
+      "workouts": [
+        {
+          "id": 4,
+          "name": "Upper Body – Academia",
+          "description": "Treino completo de membros superiores para dias de frequência 4x/semana.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "upper",
+            "força"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Ombros",
+            "Bíceps",
+            "Tríceps"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-laying-incline-row",
+              "name": "Dumbbell Laying Incline Row",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "cable-bar-reverse-grip-curl",
+              "name": "Cable Bar Reverse Grip Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-seated-single-arm-face-pull",
+              "name": "Cable Seated Single Arm Face Pull",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 50
+        },
+        {
+          "id": 5,
+          "name": "Lower Body – Academia",
+          "description": "Treino de membros inferiores focado em pernas e glúteos.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "lower",
+            "força"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Posteriores",
+            "Glúteos",
+            "Panturrilha"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 4,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "machine-horizontal-leg-press",
+              "name": "Machine Horizontal Leg Press",
+              "sets": 3,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "barbell-block-conventional-deadlift",
+              "name": "Barbell Block Conventional Deadlift",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "machine-hip-thrust",
+              "name": "Machine Hip Thrust",
+              "sets": 3,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "machine-seated-calf-raises",
+              "name": "Machine Seated Calf Raises",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 55
+        },
+        {
+          "id": 4,
+          "name": "Upper Body – Academia",
+          "description": "Treino completo de membros superiores para dias de frequência 4x/semana.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "upper",
+            "força"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Ombros",
+            "Bíceps",
+            "Tríceps"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-laying-incline-row",
+              "name": "Dumbbell Laying Incline Row",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "cable-bar-reverse-grip-curl",
+              "name": "Cable Bar Reverse Grip Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-seated-single-arm-face-pull",
+              "name": "Cable Seated Single Arm Face Pull",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 50
+        },
+        {
+          "id": 5,
+          "name": "Lower Body – Academia",
+          "description": "Treino de membros inferiores focado em pernas e glúteos.",
+          "difficulty": "intermediate",
+          "category": "Academia",
+          "tags": [
+            "lower",
+            "força"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Posteriores",
+            "Glúteos",
+            "Panturrilha"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 4,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "machine-horizontal-leg-press",
+              "name": "Machine Horizontal Leg Press",
+              "sets": 3,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "barbell-block-conventional-deadlift",
+              "name": "Barbell Block Conventional Deadlift",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "machine-hip-thrust",
+              "name": "Machine Hip Thrust",
+              "sets": 3,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "machine-seated-calf-raises",
+              "name": "Machine Seated Calf Raises",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 55
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "name": "Full Body Academia (3x/semana)",
+      "description": "Treino de corpo todo 3 vezes por semana com descanso entre sessões. Ideal para iniciantes e intermediários com menos dias disponíveis.",
+      "difficulty": "beginner",
+      "days_per_week": 3,
+      "tags": [
+        "academia",
+        "full body",
+        "iniciante"
+      ],
+      "workouts": [
+        {
+          "id": 6,
+          "name": "Full Body – Academia (Iniciante)",
+          "description": "Treino de corpo todo com equipamentos de academia. Ótimo ponto de partida.",
+          "difficulty": "beginner",
+          "category": "Academia",
+          "tags": [
+            "full body",
+            "iniciante"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Pernas",
+            "Ombros"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-pronated-pendlay-row",
+              "name": "Barbell Pronated Pendlay Row",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            }
+          ],
+          "duration_minutes": 50
+        },
+        {
+          "id": 6,
+          "name": "Full Body – Academia (Iniciante)",
+          "description": "Treino de corpo todo com equipamentos de academia. Ótimo ponto de partida.",
+          "difficulty": "beginner",
+          "category": "Academia",
+          "tags": [
+            "full body",
+            "iniciante"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Pernas",
+            "Ombros"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-pronated-pendlay-row",
+              "name": "Barbell Pronated Pendlay Row",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            }
+          ],
+          "duration_minutes": 50
+        },
+        {
+          "id": 6,
+          "name": "Full Body – Academia (Iniciante)",
+          "description": "Treino de corpo todo com equipamentos de academia. Ótimo ponto de partida.",
+          "difficulty": "beginner",
+          "category": "Academia",
+          "tags": [
+            "full body",
+            "iniciante"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Pernas",
+            "Ombros"
+          ],
+          "exercises": [
+            {
+              "id": "barbell-pause-squat",
+              "name": "Barbell Pause Squat",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-reverse-grip-bench-press",
+              "name": "Barbell Reverse Grip Bench Press",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "barbell-pronated-pendlay-row",
+              "name": "Barbell Pronated Pendlay Row",
+              "sets": 3,
+              "reps": 8,
+              "rest": 90
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "seated-leg-curl",
+              "name": "Seated Leg Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "cable-rope-overhead-tricep-extension",
+              "name": "Cable Rope Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            }
+          ],
+          "duration_minutes": 50
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "name": "Home Warrior (3x/semana)",
+      "description": "Treino de casa completo sem equipamento. Seg: Full Body, Qua: Upper, Sex: Lower.",
+      "difficulty": "beginner",
+      "days_per_week": 3,
+      "tags": [
+        "casa",
+        "bodyweight",
+        "sem equipamento"
+      ],
+      "workouts": [
+        {
+          "id": 10,
+          "name": "Full Body – Casa (Peso Corporal)",
+          "description": "Treino de corpo todo sem equipamento. Pode ser feito em qualquer lugar.",
+          "difficulty": "beginner",
+          "category": "Casa",
+          "tags": [
+            "casa",
+            "bodyweight",
+            "iniciante"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Pernas",
+            "Core"
+          ],
+          "exercises": [
+            {
+              "id": "split-squat",
+              "name": "Split Squat",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "burpee",
+              "name": "Burpee",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+              "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "ring-standing-chest-fly",
+              "name": "Ring Standing Chest Fly",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "bodyweight-close-grip-inverted-curl",
+              "name": "Bodyweight Close Grip Inverted Curl",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "long-lever-plank",
+              "name": "Long Lever Plank",
+              "sets": 3,
+              "reps": 30,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 35
+        },
+        {
+          "id": 11,
+          "name": "Upper Body – Casa",
+          "description": "Membros superiores sem equipamento usando peso corporal.",
+          "difficulty": "intermediate",
+          "category": "Casa",
+          "tags": [
+            "casa",
+            "bodyweight"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Bíceps",
+            "Tríceps",
+            "Core"
+          ],
+          "exercises": [
+            {
+              "id": "ring-standing-chest-fly",
+              "name": "Ring Standing Chest Fly",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "bodyweight-close-grip-inverted-curl",
+              "name": "Bodyweight Close Grip Inverted Curl",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "bench-dips",
+              "name": "Bench Dips",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "l-sit-chin-up",
+              "name": "L Sit Chin Up",
+              "sets": 3,
+              "reps": 8,
+              "rest": 75
+            },
+            {
+              "id": "bodyweight-knee-tricep-extension",
+              "name": "Bodyweight Knee Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "hand-side-plank",
+              "name": "Hand Side Plank",
+              "sets": 3,
+              "reps": 30,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 30
+        },
+        {
+          "id": 12,
+          "name": "Lower Body – Casa",
+          "description": "Pernas e glúteos usando peso corporal. Sem equipamento necessário.",
+          "difficulty": "beginner",
+          "category": "Casa",
+          "tags": [
+            "casa",
+            "bodyweight"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Glúteos",
+            "Posteriores",
+            "Panturrilha"
+          ],
+          "exercises": [
+            {
+              "id": "split-squat",
+              "name": "Split Squat",
+              "sets": 3,
+              "reps": 15,
+              "rest": 60
+            },
+            {
+              "id": "curtsy-lunge",
+              "name": "Curtsy Lunge",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+              "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+              "sets": 4,
+              "reps": 15,
+              "rest": 45
+            },
+            {
+              "id": "calf-raises",
+              "name": "Calf Raises",
+              "sets": 3,
+              "reps": 20,
+              "rest": 30
+            },
+            {
+              "id": "laying-alternating-leg-raise",
+              "name": "Laying Alternating Leg Raise",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            },
+            {
+              "id": "supermans",
+              "name": "Supermans",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 30
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "name": "Reabilitação Lombar (3x/semana)",
+      "description": "Programa de reabilitação para hérnia de disco ou lombalgia. Progressão gradual com foco em mobilidade, core e fortalecimento seguro.",
+      "difficulty": "beginner",
+      "days_per_week": 3,
+      "tags": [
+        "reabilitação",
+        "lombar",
+        "hérnia",
+        "pilates"
+      ],
+      "workouts": [
+        {
+          "id": 15,
+          "name": "Mobilidade Lombar – Hérnia de Disco",
+          "description": "Protocolo de mobilidade e alívio para hérnia de disco lombar. Movimentos suaves e seguros.",
+          "difficulty": "beginner",
+          "category": "Reabilitação",
+          "tags": [
+            "reabilitação",
+            "lombar",
+            "hérnia",
+            "mobilidade"
+          ],
+          "muscle_groups": [
+            "Lombar",
+            "Quadril",
+            "Core"
+          ],
+          "exercises": [
+            {
+              "id": "happy-baby",
+              "name": "Happy Baby",
+              "sets": 3,
+              "reps": 30,
+              "rest": 30
+            },
+            {
+              "id": "cobra-pose",
+              "name": "Cobra Pose",
+              "sets": 3,
+              "reps": 30,
+              "rest": 30
+            },
+            {
+              "id": "lumbar-rotation-3-supine-passive-ankle-over-opposite-knee",
+              "name": "Lumbar Rotation 3",
+              "sets": 3,
+              "reps": 30,
+              "rest": 30
+            },
+            {
+              "id": "lumbar-rotation-4-supine-active-crossed-legs",
+              "name": "Lumbar Rotation 4",
+              "sets": 3,
+              "reps": 30,
+              "rest": 30
+            },
+            {
+              "id": "child-pose-arms-extended-left-right",
+              "name": "Child Pose Arms Extended Left Right",
+              "sets": 3,
+              "reps": 40,
+              "rest": 30
+            },
+            {
+              "id": "pigeon-pose",
+              "name": "Pigeon Pose",
+              "sets": 2,
+              "reps": 45,
+              "rest": 30
+            }
+          ],
+          "duration_minutes": 25
+        },
+        {
+          "id": 16,
+          "name": "Pilates Core – Iniciante",
+          "description": "Exercícios de pilates para fortalecer o core e a coluna. Ideal para reabilitação.",
+          "difficulty": "beginner",
+          "category": "Pilates",
+          "tags": [
+            "pilates",
+            "core",
+            "reabilitação"
+          ],
+          "muscle_groups": [
+            "Core",
+            "Lombar",
+            "Abdômen"
+          ],
+          "exercises": [
+            {
+              "id": "long-lever-plank",
+              "name": "Long Lever Plank",
+              "sets": 4,
+              "reps": 40,
+              "rest": 45
+            },
+            {
+              "id": "hand-side-plank",
+              "name": "Hand Side Plank",
+              "sets": 3,
+              "reps": 30,
+              "rest": 45
+            },
+            {
+              "id": "cobra-pose",
+              "name": "Cobra Pose",
+              "sets": 3,
+              "reps": 30,
+              "rest": 30
+            },
+            {
+              "id": "happy-baby",
+              "name": "Happy Baby",
+              "sets": 3,
+              "reps": 40,
+              "rest": 30
+            },
+            {
+              "id": "supermans",
+              "name": "Supermans",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            },
+            {
+              "id": "reverse-crunch",
+              "name": "Reverse Crunch",
+              "sets": 3,
+              "reps": 12,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 30
+        },
+        {
+          "id": 17,
+          "name": "Alongamento Global",
+          "description": "Sequência completa de alongamento para melhorar mobilidade e reduzir tensão.",
+          "difficulty": "beginner",
+          "category": "Mobilidade",
+          "tags": [
+            "alongamento",
+            "mobilidade",
+            "flexibilidade"
+          ],
+          "muscle_groups": [
+            "Corpo Todo"
+          ],
+          "exercises": [
+            {
+              "id": "child-pose-arms-extended-left-right",
+              "name": "Child Pose Arms Extended Left Right",
+              "sets": 2,
+              "reps": 45,
+              "rest": 15
+            },
+            {
+              "id": "pigeon-pose",
+              "name": "Pigeon Pose",
+              "sets": 2,
+              "reps": 45,
+              "rest": 15
+            },
+            {
+              "id": "half-monkey-pose",
+              "name": "Half Monkey Pose",
+              "sets": 2,
+              "reps": 40,
+              "rest": 15
+            },
+            {
+              "id": "downward-dog-toe-to-heel",
+              "name": "Downward Dog Toe To Heel",
+              "sets": 2,
+              "reps": 40,
+              "rest": 15
+            },
+            {
+              "id": "cobra-pose",
+              "name": "Cobra Pose",
+              "sets": 2,
+              "reps": 35,
+              "rest": 15
+            },
+            {
+              "id": "happy-baby",
+              "name": "Happy Baby",
+              "sets": 2,
+              "reps": 40,
+              "rest": 15
+            }
+          ],
+          "duration_minutes": 20
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "name": "Halteres em Casa (3x/semana)",
+      "description": "Treino completo usando apenas halteres. Ótimo para quem treina em casa com equipamento mínimo.",
+      "difficulty": "intermediate",
+      "days_per_week": 3,
+      "tags": [
+        "halteres",
+        "casa"
+      ],
+      "workouts": [
+        {
+          "id": 7,
+          "name": "Full Body – Halteres",
+          "description": "Treino completo usando apenas halteres. Perfeito para academia ou treinar em casa.",
+          "difficulty": "intermediate",
+          "category": "Halteres",
+          "tags": [
+            "halteres",
+            "full body"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Peito",
+            "Costas",
+            "Ombros",
+            "Bíceps",
+            "Tríceps"
+          ],
+          "exercises": [
+            {
+              "id": "dumbbell-goblet-pulse-squat",
+              "name": "Dumbbell Goblet Pulse Squat",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "dumbbell-neutral-incline-bench-press",
+              "name": "Dumbbell Neutral Incline Bench Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-laying-incline-row",
+              "name": "Dumbbell Laying Incline Row",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "dumbbell-cross-body-romanian-deadlift",
+              "name": "Dumbbell Cross Body Romanian Deadlift",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-incline-twisting-curl",
+              "name": "Dumbbell Incline Twisting Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 45
+            },
+            {
+              "id": "dumbbell-single-arm-overhead-tricep-extension",
+              "name": "Dumbbell Single Arm Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 50
+        },
+        {
+          "id": 8,
+          "name": "Upper Body – Halteres",
+          "description": "Membros superiores completos com halteres.",
+          "difficulty": "intermediate",
+          "category": "Halteres",
+          "tags": [
+            "halteres",
+            "upper"
+          ],
+          "muscle_groups": [
+            "Peito",
+            "Costas",
+            "Ombros",
+            "Bíceps",
+            "Tríceps"
+          ],
+          "exercises": [
+            {
+              "id": "dumbbell-neutral-incline-bench-press",
+              "name": "Dumbbell Neutral Incline Bench Press",
+              "sets": 4,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-laying-incline-row",
+              "name": "Dumbbell Laying Incline Row",
+              "sets": 4,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-arnold-press",
+              "name": "Dumbbell Arnold Press",
+              "sets": 3,
+              "reps": 10,
+              "rest": 60
+            },
+            {
+              "id": "dumbbell-incline-twisting-curl",
+              "name": "Dumbbell Incline Twisting Curl",
+              "sets": 3,
+              "reps": 12,
+              "rest": 45
+            },
+            {
+              "id": "dumbbell-single-arm-overhead-tricep-extension",
+              "name": "Dumbbell Single Arm Overhead Tricep Extension",
+              "sets": 3,
+              "reps": 12,
+              "rest": 45
+            },
+            {
+              "id": "cable-seated-single-arm-face-pull",
+              "name": "Cable Seated Single Arm Face Pull",
+              "sets": 3,
+              "reps": 15,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 45
+        },
+        {
+          "id": 9,
+          "name": "Lower Body – Halteres",
+          "description": "Pernas e glúteos com halteres. Pode ser feito em casa.",
+          "difficulty": "intermediate",
+          "category": "Halteres",
+          "tags": [
+            "halteres",
+            "lower"
+          ],
+          "muscle_groups": [
+            "Quadríceps",
+            "Glúteos",
+            "Posteriores",
+            "Panturrilha"
+          ],
+          "exercises": [
+            {
+              "id": "dumbbell-goblet-pulse-squat",
+              "name": "Dumbbell Goblet Pulse Squat",
+              "sets": 4,
+              "reps": 12,
+              "rest": 75
+            },
+            {
+              "id": "dumbbell-swing-lunge",
+              "name": "Dumbbell Swing Lunge",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "dumbbell-cross-body-romanian-deadlift",
+              "name": "Dumbbell Cross Body Romanian Deadlift",
+              "sets": 3,
+              "reps": 10,
+              "rest": 75
+            },
+            {
+              "id": "hamstring-bridge-with-elevated-legs-box-unilateral",
+              "name": "Hamstring Bridge With Elevated Legs Box Unilateral",
+              "sets": 3,
+              "reps": 12,
+              "rest": 60
+            },
+            {
+              "id": "calf-raises",
+              "name": "Calf Raises",
+              "sets": 3,
+              "reps": 20,
+              "rest": 45
+            }
+          ],
+          "duration_minutes": 40
+        }
+      ]
+    }
+  ]
+}
