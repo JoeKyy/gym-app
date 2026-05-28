@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getExercises } from "@/lib/data";
 import { usePlans, DAY_LABELS } from "@/hooks/usePlans";
 import { useWorkouts } from "@/hooks/useWorkouts";
-import { getInjuriesV2 } from "@/lib/storage";
+import { getInjuriesV2, getSessions } from "@/lib/storage";
 import { INJURY_CONDITIONS_MAP } from "@/lib/rehab";
 import {
   Dumbbell, Flame, HeartPulse, Moon, Sparkles, ChevronRight,
@@ -186,7 +186,6 @@ function QuickCard({ href, Icon, label, desc }: {
 function StreakBanner() {
   const [streak, setStreak] = useState(0);
   useEffect(() => {
-    const { getSessions } = require("@/lib/storage") as typeof import("@/lib/storage");
     const sessions = getSessions();
     const dates = new Set(sessions.map((s: { date: string }) => s.date));
     let s = 0;
