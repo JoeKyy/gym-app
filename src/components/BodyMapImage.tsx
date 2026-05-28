@@ -1,12 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface BodyMapImageProps {
   slug: string;
-  /** Which view to show initially. "auto" picks back if the exercise primarily targets back muscles */
   defaultView?: "front" | "back" | "auto";
-  /** Muscle names to determine auto-view */
   targetMuscles?: string[];
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -41,10 +39,19 @@ export default function BodyMapImage({
   className = "",
   showToggle = true,
 }: BodyMapImageProps) {
-  const initial =
-    defaultView === "auto" ? detectView(targetMuscles) : defaultView;
+  const initial = defaultView === "auto" ? detectView(targetMuscles) : defaultView;
   const [view, setView] = useState<"front" | "back">(initial);
   const [error, setError] = useState(false);
+  // Watch theme so images re-render with correct filter on theme toggle
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const read = () => setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
+    read();
+    const obs = new MutationObserver(read);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
+  }, []);
 
   const { width, height } = SIZES[size];
   const src = `/data/media/bodymaps/${slug}-${view}.png`;
@@ -52,20 +59,25 @@ export default function BodyMapImage({
   if (error) return null;
 
   return (
-    <div className={`flex flex-col items-center gap-6 ${className}`}>
+    <div className={`flex flex-col items-center gap-3 ${className}`}>
+      {/* Contrasting background panel — same approach as BodyDiagram */}
       <div
-        style={{ width, height }}
-        className="relative overflow-hidden"
+        className="rounded-2xl p-3 flex items-center justify-center"
+        style={{ background: "var(--color-surface-2)" }}
       >
-        <Image
-          key={src}
-          src={src}
-          alt={`Bodymap ${view} view`}
-          fill
-          className="object-contain"
-          onError={() => setError(true)}
-          unoptimized
-        />
+        <div style={{ width, height, position: "relative" }}>
+          <Image
+            key={src}
+            src={src}
+            alt={`Bodymap ${view} view`}
+            fill
+            className="object-contain"
+            // In dark mode: invert white→black background, keep colored highlights via hue-rotate
+            style={theme === "dark" ? { filter: "invert(1) hue-rotate(180deg)" } : undefined}
+            onError={() => setError(true)}
+            unoptimized
+          />
+        </div>
       </div>
 
       {showToggle && (

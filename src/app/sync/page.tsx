@@ -29,6 +29,7 @@ export default function SyncPage() {
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [connected, setConnected] = useState(false);
+  const [hasCredentials, setHasCredentials] = useState(false);
   const [showStravaForm, setShowStravaForm] = useState(false);
   const [stravaMsg, setStravaMsg] = useState("");
   const [stravaLoading, setStravaLoading] = useState(false);
@@ -45,6 +46,7 @@ export default function SyncPage() {
     if (settings) {
       setClientId(settings.clientId);
       setClientSecret(settings.clientSecret);
+      setHasCredentials(true);
     }
     setConnected(isStravaConnected());
     return () => clearTimeout(stravaMsgTimer.current);
@@ -58,6 +60,7 @@ export default function SyncPage() {
       return;
     }
     saveStravaSettings({ clientId: clientId.trim(), clientSecret: clientSecret.trim() });
+    setHasCredentials(true);
     redirectToStravaAuth(clientId.trim());
   }
 
@@ -173,7 +176,9 @@ export default function SyncPage() {
                 : "text-[var(--color-text-muted)]"
             }`}
           >
-            {t === "strava" ? <><Bike size={14} /> Strava</> : <><Apple size={14} /> Apple Health</>}
+            {t === "strava"
+              ? <span className="flex items-center justify-center gap-1.5"><Bike size={14} /> Strava</span>
+              : <span className="flex items-center justify-center gap-1.5"><Apple size={14} /> Apple / Android</span>}
           </button>
         ))}
       </div>
@@ -272,15 +277,26 @@ export default function SyncPage() {
               <div>
                 <p className="font-semibold text-lg">Conectar com Strava</p>
                 <p className="text-sm text-[var(--color-text-muted)] mt-1">
-                  Sincronize frequência cardíaca e calorias com suas sessões
+                  {hasCredentials
+                    ? "Credenciais salvas. Clique para autorizar o acesso."
+                    : "Sincronize frequência cardíaca e calorias com suas sessões"}
                 </p>
               </div>
               <button
                 className="btn btn-primary w-full"
-                onClick={() => setShowStravaForm(true)}
+                onClick={() => hasCredentials ? redirectToStravaAuth(clientId) : setShowStravaForm(true)}
               >
-                Conectar com Strava
+                {hasCredentials ? "Conectar com Strava" : "Configurar e conectar"}
               </button>
+              {hasCredentials && (
+                <button
+                  className="text-xs underline"
+                  style={{ color: "var(--color-text-muted)" }}
+                  onClick={() => setShowStravaForm(true)}
+                >
+                  Alterar credenciais
+                </button>
+              )}
             </div>
           )}
 
@@ -296,53 +312,72 @@ export default function SyncPage() {
         </div>
       )}
 
-      {/* ── Apple Health Tab ──────────────────────────────────────────────── */}
+      {/* ── Apple / Android Wearables Tab ─────────────────────────────────── */}
       {tab === "apple" && (
         <div className="space-y-4">
-          {/* Export */}
+
+          {/* TCX Export (works for Apple + Android + Garmin) */}
           <div className="card p-4 space-y-3">
-            <p className="font-semibold">📤 Exportar para Apple Health</p>
+            <p className="font-semibold">Exportar sessão (.tcx)</p>
             <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
-              Exporte sessões individuais como arquivo .tcx e importe no iPhone via app
-              Arquivos → compartilhar com Health.
+              O arquivo .tcx é reconhecido pelo Apple Health, Garmin Connect, Polar Flow e outros.
             </p>
             <SessionTCXList />
           </div>
 
-          {/* Import */}
+          {/* Apple Watch / iPhone */}
           <div className="card p-4 space-y-3">
-            <p className="font-semibold">Importar do Apple Health</p>
-            <ol className="text-xs text-[var(--color-text-muted)] leading-relaxed space-y-1">
-              <li>1. No iPhone: app Saúde → foto de perfil → Exportar dados de saúde</li>
-              <li>2. Extraia o ZIP e encontre o arquivo <code className="bg-[var(--color-surface-2)] px-1 rounded">export.xml</code></li>
-              <li>3. Selecione o arquivo abaixo</li>
+            <div className="flex items-center gap-2 mb-1">
+              <Apple size={16} />
+              <p className="font-semibold text-sm">Apple Watch / iPhone</p>
+            </div>
+            <ol className="text-xs text-[var(--color-text-muted)] leading-relaxed space-y-1.5">
+              <li>1. Exporte o .tcx acima e abra no iPhone</li>
+              <li>2. Compartilhe com o app <strong>Saúde</strong> (Health) — aparece automaticamente nos treinos</li>
+              <li className="mt-2 pt-2" style={{ borderTop: "1px solid var(--color-border)" }}>
+                <strong>Importar do Apple Health:</strong> app Saúde → foto de perfil → Exportar dados de saúde → extraia o ZIP e selecione abaixo
+              </li>
             </ol>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xml"
-              className="hidden"
-              onChange={handleAppleImport}
-            />
+            <input ref={fileInputRef} type="file" accept=".xml" className="hidden" onChange={handleAppleImport} />
             <button
-              className="btn btn-primary w-full"
+              className="btn btn-secondary w-full text-sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={appleLoading}
             >
-              {appleLoading ? "Processando..." : "📂 Selecionar export.xml"}
+              {appleLoading ? "Processando..." : "Selecionar export.xml"}
             </button>
-            {appleMsg && (
-              <p className="text-sm text-[var(--color-text-muted)]">{appleMsg}</p>
-            )}
+            {appleMsg && <p className="text-sm text-[var(--color-text-muted)]">{appleMsg}</p>}
           </div>
 
-          {/* What gets imported */}
+          {/* Android / Garmin */}
+          <div className="card p-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <ArrowDownToLine size={16} />
+              <p className="font-semibold text-sm">Android / Garmin / Polar</p>
+            </div>
+            <div className="text-xs text-[var(--color-text-muted)] leading-relaxed space-y-3">
+              <div>
+                <p className="font-medium text-[var(--color-text)] mb-1">Garmin Connect</p>
+                <p>Importe o .tcx em <strong>garminconnect.com</strong> → Atividades → Importar dados → selecione o arquivo</p>
+              </div>
+              <div>
+                <p className="font-medium text-[var(--color-text)] mb-1">Wear OS / Health Connect (Android 9+)</p>
+                <p>Use o app <strong>FitToFit</strong> ou <strong>Health Sync</strong> para importar .tcx para o Health Connect do Android — disponível na Play Store</p>
+              </div>
+              <div>
+                <p className="font-medium text-[var(--color-text)] mb-1">Samsung Health</p>
+                <p>Importe via Strava (conecte Samsung Health ↔ Strava nas configurações do Samsung Health)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* What gets synced */}
           <div className="card p-4 space-y-2">
-            <p className="text-sm font-semibold">O que é importado?</p>
-            <ul className="text-xs text-[var(--color-text-muted)] space-y-1">
-              <li className="flex items-center gap-1.5"><Heart size={11} />Frequência cardíaca (de leituras Apple Watch)</li>
-              <li className="flex items-center gap-1.5"><Flame size={11} />Calorias ativas (Active Energy Burned)</li>
-              <li className="flex items-center gap-1.5"><ArrowDownToLine size={11} />Match por data com HKWorkout de força</li>
+            <p className="text-sm font-semibold">O que é sincronizado via .tcx?</p>
+            <ul className="text-xs text-[var(--color-text-muted)] space-y-1.5">
+              <li className="flex items-center gap-2"><Heart size={12} />Frequência cardíaca (se disponível)</li>
+              <li className="flex items-center gap-2"><Flame size={12} />Calorias estimadas</li>
+              <li className="flex items-center gap-2"><Calendar size={12} />Data, duração e tipo de treino</li>
             </ul>
           </div>
         </div>
