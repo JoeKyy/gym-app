@@ -434,14 +434,14 @@ function ExerciseDetailSheet({ ex, onClose, injuredMuscleNames, sessionState, on
                 </button>
                 <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">{idx + 1}</span>
                 <input type="number" inputMode="decimal" placeholder="—"
-                  value={set.weight} disabled={set.done}
+                  value={set.weight}
                   onChange={(e) => updateSet(set.id, "weight", e.target.value)}
-                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                  className={`input flex-1 text-center py-2 ${set.done ? "opacity-50" : ""}`}
                 />
                 <input type="number" inputMode="numeric" placeholder={SHEET_DEFAULT_REPS}
-                  value={set.reps} disabled={set.done}
+                  value={set.reps}
                   onChange={(e) => updateSet(set.id, "reps", e.target.value)}
-                  className="input flex-1 text-center py-2 disabled:opacity-40 disabled:cursor-default"
+                  className={`input flex-1 text-center py-2 ${set.done ? "opacity-50" : ""}`}
                 />
                 <button onClick={() => { const updated = sets.filter((s) => s.id !== set.id); setSets(updated); syncSession(updated); }}
                   className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-lg">
