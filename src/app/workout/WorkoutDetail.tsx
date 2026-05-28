@@ -933,7 +933,7 @@ export default function WorkoutEditorPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const id = searchParams.get("id") ?? "";
-  const { workouts, updateWorkout } = useWorkouts();
+  const { workouts, hydrated, updateWorkout } = useWorkouts();
   const { injuredMuscleNames, isRisky } = useInjuries();
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
   const [search, setSearch] = useState("");
@@ -1149,6 +1149,16 @@ export default function WorkoutEditorPage() {
 
   // ── Guards ──────────────────────────────────────────────────────────────────
 
+  if (!hydrated) {
+    return (
+      <div className="text-center py-20" style={{ color: "var(--color-text-muted)" }}>
+        <div className="flex justify-center mb-3">
+          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--color-primary)", borderTopColor: "transparent" }} />
+        </div>
+        <p>Carregando...</p>
+      </div>
+    );
+  }
   if (!workout) {
     return <div className="text-center py-20" style={{ color: "var(--color-text-muted)" }}>Treino não encontrado</div>;
   }

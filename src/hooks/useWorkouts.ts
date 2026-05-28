@@ -5,9 +5,11 @@ import type { Workout, WorkoutExercise, WorkoutEnvironment } from "@/lib/types";
 
 export function useWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setWorkouts(getWorkouts());
+    setHydrated(true);
   }, []);
 
   const createWorkout = useCallback(
@@ -39,5 +41,5 @@ export function useWorkouts() {
     setWorkouts(getWorkouts());
   }, []);
 
-  return { workouts, createWorkout, updateWorkout, removeWorkout };
+  return { workouts, hydrated, createWorkout, updateWorkout, removeWorkout };
 }
