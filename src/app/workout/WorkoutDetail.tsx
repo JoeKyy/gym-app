@@ -949,6 +949,7 @@ export default function WorkoutEditorPage() {
   const [sessionLogs, setSessionLogs] = useState<SessionLogs>({});
   const [elapsed, setElapsed] = useState(0);
   const [showFinish, setShowFinish] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Rest timer
@@ -1134,7 +1135,11 @@ export default function WorkoutEditorPage() {
       notes: notes || undefined,
     };
 
-    saveSession(session);
+    const ok = saveSession(session);
+    if (!ok) {
+      setSaveError("Não foi possível salvar o treino. Armazenamento cheio — libere espaço e tente novamente.");
+      return;
+    }
     router.push("/progress");
   }, [workout, sessionStartedAt, sessionLogs, elapsed, router]);
 
@@ -1161,6 +1166,13 @@ export default function WorkoutEditorPage() {
 
   return (
     <>
+      {saveError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-lg text-sm font-semibold"
+          style={{ background: "var(--color-danger, #ef4444)", color: "white" }}>
+          ⚠️ {saveError}
+          <button onClick={() => setSaveError(null)} className="ml-3 underline text-xs">fechar</button>
+        </div>
+      )}
       {detailEx && (
         <ExerciseDetailSheet
           ex={detailEx} onClose={() => setDetailEx(null)} injuredMuscleNames={injuredMuscleNames}

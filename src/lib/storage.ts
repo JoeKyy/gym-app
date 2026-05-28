@@ -22,9 +22,15 @@ function load<T>(key: string, fallback: T): T {
   }
 }
 
-function save<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(key, JSON.stringify(value));
+function save<T>(key: string, value: T): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.error("[storage] save failed:", e);
+    return false;
+  }
 }
 
 // ─── Injuries (v1 — legacy, keeps backward compat) ───────────────────────────
@@ -111,9 +117,9 @@ export function getSessions(): WorkoutSession[] {
   return load<WorkoutSession[]>(KEYS.sessions, []);
 }
 
-export function saveSession(session: WorkoutSession): void {
+export function saveSession(session: WorkoutSession): boolean {
   const sessions = getSessions().filter((s) => s.id !== session.id);
-  save(KEYS.sessions, [...sessions, session]);
+  return save(KEYS.sessions, [...sessions, session]);
 }
 
 export function deleteSession(id: string): void {
