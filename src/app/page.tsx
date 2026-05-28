@@ -7,11 +7,29 @@ import { useWorkouts } from "@/hooks/useWorkouts";
 import { getInjuriesV2, getSessions } from "@/lib/storage";
 import { INJURY_CONDITIONS_MAP } from "@/lib/rehab";
 import { calculateFreshness, recommendFocusFromFreshness, GROUP_LABELS } from "@/lib/recovery";
+import BodyDiagram from "@/components/BodyDiagram";
 import type { DayOfWeek, Injury, MuscleRecoveryStatus } from "@/lib/types";
 
 const DAYS: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const ENV_ICON: Record<string, string> = { home: "🏠", gym: "🏋", pilates: "🧘", any: "⚡" };
 const GREETINGS = ["Bom dia", "Bom dia", "Boa tarde", "Boa tarde", "Boa tarde", "Boa noite", "Boa noite"];
+
+// Maps recovery group names → muscle names used in BodyDiagram
+const FRESHNESS_GROUP_MUSCLES: Record<string, string[]> = {
+  biceps:     ["biceps"],
+  triceps:    ["triceps"],
+  calves:     ["calves"],
+  forearms:   ["forearms"],
+  chest:      ["chest", "pecs"],
+  shoulders:  ["shoulders"],
+  core:       ["abdominals", "obliques"],
+  quadriceps: ["quadriceps"],
+  hamstrings: ["hamstrings"],
+  glutes:     ["glutes"],
+  lats:       ["lats"],
+  upper_back: ["upper back", "traps"],
+  lower_back: ["lower back", "erector spinae"],
+};
 
 function getGreeting() {
   return GREETINGS[Math.floor(new Date().getHours() / 4)] ?? "Olá";
@@ -81,6 +99,17 @@ export default function HomePage() {
   const fatigued = freshness.filter((s) => s.status === "resting");
   const partial = freshness.filter((s) => s.status === "partial");
   const ready = freshness.filter((s) => s.status === "ready");
+
+  // Build muscle status map for body diagram
+  const freshnessBodyMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const s of freshness) {
+      const muscles = FRESHNESS_GROUP_MUSCLES[s.group] ?? [];
+      const status = s.status === "resting" ? "fatigued" : s.status === "partial" ? "recovering" : "fresh";
+      muscles.forEach((m) => map.set(m, status));
+    }
+    return map;
+  }, [freshness]);
 
   return (
     <div className="space-y-4">
@@ -202,6 +231,16 @@ export default function HomePage() {
           {focusRec && (
             <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>{focusRec.reason}</p>
           )}
+
+          {/* Visual body map showing recovery state */}
+          <div className="card p-4 mb-3">
+            <BodyDiagram
+              statusMap={freshnessBodyMap}
+              readOnly
+              sideWidth={115}
+              showLegend
+            />
+          </div>
 
           {/* Chip rows grouped by status */}
           <div className="space-y-2.5">

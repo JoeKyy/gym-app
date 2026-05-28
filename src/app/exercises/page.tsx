@@ -21,16 +21,21 @@ const DEFAULT_FILTERS: AppFilters = {
 
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<AppFilters>(DEFAULT_FILTERS);
   const [sortBy, setSortBy] = useState<"name" | "difficulty" | "muscle">("name");
   const [showInjuryPanel, setShowInjuryPanel] = useState(false);
   const [userEquipment, setUserEquipment] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { injuredMuscleNames, isRisky } = useInjuries();
 
   useEffect(() => {
-    getExercises().then(setExercises);
+    getExercises().then((exs) => {
+      setExercises(exs);
+      setLoading(false);
+    });
     setUserEquipment(getEquipmentProfile());
   }, []);
 
@@ -92,6 +97,29 @@ export default function ExercisesPage() {
             <option value="muscle">Músculo</option>
             <option value="difficulty">Dificuldade</option>
           </select>
+          {/* View mode toggle */}
+          <div className="flex rounded-lg border overflow-hidden" style={{ borderColor: "var(--color-border)" }}>
+            <button
+              onClick={() => setViewMode("grid")}
+              title="Grade"
+              className={`px-2.5 py-1.5 text-sm transition-colors ${
+                viewMode === "grid"
+                  ? "text-[var(--color-primary)]"
+                  : "text-[var(--color-text-muted)]"
+              }`}
+              style={viewMode === "grid" ? { background: "var(--color-primary-soft)" } : { background: "var(--color-surface-2)" }}
+            >⊞</button>
+            <button
+              onClick={() => setViewMode("list")}
+              title="Lista"
+              className={`px-2.5 py-1.5 text-sm transition-colors ${
+                viewMode === "list"
+                  ? "text-[var(--color-primary)]"
+                  : "text-[var(--color-text-muted)]"
+              }`}
+              style={viewMode === "list" ? { background: "var(--color-primary-soft)" } : { background: "var(--color-surface-2)" }}
+            >≡</button>
+          </div>
           <button
             onClick={() => setShowInjuryPanel((v) => !v)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
@@ -130,7 +158,34 @@ export default function ExercisesPage() {
         userEquipment={userEquipment}
       />
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        /* Skeleton grid while exercises.json loads */
+        <div className={viewMode === "grid"
+          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          : "flex flex-col gap-2"
+        }>
+          {Array.from({ length: viewMode === "grid" ? 9 : 8 }).map((_, i) =>
+            viewMode === "grid" ? (
+              <div key={i} className="card overflow-hidden">
+                <div className="skeleton w-full" style={{ aspectRatio: "4/3" }} />
+                <div className="p-3 space-y-2">
+                  <div className="skeleton h-4 rounded" style={{ width: `${55 + (i % 4) * 10}%` }} />
+                  <div className="skeleton h-3 rounded" style={{ width: `${35 + (i % 3) * 10}%` }} />
+                  <div className="skeleton h-3 rounded w-20" />
+                </div>
+              </div>
+            ) : (
+              <div key={i} className="card flex gap-3 p-2 items-center overflow-hidden">
+                <div className="skeleton shrink-0 rounded-lg" style={{ width: 64, height: 64 }} />
+                <div className="flex-1 space-y-2">
+                  <div className="skeleton h-4 rounded" style={{ width: `${50 + (i % 4) * 10}%` }} />
+                  <div className="skeleton h-3 rounded w-28" />
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-[var(--color-text-muted)]">
           <p className="text-4xl mb-3">🔍</p>
           <p className="font-semibold">Nenhum exercício encontrado</p>
@@ -138,9 +193,12 @@ export default function ExercisesPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className={viewMode === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+            : "flex flex-col gap-2"
+          }>
             {visible.map((ex) => (
-              <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} />
+              <ExerciseCard key={ex.id} exercise={ex} isRisky={isRisky(ex)} variant={viewMode} />
             ))}
           </div>
 

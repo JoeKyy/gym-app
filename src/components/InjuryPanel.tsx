@@ -1,5 +1,6 @@
 "use client";
 import { useInjuries } from "@/hooks/useInjuries";
+import BodyDiagram from "@/components/BodyDiagram";
 import type { InjurySeverity } from "@/lib/types";
 
 const MUSCLE_GROUPS: Record<string, string[]> = {
@@ -68,11 +69,35 @@ export default function InjuryPanel() {
     });
   };
 
+  const handleBodyToggle = (muscles: string[]) => {
+    const isAnyActive = muscles.some((m) => injuredMap.has(m));
+    if (isAnyActive) {
+      muscles.forEach((m) => { if (injuredMap.has(m)) removeInjury(m); });
+    } else {
+      muscles.forEach((m) => addInjury(m, "recovering"));
+    }
+  };
+
   return (
     <div className="card p-4 space-y-4">
       <h2 className="font-semibold text-base flex items-center gap-2">
         🩹 Músculos em recuperação
       </h2>
+
+      {/* Visual body diagram — click regions to mark injured */}
+      <div>
+        <p className="text-xs text-[var(--color-text-muted)] mb-3">
+          Clique nos músculos para marcar como em recuperação
+        </p>
+        <BodyDiagram
+          statusMap={injuredMap as Map<string, string>}
+          onToggleRegion={handleBodyToggle}
+          sideWidth={118}
+          showLegend
+        />
+      </div>
+
+      <hr style={{ borderColor: "var(--color-border-subtle)" }} />
 
       <div>
         <p className="text-xs text-[var(--color-text-muted)] mb-2">Condições pré-definidas</p>
