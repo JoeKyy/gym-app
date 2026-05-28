@@ -6,7 +6,7 @@ import { ThumbsUp, ThumbsDown, Ban, Trophy, Dumbbell, ChevronLeft } from "lucide
 import { getExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { useRouter } from "next/navigation";
-import { DIFFICULTY_PT, EQUIPMENT_PT } from "@/lib/translations";
+import { DIFFICULTY_PT, EQUIPMENT_PT, MECHANIC_PT, MUSCLE_PT } from "@/lib/translations";
 import BodyMapImage from "@/components/BodyMapImage";
 import { getExercisePreference, setExercisePreference } from "@/lib/storage";
 import type { Exercise } from "@/lib/types";
@@ -118,7 +118,6 @@ export default function ExerciseDetailPage() {
     frontMale: "♂ Frontal", sideMale: "♂ Lateral",
     frontFemale: "♀ Frontal", sideFemale: "♀ Lateral",
   };
-  const mechanicPt: Record<string, string> = { compound: "Composto", isolation: "Isolamento" };
   const diffPt = exercise.difficulty ? (DIFFICULTY_PT[exercise.difficulty] ?? exercise.difficulty) : null;
 
   const toggleSet = (id: number) => {
@@ -192,7 +191,7 @@ export default function ExerciseDetailPage() {
                 {diffPt}
               </span>
             )}
-            {exercise.mechanic && <span className="badge badge-gray">{mechanicPt[exercise.mechanic] ?? exercise.mechanic}</span>}
+            {exercise.mechanic && <span className="badge badge-gray">{MECHANIC_PT[exercise.mechanic] ?? exercise.mechanic}</span>}
             {exercise.equipments.length > 0 && exercise.equipments.map((eq) => (
               <span key={eq} className="badge badge-gray">{EQUIPMENT_PT[eq] ?? eq}</span>
             ))}
@@ -256,7 +255,7 @@ export default function ExerciseDetailPage() {
                     <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
                     <div className="flex flex-wrap gap-1.5">
                       {exercise.targetMuscles.map((m) => (
-                        <span key={m} className={`badge font-semibold ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"}`}>{m}</span>
+                        <span key={m} className={`badge font-semibold ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-green"}`}>{MUSCLE_PT[m] ?? m}</span>
                       ))}
                     </div>
                   </div>
@@ -266,7 +265,7 @@ export default function ExerciseDetailPage() {
                     <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Secundários</p>
                     <div className="flex flex-wrap gap-1.5">
                       {exercise.secondaryMuscles.map((m) => (
-                        <span key={m} className={`badge ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"}`}>{m}</span>
+                        <span key={m} className={`badge ${injuredMuscleNames.includes(m.toLowerCase()) ? "badge-red" : "badge-gray"}`}>{MUSCLE_PT[m] ?? m}</span>
                       ))}
                     </div>
                   </div>
@@ -321,7 +320,7 @@ export default function ExerciseDetailPage() {
               <span className="w-7 shrink-0" />
               <span className="text-xs text-[var(--color-text-muted)] w-8 text-center">#</span>
               <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Peso (kg)</span>
-              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Reps</span>
+              <span className="text-xs text-[var(--color-text-muted)] flex-1 text-center">Repetições</span>
               <span className="w-8 shrink-0" />
             </div>
 

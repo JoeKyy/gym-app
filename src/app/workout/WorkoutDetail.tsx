@@ -7,6 +7,7 @@ import { useWorkouts } from "@/hooks/useWorkouts";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getExercises, filterExercises } from "@/lib/data";
 import { saveSession, generateId, now as nowISO, getBestEstimated1RM, epley1RM } from "@/lib/storage";
+import { MUSCLE_PT } from "@/lib/translations";
 import ExerciseMedia, { getAvailableAngles, getVideoUrl } from "@/components/ExerciseMedia";
 import type { VideoAngle } from "@/components/ExerciseMedia";
 import BodyMapImage from "@/components/BodyMapImage";
@@ -235,7 +236,7 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
                   <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Primários</p>
                   <div className="flex flex-wrap gap-1.5">
                     {ex.targetMuscles.map((m) => (
-                      <span key={m} className="badge badge-green font-semibold">{m}</span>
+                      <span key={m} className="badge badge-green font-semibold">{MUSCLE_PT[m] ?? m}</span>
                     ))}
                   </div>
                 </div>
@@ -244,7 +245,7 @@ function ExerciseDetailSheet({ ex, onClose }: { ex: Exercise; onClose: () => voi
                     <p className="text-[10px] uppercase tracking-wide mb-1.5" style={{ color: "var(--color-text-muted)" }}>Secundários</p>
                     <div className="flex flex-wrap gap-1.5">
                       {ex.secondaryMuscles.map((m) => (
-                        <span key={m} className="badge badge-gray">{m}</span>
+                        <span key={m} className="badge badge-gray">{MUSCLE_PT[m] ?? m}</span>
                       ))}
                     </div>
                   </div>
@@ -558,7 +559,7 @@ function WorkoutExerciseRow({
         <button className="flex-1 min-w-0 text-left" onClick={() => setExpanded((v) => !v)}>
           <p className="font-semibold text-sm truncate capitalize" style={{ color: "var(--color-text)" }}>{ex.name}</p>
           <p className="text-xs truncate mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            {ex.targetMuscles.slice(0, 3).join(", ")}
+            {ex.targetMuscles.slice(0, 3).map(m => MUSCLE_PT[m] ?? m).join(", ")}
           </p>
         </button>
 
@@ -596,7 +597,7 @@ function WorkoutExerciseRow({
                 className="input w-12 px-1.5 py-1 text-center text-xs" />
             </label>
             <label className="flex items-center gap-1.5 text-xs">
-              <span style={{ color: "var(--color-text-secondary)" }}>Reps</span>
+              <span style={{ color: "var(--color-text-secondary)" }}>Repetições</span>
               <input type="text" value={config.reps}
                 onChange={(e) => onUpdate({ reps: e.target.value })}
                 className="input w-16 px-1.5 py-1 text-center text-xs" placeholder="12" />

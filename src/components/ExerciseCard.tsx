@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import type { Exercise } from "@/lib/types";
-import { EQUIPMENT_PT } from "@/lib/translations";
+import { EQUIPMENT_PT, MUSCLE_PT } from "@/lib/translations";
 import ExerciseMedia from "@/components/ExerciseMedia";
 
 interface Props {
@@ -49,7 +49,7 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, varian
           </Link>
 
           <p className="text-xs mt-0.5 line-clamp-1" style={{ color: "var(--color-text-muted)" }}>
-            {exercise.targetMuscles.slice(0, 3).join(", ")}
+            {exercise.targetMuscles.slice(0, 3).map(m => MUSCLE_PT[m] ?? m).join(", ")}
           </p>
 
           {exercise.equipments.length > 0 && (
@@ -114,7 +114,7 @@ export default function ExerciseCard({ exercise, isRisky, onAddToWorkout, varian
 
           {exercise.targetMuscles.length > 0 && (
             <p className="text-xs mt-1 line-clamp-2" style={{ color: "var(--color-text-muted)" }}>
-              {exercise.targetMuscles.slice(0, 4).join(", ")}
+              {exercise.targetMuscles.slice(0, 4).map(m => MUSCLE_PT[m] ?? m).join(", ")}
             </p>
           )}
         </div>

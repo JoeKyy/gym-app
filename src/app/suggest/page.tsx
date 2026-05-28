@@ -9,6 +9,7 @@ import { getRehabProtocolsForConditions, INJURY_CONDITIONS_MAP } from "@/lib/reh
 import { exerciseMatchesEquipment } from "@/lib/suggestions";
 import { calculateFreshness, recommendFocusFromFreshness, GROUP_LABELS } from "@/lib/recovery";
 import ExerciseMedia from "@/components/ExerciseMedia";
+import { MECHANIC_PT, MUSCLE_PT } from "@/lib/translations";
 import { Dumbbell, HeartPulse, Sparkles, Target, Zap, Flame, RefreshCw, X, Save } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import type {
@@ -80,7 +81,7 @@ function ReplaceModal({
               {targetEx.name}
             </p>
             <p className="text-xs truncate" style={{ color: "var(--color-text-muted)" }}>
-              {targetEx.targetMuscles.slice(0, 3).join(", ")}
+              {targetEx.targetMuscles.slice(0, 3).map(m => MUSCLE_PT[m] ?? m).join(", ")}
             </p>
           </div>
           <button onClick={onClose}
@@ -153,7 +154,7 @@ function ReplaceModal({
                       </p>
                       <p className="text-[10px] mt-1 truncate"
                          style={{ color: "var(--color-text-muted)" }}>
-                        {ex.targetMuscles[0]}
+                        {MUSCLE_PT[ex.targetMuscles[0]] ?? ex.targetMuscles[0]}
                       </p>
                       {isSameMuscle && (
                         <span className="inline-block mt-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
@@ -575,10 +576,10 @@ export default function SuggestPage() {
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {ex.targetMuscles.slice(0, 2).map((m) => (
-                          <span key={m} className="badge badge-gray text-[10px]">{m}</span>
+                          <span key={m} className="badge badge-gray text-[10px]">{MUSCLE_PT[m] ?? m}</span>
                         ))}
                         {ex.mechanic && (
-                          <span className="badge badge-green text-[10px]">{ex.mechanic}</span>
+                          <span className="badge badge-green text-[10px]">{MECHANIC_PT[ex.mechanic] ?? ex.mechanic}</span>
                         )}
                       </div>
                       <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>{se.reason}</p>

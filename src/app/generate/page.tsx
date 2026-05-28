@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getExercises } from "@/lib/data";
 import { getEquipmentProfile, getInjuriesV2, saveWorkout, getProfile } from "@/lib/storage";
+import { MECHANIC_PT, EQUIPMENT_PT, MUSCLE_PT } from "@/lib/translations";
 import BackButton from "@/components/BackButton";
 import {
   generateWorkout,
@@ -448,7 +449,7 @@ export default function GeneratePage() {
                     <p className="font-semibold text-sm capitalize leading-tight line-clamp-1">{ge.exercise.name}</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {ge.exercise.targetMuscles.slice(0, 2).map((m) => (
-                        <span key={m} className="badge badge-green text-[10px]">{m}</span>
+                        <span key={m} className="badge badge-green text-[10px]">{MUSCLE_PT[m] ?? m}</span>
                       ))}
                     </div>
                   </div>
@@ -463,7 +464,7 @@ export default function GeneratePage() {
                 {/* Swap button */}
                 <div className="border-t px-3 py-2 flex justify-between items-center" style={{ borderColor: "var(--color-border-subtle)" }}>
                   <span className="text-xs text-[var(--color-text-muted)]">
-                    {ge.exercise.mechanic === "compound" ? "Composto" : "Isolamento"} · {ge.exercise.equipments[0] ?? "Peso corporal"}
+                    {MECHANIC_PT[ge.exercise.mechanic ?? ""] ?? ge.exercise.mechanic ?? "—"} · {EQUIPMENT_PT[ge.exercise.equipments[0]] ?? ge.exercise.equipments[0] ?? "Peso corporal"}
                   </span>
                   <button onClick={() => swapExercise(idx)}
                     className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1">
