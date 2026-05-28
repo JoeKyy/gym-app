@@ -264,4 +264,5 @@ export interface AppFilters {
   environment: WorkoutEnvironment | "all";
   hideRisky: boolean;
   myEquipmentOnly?: boolean;
+  calisthenicsOnly?: boolean;
 }

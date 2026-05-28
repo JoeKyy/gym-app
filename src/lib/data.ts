@@ -27,9 +27,10 @@ export function filterExercises(
     environment?: string;
     injuredMuscles?: string[];
     hideRisky?: boolean;
+    calisthenicsOnly?: boolean;
   }
 ): Exercise[] {
-  const { search, bodyPart, equipment, environment, injuredMuscles = [], hideRisky } = opts;
+  const { search, bodyPart, equipment, environment, injuredMuscles = [], hideRisky, calisthenicsOnly } = opts;
 
   // Equipment sets per environment — handles both wger (lowercase) and MuscleWiki (capitalized) names
   const ENV_EQUIPMENT: Record<string, string[]> = {
@@ -44,6 +45,8 @@ export function filterExercises(
   return exercises.filter((ex) => {
     if (search && !ex.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (bodyPart && !ex.bodyParts.some((b) => b.toLowerCase() === bodyPart.toLowerCase())) return false;
+    // Calisthenics: bodyweight category only (excludes recovery/stretches/yoga)
+    if (calisthenicsOnly && (ex.category ?? "").toLowerCase() !== "bodyweight") return false;
     if (equipment) {
       const eqNorm = normalizeEq(equipment);
       if (!ex.equipments.some((e) => normalizeEq(e) === eqNorm || normalizeEq(e).includes(eqNorm) || eqNorm.includes(normalizeEq(e)))) return false;

@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getExercises, filterExercises } from "@/lib/data";
 import { useInjuries } from "@/hooks/useInjuries";
 import { getEquipmentProfile, getExerciseScoreMap } from "@/lib/storage";
-import { HeartPulse, Activity, Map as MapIcon, X } from "lucide-react";
+import { HeartPulse, Activity, Map as MapIcon, X, Zap } from "lucide-react";
 import ExerciseCard from "@/components/ExerciseCard";
 import ExerciseFilters from "@/components/ExerciseFilters";
 import InjuryPanel from "@/components/InjuryPanel";
@@ -20,6 +20,7 @@ const DEFAULT_FILTERS: AppFilters = {
   environment: "all",
   hideRisky: false,
   myEquipmentOnly: false,
+  calisthenicsOnly: false,
 };
 
 // Maps BodyDiagram muscle keys → exercise bodyParts/targetMuscles values
@@ -87,7 +88,12 @@ export default function ExercisesPage() {
     setScoreMap(getExerciseScoreMap());
   }, []);
 
-  // Reset pagination whenever filters/sort/muscles change
+  // Auto-switch sort to difficulty when calisthenics mode is activated (progression order)
+  useEffect(() => {
+    if (filters.calisthenicsOnly) setSortBy("difficulty");
+  }, [filters.calisthenicsOnly]);
+
+
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [filters, sortBy, selectedMuscles]);
@@ -128,7 +134,7 @@ export default function ExercisesPage() {
   const DIFF_ORDER: Record<string, number> = { beginner: 0, intermediate: 1, expert: 2, advanced: 2 };
 
   const filtered = useMemo(() => {
-    let base = filterExercises(exercises, { ...filters, injuredMuscles: injuredMuscleNames });
+    let base = filterExercises(exercises, { ...filters, calisthenicsOnly: filters.calisthenicsOnly, injuredMuscles: injuredMuscleNames });
     if (filters.myEquipmentOnly && userEquipment.length > 0) {
       base = base.filter((ex) => ex.equipments.some((eq) => userEquipment.includes(eq)));
     }
@@ -296,6 +302,21 @@ export default function ExercisesPage() {
         equipments={equipments}
         userEquipment={userEquipment}
       />
+
+      {filters.calisthenicsOnly && (
+        <div className="card p-4 flex items-start gap-3 border border-[var(--color-primary-border)]"
+          style={{ background: "var(--color-primary-soft)" }}>
+          <Zap size={16} style={{ color: "var(--color-primary)", marginTop: 2, flexShrink: 0 }} />
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
+              Modo Calistenia — {filtered.length} exercícios
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+              Ordenado por dificuldade · Use o mapa corporal para filtrar por músculo · Combine com busca por nome
+            </p>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         /* Skeleton grid while exercises.json loads */

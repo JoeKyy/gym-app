@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Home, Dumbbell, Activity, Settings, Search } from "lucide-react";
+import { Home, Dumbbell, Activity, Settings, Search, Zap } from "lucide-react";
 import type { AppFilters, WorkoutEnvironment } from "@/lib/types";
 import { BODYPART_PT, EQUIPMENT_PT } from "@/lib/translations";
 
@@ -60,6 +60,17 @@ export default function ExerciseFilters({ filters, onChange, bodyParts, equipmen
             <span className="flex items-center gap-1"><Settings size={12} />Meu Equipamento</span>
           </button>
         )}
+
+        <button
+          onClick={() => set({ calisthenicsOnly: !filters.calisthenicsOnly })}
+          className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+            filters.calisthenicsOnly
+              ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-primary-text)] font-bold"
+              : "bg-[var(--color-surface-2)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]"
+          }`}
+        >
+          <span className="flex items-center gap-1"><Zap size={12} />Calistenia</span>
+        </button>
 
         <select value={filters.bodyPart} onChange={(e) => set({ bodyPart: e.target.value })} className={selectCls}>
           <option value="">Parte do corpo</option>
