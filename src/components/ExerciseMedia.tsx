@@ -8,6 +8,8 @@
  * even with 100+ cards rendered.
  *
  * Falls back to static JPEG poster if video fails or is unavailable.
+ * For FED exercises with 2 images (0.jpg / 1.jpg) and no video, flips between
+ * frames at ~750ms when in viewport — simulating a GIF.
  */
 
 import { useRef, useEffect, useState } from "react";
@@ -17,6 +19,7 @@ import type { Exercise } from "@/lib/types";
 export type VideoAngle = "frontMale" | "sideMale" | "frontFemale" | "sideFemale";
 
 const ANGLE_PRIORITY: VideoAngle[] = ["frontMale", "frontFemale", "sideMale", "sideFemale"];
+const FLIP_INTERVAL_MS = 750;
 
 export function getVideoUrl(exercise: Exercise, angle?: VideoAngle): string | null {
   if (!exercise.videoUrls || typeof exercise.videoUrls !== "object") return null;
@@ -58,11 +61,15 @@ export default function ExerciseMedia({
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [videoError, setVideoError] = useState(false);
+  const [frameIdx, setFrameIdx] = useState(0);
 
   const videoUrl = !videoError ? getVideoUrl(exercise, angle) : null;
   const posterUrl = exercise.gifUrl ?? undefined;
 
-  // Autoplay when in viewport, pause when out; track visibility for UI
+  // Flip-book frames: only used when there's no video and ≥2 images
+  const frames = !videoUrl && (exercise.images?.length ?? 0) > 1 ? exercise.images! : null;
+
+  // Autoplay video when in viewport, pause when out
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     const video = videoRef.current;
@@ -84,6 +91,35 @@ export default function ExerciseMedia({
     observer.observe(container);
     return () => observer.disconnect();
   }, [videoUrl]);
+
+  // Flip-book animation for FED image pairs (no video)
+  useEffect(() => {
+    if (!frames) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          intervalId = setInterval(() => {
+            setFrameIdx((i) => (i + 1) % frames.length);
+          }, FLIP_INTERVAL_MS);
+        } else {
+          if (intervalId) { clearInterval(intervalId); intervalId = null; }
+          setFrameIdx(0);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [frames]);
 
   const Tag = onClick ? "button" : "div";
 
@@ -122,11 +158,17 @@ export default function ExerciseMedia({
             playsInline
             onError={() => setVideoError(true)}
             className="w-full h-full object-cover"
-            // preload="none" keeps initial page load fast; IO starts playback when visible
-            // No poster= attribute: poster fetches eagerly even with preload=none
             preload="none"
           />
         </>
+      ) : frames ? (
+        <img
+          key={frames[frameIdx]}
+          src={frames[frameIdx]}
+          alt={exercise.name}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
       ) : posterUrl ? (
         <img
           src={posterUrl}

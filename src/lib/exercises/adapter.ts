@@ -26,6 +26,7 @@ export function complementaryToExercise(ce: ComplementaryExercise): Exercise {
     equipments: ce.eq ? [ce.eq] : [],
     mediaType: ce.images.length > 0 ? "gif" : "none",
     gifUrl: ce.images[0] ?? undefined,
+    images: ce.images.length > 0 ? ce.images : undefined,
     instructions: ce.steps,
     spinalLoad:
       ce.safety.level === "safe"

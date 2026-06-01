@@ -29,6 +29,8 @@ export interface Exercise {
   mediaType: MediaType;
   videoUrls?: VideoUrls;
   gifUrl?: string;
+  /** For FED exercises: [0.jpg, 1.jpg] — used for flip-book animation */
+  images?: string[];
   instructions: string[];
   instructions_pt?: string[];
   musclewikiUrl?: string;

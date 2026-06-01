@@ -53,12 +53,15 @@ export async function getExercises(): Promise<Exercise[]> {
         const key = normalizeName(ce.n);
         const existing = byName.get(key);
         if (existing) {
-          // Enrich: gifUrl e spinalLoad se curado não tiver
+          // Enrich: gifUrl, images e spinalLoad se curado não tiver
           if (!existing.gifUrl && ce.images[0]) {
             existing.gifUrl = ce.images[0];
             if (!existing.mediaType || existing.mediaType === "none") {
               (existing as Exercise & { mediaType: string }).mediaType = "gif";
             }
+          }
+          if (!existing.images && ce.images.length > 0) {
+            existing.images = ce.images;
           }
           if (!existing.spinalLoad) {
             existing.spinalLoad =
