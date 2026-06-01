@@ -76,6 +76,10 @@ export interface ComplementaryExercise extends AppExercise {
   primaryMuscles: string[];
   secondaryMuscles: string[];
   safety: { level: SafetyLevel; reasons: string[] };
+  /** Portuguese name (added via batch translation) */
+  name_pt?: string;
+  /** Portuguese instructions (added via batch translation) */
+  instructions_pt?: string[];
 }
 
 /* ─────────────────────────────  3. FONTES  ───────────────────────────── */

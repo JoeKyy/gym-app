@@ -184,7 +184,7 @@ export default function ExerciseDetailPage() {
 
         {/* Title + badges */}
         <div>
-          <h1 className="text-2xl font-bold leading-tight capitalize">{exercise.name}</h1>
+          <h1 className="text-2xl font-bold leading-tight capitalize">{exercise.name_pt ?? exercise.name}</h1>
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
             {diffPt && (
               <span className={`badge ${exercise.difficulty === "beginner" ? "badge-green" : exercise.difficulty === "intermediate" ? "badge-amber" : "badge-red"}`}>

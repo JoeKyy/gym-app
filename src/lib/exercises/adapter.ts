@@ -27,6 +27,9 @@ export function complementaryToExercise(ce: ComplementaryExercise): Exercise {
     mediaType: ce.images.length > 0 ? "gif" : "none",
     gifUrl: ce.images[0] ?? undefined,
     images: ce.images.length > 0 ? ce.images : undefined,
+    // Placeholder: name_pt and instructions_pt will be populated from translation batch
+    name_pt: undefined,
+    instructions_pt: undefined,
     instructions: ce.steps,
     spinalLoad:
       ce.safety.level === "safe"

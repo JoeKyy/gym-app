@@ -31,6 +31,8 @@ export interface Exercise {
   gifUrl?: string;
   /** For FED exercises: [0.jpg, 1.jpg] — used for flip-book animation */
   images?: string[];
+  /** Portuguese name for FED exercises (e.g., "Abdominal 3/4" for "3/4 Sit-Up") */
+  name_pt?: string;
   instructions: string[];
   instructions_pt?: string[];
   musclewikiUrl?: string;
