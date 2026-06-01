@@ -1,14 +1,32 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { getInjuries, saveInjuries } from "@/lib/storage";
+import { getInjuries, getInjuriesV2, saveInjuries } from "@/lib/storage";
 import { isExerciseRisky } from "@/lib/data";
-import type { InjuredMuscle, InjurySeverity, Exercise } from "@/lib/types";
+import { INJURY_CONDITIONS_MAP } from "@/lib/rehab";
+import type { InjuredMuscle, InjurySeverity, Exercise, Injury } from "@/lib/types";
+
+const LOAD_RANK: Record<string, number> = { low: 0, medium: 1, high: 2 };
+
+function isSpinalLoadRisky(exercise: Exercise, activeInjuries: Injury[]): boolean {
+  if (!exercise.spinalLoad) return false;
+  const exRank = LOAD_RANK[exercise.spinalLoad] ?? 0;
+  return activeInjuries.some((inj) => {
+    if (inj.phase === "recovered") return false;
+    const condition = INJURY_CONDITIONS_MAP.get(inj.conditionId);
+    if (!condition?.spinalLoadLimit) return false;
+    const limit = condition.spinalLoadLimit[inj.phase];
+    if (!limit) return false;
+    return exRank > (LOAD_RANK[limit] ?? 2);
+  });
+}
 
 export function useInjuries() {
   const [injuries, setInjuries] = useState<InjuredMuscle[]>([]);
+  const [injuriesV2, setInjuriesV2] = useState<Injury[]>([]);
 
   useEffect(() => {
     setInjuries(getInjuries());
+    setInjuriesV2(getInjuriesV2());
   }, []);
 
   const addInjury = useCallback((muscle: string, severity: InjurySeverity = "recovering") => {
@@ -40,9 +58,11 @@ export function useInjuries() {
   const injuredMuscleNames = injuries.map((i) => i.muscle);
 
   const isRisky = useCallback(
-    (exercise: Exercise) => isExerciseRisky(exercise, injuredMuscleNames),
-    [injuredMuscleNames]
+    (exercise: Exercise) =>
+      isExerciseRisky(exercise, injuredMuscleNames) ||
+      isSpinalLoadRisky(exercise, injuriesV2),
+    [injuredMuscleNames, injuriesV2]
   );
 
-  return { injuries, injuredMuscleNames, addInjury, removeInjury, updateSeverity, isRisky };
+  return { injuries, injuriesV2, injuredMuscleNames, addInjury, removeInjury, updateSeverity, isRisky };
 }

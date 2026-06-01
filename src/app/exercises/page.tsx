@@ -295,21 +295,6 @@ export default function ExercisesPage() {
         </div>
       )}
 
-      {/* Card Biblioteca Complementar */}
-      <a
-        href="/exercises/complementary"
-        className="card flex items-center justify-between gap-4 px-4 py-3 hover:bg-[var(--color-surface-2)] transition-colors group"
-      >
-        <div>
-          <p className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-2">
-            📚 Biblioteca Complementar
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">NOVO</span>
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">+800 exercícios com triagem de segurança lombar</p>
-        </div>
-        <span className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-colors">›</span>
-      </a>
-
       <ExerciseFilters
         filters={filters}
         onChange={setFilters}

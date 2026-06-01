@@ -1,30 +1,88 @@
 import type { Exercise } from "./types";
 import { applyEquipmentCorrections } from "./exercise-corrections";
+import { adaptAll, type RawExercise } from "./exercises/free-exercise-db";
+import { complementaryToExercise } from "./exercises/adapter";
 
 let _exercises: Exercise[] | null = null;
+
+/** Normaliza nome para dedup: lowercase, só alfanumérico. */
+function normalizeName(n: string): string {
+  return n.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
 
 export async function getExercises(): Promise<Exercise[]> {
   if (_exercises) return _exercises;
 
+  // ── 1. Curados ──────────────────────────────────────────────────────────
+  let curated: Exercise[] = [];
   try {
     const res = await fetch("/data/exercises.json");
     if (!res.ok) throw new Error("Failed to load exercises");
     const raw = await res.json();
-    if (!Array.isArray(raw) || !raw.every((e: unknown) =>
-      typeof e === "object" && e !== null &&
-      typeof (e as Record<string, unknown>).id === "string" &&
-      Array.isArray((e as Record<string, unknown>).targetMuscles)
-    )) {
+    if (
+      !Array.isArray(raw) ||
+      !raw.every(
+        (e: unknown) =>
+          typeof e === "object" &&
+          e !== null &&
+          typeof (e as Record<string, unknown>).id === "string" &&
+          Array.isArray((e as Record<string, unknown>).targetMuscles)
+      )
+    ) {
       console.warn("[data] exercises.json has unexpected shape, using empty fallback");
-      return [];
+    } else {
+      curated = applyEquipmentCorrections(raw as Exercise[]);
     }
-    _exercises = applyEquipmentCorrections(raw as Exercise[]);
-    return _exercises;
   } catch {
     console.warn("exercises.json not found — returning empty list");
-    return [];
   }
+
+  // ── 2. Complementares — merge silencioso ─────────────────────────────
+  try {
+    const res = await fetch("/data/free-exercise-db.json");
+    if (res.ok) {
+      const raw = (await res.json()) as RawExercise[];
+      const complementary = adaptAll(raw);
+
+      // Índice rápido por nome normalizado para dedup
+      const byName = new Map<string, Exercise>();
+      for (const ex of curated) byName.set(normalizeName(ex.name), ex);
+
+      for (const ce of complementary) {
+        if (ce.safety.level === "avoid") continue; // nunca incluir
+        const key = normalizeName(ce.n);
+        const existing = byName.get(key);
+        if (existing) {
+          // Enrich: gifUrl e spinalLoad se curado não tiver
+          if (!existing.gifUrl && ce.images[0]) {
+            existing.gifUrl = ce.images[0];
+            if (!existing.mediaType || existing.mediaType === "none") {
+              (existing as Exercise & { mediaType: string }).mediaType = "gif";
+            }
+          }
+          if (!existing.spinalLoad) {
+            existing.spinalLoad =
+              ce.safety.level === "safe" ? "low" : "medium";
+          }
+          if (existing.isRehabSafe === undefined) {
+            existing.isRehabSafe = ce.safety.level === "safe";
+          }
+        } else {
+          // Novo exercício — converter e adicionar
+          const converted = complementaryToExercise(ce);
+          curated.push(converted);
+          byName.set(key, converted);
+        }
+      }
+    }
+  } catch {
+    // Complementar é opcional — falha silenciosa
+  }
+
+  _exercises = curated;
+  return _exercises;
 }
+
 
 export function filterExercises(
   exercises: Exercise[],
