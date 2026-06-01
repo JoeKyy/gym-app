@@ -112,6 +112,7 @@ export default function InjuriesPage() {
   const [checkInInjuryId, setCheckInInjuryId] = useState<string | null>(null);
   const [checkInSeverity, setCheckInSeverity] = useState<1 | 2 | 3 | 4 | 5>(2);
   const [checkInNotes, setCheckInNotes] = useState("");
+  const [openEvidenceId, setOpenEvidenceId] = useState<string | null>(null);
 
   const [selectedCondition, setSelectedCondition] = useState("");
   const [severity, setSeverity] = useState<1 | 2 | 3 | 4 | 5>(2);
@@ -259,6 +260,16 @@ export default function InjuriesPage() {
                   <span className="text-xs text-[var(--color-text-muted)]">
                     Severidade: {inj.severity}/5
                   </span>
+                  {condition?.directionalPreference && (
+                    <span className="text-xs px-2 py-0.5 rounded-full border border-[var(--color-primary-border)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                      🔄{" "}
+                      {condition.directionalPreference === "extension"
+                        ? "Preferência: Extensão (McKenzie)"
+                        : condition.directionalPreference === "flexion"
+                        ? "Preferência: Flexão"
+                        : "Preferência direcional: variável"}
+                    </span>
+                  )}
                 </div>
                 {condition?.description && (
                   <p className="text-[var(--color-text-secondary)] text-sm mt-2">{condition.description}</p>
@@ -315,6 +326,24 @@ export default function InjuriesPage() {
                 <p className="mt-1 font-medium">{condition.phaseDescriptions[inj.phase]}</p>
               )}
             </div>
+
+            {/* Evidence summary accordion */}
+            {condition?.evidenceSummary && (
+              <div className="border border-[var(--color-border)] rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setOpenEvidenceId(openEvidenceId === inj.id ? null : inj.id)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[var(--color-text-secondary)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface)] transition-colors"
+                >
+                  <span className="flex items-center gap-1.5">📖 Base de evidências</span>
+                  <span className="text-[var(--color-text-muted)]">{openEvidenceId === inj.id ? "▲" : "▼"}</span>
+                </button>
+                {openEvidenceId === inj.id && (
+                  <div className="px-3 py-3 text-xs text-[var(--color-text-secondary)] leading-relaxed bg-[var(--color-surface)]">
+                    {condition.evidenceSummary}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Phase buttons */}
             <div>

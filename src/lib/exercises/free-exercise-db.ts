@@ -82,8 +82,7 @@ export interface ComplementaryExercise extends AppExercise {
 
 export const FED_DIST_JSON =
   "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json";
-export const FED_IMAGE_BASE =
-  "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
+export const FED_IMAGE_BASE = "/data/exercises-img/";
 
 export async function fetchFreeExerciseDb(
   url: string = FED_DIST_JSON

@@ -2,6 +2,10 @@
  * rehab.ts — Evidence-based rehabilitation protocols and injury condition library.
  *
  * Sources:
+ * - NICE NG59: Low back pain and sciatica in over 16s (2016, updated 2020). NICE.org.uk.
+ * - Foster, N.E. et al. (2018). Prevention and treatment of low back pain. Lancet, 391(10137), 2368–2383.
+ * - Hartvigsen, J. et al. (2018). What low back pain is and why we need to pay attention. Lancet, 391(10137), 2356–2367.
+ * - Physiopedia — Lumbar Disc Herniation; Non-Specific Low Back Pain. physio-pedia.com.
  * - McGill, S. (2015). Back Mechanic. Backfitpro Inc.
  * - McKenzie, R. (1981). The Lumbar Spine: Mechanical Diagnosis & Therapy.
  * - ACSM Guidelines for Exercise Testing and Prescription (11th ed.)
@@ -29,6 +33,16 @@ export interface InjuryCondition {
   recommendedCategories: Record<string, string[]>;
   description: string;
   phaseDescriptions: Record<string, string>;
+  /** Concise summary of the evidence base for this condition (NICE NG59, Lancet 2018, etc.) */
+  evidenceSummary?: string;
+  /**
+   * McKenzie / MDT directional preference when known:
+   * - "extension": most lumbar disc herniations — extension centralizes pain
+   * - "flexion": lumbar spinal stenosis — flexion opens the canal
+   * - "variable": non-specific LBP — depends on individual assessment
+   * - null: not applicable / unknown
+   */
+  directionalPreference?: "extension" | "flexion" | "variable" | null;
 }
 
 export const INJURY_CONDITIONS: InjuryCondition[] = [
@@ -99,11 +113,18 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
     description:
       "Protrusão ou extrusão de material do disco intervertebral. Requer redução de carga compressiva e cisalhamento na coluna lombar. Protocolo McGill Big 3 é primeira linha.",
     phaseDescriptions: {
-      acute: "1-2 semanas: repouso relativo, somente McGill Big 3 e mobilização suave.",
-      subacute: "2-6 semanas: adicionar extensões McKenzie, fortalecimento progressivo do core.",
-      chronic: "6+ semanas: exercícios de baixo impacto, pilates, natação, fortalecimento funcional.",
-      performance: "Retorno ao exercício completo com consciência postural permanente.",
+      acute:
+        "1-2 semanas: repouso RELATIVO (não repouso total — imobilidade piora o prognóstico). McGill Big 3 e mobilização suave. Educação sobre a condição reduz catastrofização.",
+      subacute:
+        "2-6 semanas: adicionar extensões McKenzie se houver preferência direcional. Fortalecimento progressivo do core. Não esperar ausência completa de dor para avançar.",
+      chronic:
+        "6+ semanas: retomada gradual de atividades normais. Pilates, natação, fortalecimento funcional. Movimento e consistência importam mais que técnica perfeita.",
+      performance:
+        "Retorno ao exercício completo. Manutenção do programa de core. Consciência postural permanente sem evitamento excessivo.",
     },
+    evidenceSummary:
+      "NICE NG59 recomenda manejo ativo (exercício + educação + autogestão) como primeira linha para hérnia lombar. Nenhum tipo específico de exercício é comprovadamente superior — McKenzie, Pilates, controle motor e hidroterapia têm evidência de qualidade baixa a moderada (Lancet 2018, Foster et al.). Tração, TENS e ultrassom isolados NÃO são recomendados pelo NICE. O modelo biopsicossocial (Lancet 2018, Hartvigsen et al.) mostra que movimento + consistência importam mais que técnica perfeita.",
+    directionalPreference: "extension",
   },
   {
     id: "hernia-cervical",
@@ -156,6 +177,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "6+ semanas: exercícios funcionais sem carga cervical direta.",
       performance: "Exercícios completos evitando overhead pesado.",
     },
+    evidenceSummary:
+      "Evidência limitada específica para hérnia cervical. Princípios gerais de manejo ativo (NICE NG59 adaptado) e reabilitação progressiva. Fisioterapia manual combinada com exercício é superior ao exercício isolado em dor cervical radicular (Physiopedia).",
+    directionalPreference: null,
   },
   {
     id: "impacto-ombro",
@@ -199,6 +223,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Fortalecimento progressivo do complexo do ombro.",
       performance: "Retorno ao treino completo com boa mecânica.",
     },
+    evidenceSummary:
+      "Exercício supervisionado é equivalente à cirurgia artroscópica em 12 meses para síndrome do impacto (Ketola et al.). Foco em rotadores externos e estabilizadores escapulares. Injeções de corticosteroide têm benefício a curto prazo mas não alteram prognóstico a longo prazo (Physiopedia).",
+    directionalPreference: null,
   },
   {
     id: "lesao-manguito",
@@ -246,6 +273,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Fortalecimento progressivo do manguito.",
       performance: "Retorno supervisionado ao esporte/treino.",
     },
+    evidenceSummary:
+      "Lesões parciais respondem bem à reabilitação conservadora. Lesões totais podem requerer cirurgia mas mesmo pós-op a reabilitação estruturada é determinante do resultado (Physiopedia). Evidência de qualidade moderada para exercício excêntrico e isotônico progressivo.",
+    directionalPreference: null,
   },
   {
     id: "tendinopatia-patelar",
@@ -293,6 +323,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Progressão excêntrica + concêntrica.",
       performance: "Retorno ao salto/corrida graduado.",
     },
+    evidenceSummary:
+      "Protocolo excêntrico (Alfredson) tem evidência sólida para tendinopatia patelar. Cargas lentas pesadas (heavy slow resistance) podem ser equivalentes ou superiores em alguns estudos. Repouso absoluto e descarga prolongada são contraindicados — a carga controlada é terapêutica (Physiopedia).",
+    directionalPreference: null,
   },
   {
     id: "sfp",
@@ -337,6 +370,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Fortalecimento funcional completo.",
       performance: "Retorno ao esporte com boa mecânica de joelho.",
     },
+    evidenceSummary:
+      "Exercício supervisionado (especialmente fortalecimento de quadríceps e quadril) é o tratamento de primeira linha com boa evidência. Educação sobre a condição reduz catastrofização e melhora adesão. Orteses, tape patelar e palmilhas têm evidência de baixa a moderada qualidade como adjuntos (Physiopedia).",
+    directionalPreference: null,
   },
   {
     id: "osteoartrite-joelho",
@@ -383,6 +419,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Exercício funcional regular, baixo impacto.",
       performance: "Manutenção com exercícios de baixo impacto.",
     },
+    evidenceSummary:
+      "Exercício é tratamento de primeira linha com evidência sólida — reduz dor e melhora função de forma comparável a AINEs sem os efeitos colaterais (OARSI guidelines). Aquaterapia e ciclismo são bem tolerados. Gestão do peso é determinante em OA joelho com sobrepeso (ACSM). Cirurgia de artroscopia lavagem NÃO é recomendada.",
+    directionalPreference: null,
   },
   {
     id: "epicondilite-lateral",
@@ -430,6 +469,9 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
       chronic: "Tyler twist com theraband, fortalecimento gradual.",
       performance: "Retorno ao treino com cuidado com preensão.",
     },
+    evidenceSummary:
+      "Exercício excêntrico dos extensores do punho tem evidência de qualidade moderada (Tyler twist). Injeções de corticosteroide têm benefício a curto prazo mas podem piorar resultados a longo prazo vs. fisioterapia (Coombes et al., Lancet). Watchful waiting resolve 80-90% dos casos em 1-2 anos.",
+    directionalPreference: null,
   },
   {
     id: "dor-lombar",
@@ -479,11 +521,18 @@ export const INJURY_CONDITIONS: InjuryCondition[] = [
     description:
       "Dor lombar sem causa estrutural identificada. Exercício é o tratamento mais eficaz — movimento é medicina.",
     phaseDescriptions: {
-      acute: "Manter movimento suave, evitar repouso prolongado.",
-      subacute: "McGill Big 3, caminhada, mobilidade do quadril.",
-      chronic: "Fortalecimento do core, exercício aeróbico regular.",
-      performance: "Exercício completo com boa mecânica de movimento.",
+      acute:
+        "Manter movimento suave — evitar repouso prolongado (NICE NG59 desencoraja imobilidade). Educação sobre a natureza benigna da dor na maioria dos casos.",
+      subacute:
+        "McGill Big 3, caminhada, mobilidade do quadril. Não esperar ausência de dor para progredir.",
+      chronic:
+        "Fortalecimento do core, exercício aeróbico regular. Retomada gradual de atividades normais. Modelo biopsicossocial: fatores emocionais e contextuais influenciam a percepção de dor.",
+      performance:
+        "Exercício completo com boa mecânica de movimento. Consistência > perfeição.",
     },
+    evidenceSummary:
+      "NICE NG59 e Lancet 2018 (Hartvigsen et al., Foster et al.) são consenso: manejo ativo com exercício + educação + autogestão é primeira linha. Nenhum tipo específico de exercício é superior — McKenzie, Pilates, controle motor e yoga têm evidência de qualidade baixa a moderada. Tração, TENS, ultrassom e repouso prolongado NÃO são recomendados. O modelo biopsicossocial mostra que fatores psicossociais (catastrofização, medo de movimento) são preditores mais fortes de cronificação do que achados de imagem.",
+    directionalPreference: "variable",
   },
 ];
 
